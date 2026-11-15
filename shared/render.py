@@ -967,7 +967,7 @@ def help_filters(guides: list[dict]) -> list[tuple[str, str, str, str, int]]:
 def service_href(sid: str) -> str:
     """Where a product is listed: How to IRL's apps and services, or the building blocks on IRL Commons' Standards."""
     if SERVICES_BY_ID[sid]['class'] == 'building-block':
-        return f'https://irlcommons.org/standards.html#block-{sid}'
+        return f'https://irlcommons.org/existing-formats.html#block-{sid}'
     return f'links.html#{sid}' if SERVICES_BY_ID[sid]['class'] in STREAMER_CLASSES else html.escape(SERVICES_BY_ID[sid]['url'])
 
 def guide_row(g: dict, repeated: bool=False) -> str:
