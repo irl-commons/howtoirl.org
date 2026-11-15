@@ -1,0 +1,28 @@
+<div class="wrap page words-page">
+  <header class="page-head">
+    <svg class="head-ill" aria-hidden="true"><use href="#i-book"/></svg>
+    <h1>Glossary</h1>
+    <p class="lede">Each word has its own link. You can send someone just the word they asked about.</p>
+  </header>
+
+  <nav class="toc" aria-label="Words">
+    <ul>
+      <!--words:toc:en-->
+    </ul>
+  </nav>
+
+  <div class="parts">
+    <section class="part" id="all-words" aria-labelledby="all-words-h">
+      <h2 id="all-words-h" class="vh">All words</h2>
+      <div class="word-tools" id="word-tools" hidden>
+        <p class="search-field word-search"><label for="word-q">Search the glossary</label> <input type="search" id="word-q" autocomplete="off" spellcheck="false"></p>
+        <p class="word-count" id="word-count" role="status"></p>
+      </div>
+      <p class="no-words" id="no-words" hidden>No word matches that. <button type="button" class="btn" id="word-reset">Show all words</button></p>
+      <dl class="glossary">
+<!--words:entries:en-->
+      </dl>
+      <!--commons:line-->
+    </section>
+  </div>
+</div>

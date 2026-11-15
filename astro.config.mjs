@@ -1,0 +1,2 @@
+import {defineConfig} from 'astro/config';
+export default defineConfig({site:'https://howtoirl.org',output:'static',build:{format:'file'},compressHTML:false});
