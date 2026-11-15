@@ -1,0 +1,46 @@
+/* Platform filters for the apps and services page, derived from upstream data. */
+@supports selector(:has(a)) {
+  .links-page:has(#on-android:target) .svc:not([data-on~="android"]), .links-page:has(#on-android:target) .host-group:not(:has(.svc[data-on~="android"])), .links-page:has(#on-android:target) .cls:not(:has(.svc[data-on~="android"])) { display: none; }
+  .links-page:has(#on-android:target) .on-filter a[href="#on-android"] { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+  .links-page:has(#on-android:target) .on-filter .on-all { border-color: var(--rule-strong); background: transparent; box-shadow: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="bonding"] { display: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="hardware"] { display: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="parts"] { display: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="stores"] { display: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="cloud"] { display: none; }
+  .links-page:has(#on-android:target) .toc li[data-for="production"] { display: none; }
+  .links-page:has(#on-ios:target) .svc:not([data-on~="ios"]), .links-page:has(#on-ios:target) .host-group:not(:has(.svc[data-on~="ios"])), .links-page:has(#on-ios:target) .cls:not(:has(.svc[data-on~="ios"])) { display: none; }
+  .links-page:has(#on-ios:target) .on-filter a[href="#on-ios"] { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+  .links-page:has(#on-ios:target) .on-filter .on-all { border-color: var(--rule-strong); background: transparent; box-shadow: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="bonding"] { display: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="hardware"] { display: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="parts"] { display: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="stores"] { display: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="cloud"] { display: none; }
+  .links-page:has(#on-ios:target) .toc li[data-for="production"] { display: none; }
+  .links-page:has(#on-desktop:target) .svc:not([data-on~="desktop"]), .links-page:has(#on-desktop:target) .host-group:not(:has(.svc[data-on~="desktop"])), .links-page:has(#on-desktop:target) .cls:not(:has(.svc[data-on~="desktop"])) { display: none; }
+  .links-page:has(#on-desktop:target) .on-filter a[href="#on-desktop"] { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+  .links-page:has(#on-desktop:target) .on-filter .on-all { border-color: var(--rule-strong); background: transparent; box-shadow: none; }
+  .links-page:has(#on-desktop:target) .toc li[data-for="phone-apps"] { display: none; }
+  .links-page:has(#on-desktop:target) .toc li[data-for="hardware"] { display: none; }
+  .links-page:has(#on-desktop:target) .toc li[data-for="parts"] { display: none; }
+  .links-page:has(#on-desktop:target) .toc li[data-for="stores"] { display: none; }
+  .links-page:has(#on-desktop:target) .toc li[data-for="cloud"] { display: none; }
+  .links-page:has(#on-hardware:target) .svc:not([data-on~="hardware"]), .links-page:has(#on-hardware:target) .host-group:not(:has(.svc[data-on~="hardware"])), .links-page:has(#on-hardware:target) .cls:not(:has(.svc[data-on~="hardware"])) { display: none; }
+  .links-page:has(#on-hardware:target) .on-filter a[href="#on-hardware"] { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+  .links-page:has(#on-hardware:target) .on-filter .on-all { border-color: var(--rule-strong); background: transparent; box-shadow: none; }
+  .links-page:has(#on-hardware:target) .toc li[data-for="phone-apps"] { display: none; }
+  .links-page:has(#on-hardware:target) .toc li[data-for="helper-apps"] { display: none; }
+  .links-page:has(#on-hardware:target) .toc li[data-for="bonding"] { display: none; }
+  .links-page:has(#on-hardware:target) .toc li[data-for="cloud"] { display: none; }
+  .links-page:has(#on-hardware:target) .toc li[data-for="production"] { display: none; }
+  .links-page:has(#on-online:target) .svc:not([data-on~="online"]), .links-page:has(#on-online:target) .host-group:not(:has(.svc[data-on~="online"])), .links-page:has(#on-online:target) .cls:not(:has(.svc[data-on~="online"])) { display: none; }
+  .links-page:has(#on-online:target) .on-filter a[href="#on-online"] { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+  .links-page:has(#on-online:target) .on-filter .on-all { border-color: var(--rule-strong); background: transparent; box-shadow: none; }
+  .links-page:has(#on-online:target) .toc li[data-for="phone-apps"] { display: none; }
+  .links-page:has(#on-online:target) .toc li[data-for="helper-apps"] { display: none; }
+  .links-page:has(#on-online:target) .toc li[data-for="hardware"] { display: none; }
+  .links-page:has(#on-online:target) .toc li[data-for="parts"] { display: none; }
+  .links-page:has(#on-online:target) .toc li[data-for="stores"] { display: none; }
+  .links-page:not(:has(.on-mark:target)) .on-filter .on-all { border-color: var(--fg); background: var(--sunk); box-shadow: inset 0 -3px 0 var(--fg); }
+}
