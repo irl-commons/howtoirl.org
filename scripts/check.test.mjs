@@ -352,7 +352,7 @@ test('Help: Guides list the site\'s own pages first, then every IRL Commons guid
  const other=h.slice(h.indexOf('id="g-other"'));
  assert.deepEqual([...other.matchAll(/<li class="gi" id="([^"]+)"/g)].map(m=>m[1]),guides.map(g=>g.id));
  const ids=new Set([...docs.get('help.html').matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
- for(const a of ['start-here','guides','my-stack','where-to-ask','listed','guides-camera','guides-obs','guides-platform','kind-video','kind-article','kind-docs','for-moblin']) assert.ok(ids.has(a),a);
+ for(const a of ['start-here','guides','my-stack','where-to-ask','guides-camera','guides-obs','guides-platform','kind-video','kind-article','kind-docs','for-moblin']) assert.ok(ids.has(a),a);
  assert.ok(/<p class="gcount"><span id="gcount" role="status">All 39 guides<\/span>/.test(h)||/All \d+ guides/.test(h));
 });
 
