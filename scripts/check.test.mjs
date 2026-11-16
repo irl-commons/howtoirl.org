@@ -380,3 +380,22 @@ test('Privacy pages say what "My apps" keeps, in English and German', ()=>{
  assert.ok(plain(docs.get('privacy.html')).includes('If you save apps under “My apps” on the Help page, your browser keeps that list only on your device; “Clear” removes it.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Apps, die Sie auf der Hilfeseite unter „My apps“ speichern, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear“ entfernt sie.'));
 });
+
+test('Support channel types come from the catalogue, with legacy labels as fallback', async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-c', `
+import sys
+sys.path.insert(0, 'shared')
+import render as r
+service = {'support': [
+    {'label': 'Help with an account', 'url': 'https://example.org/account', 'kind': 'contact'},
+    {'label': 'Chat with us', 'url': 'https://example.org/chat', 'kind': 'discord'},
+    {'label': 'GitHub issues', 'url': 'https://github.com/example/example/issues', 'kind': 'github'},
+], 'links': []}
+assert r.channels(service) == service['support']
+assert r.help_channels(service) == [('Discord', 'https://example.org/chat'), ('Contact', 'https://example.org/account')]
+assert r.channel_type('GitHub discussions', 'https://github.com/example/example/discussions') == 'Forum'
+assert r.channel_type('Manual', 'https://example.org/manual', 'docs') == 'Help'
+assert not hasattr(r, 'SITE_SUPPORT_EXTRA')
+`],{stdio:'pipe'});
+});
