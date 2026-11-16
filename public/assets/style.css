@@ -505,12 +505,12 @@ details.more > p { font-size: 16px; padding-left: calc(1ch + 10px); }
 @media print { .tint { background: none; } }
 
 
-.home-lead { padding-top: var(--s6); padding-bottom: var(--s5); }
+.home-lead { padding-top: var(--head-top); padding-bottom: var(--s5); }
 .home .then { margin-bottom: 0; }
 .standing-head { border-bottom: 2px solid var(--fg); }
 .standing-head h2 { font-size: var(--t-h3); letter-spacing: -0.01em; }
 .stand-rows p { font-size: 17px; }
-@media (max-width: 759px) { .home-lead { padding-top: var(--s4); padding-bottom: var(--s5); } .tint { padding: var(--s4) 0; } }
+@media (max-width: 759px) { .home-lead { padding-bottom: var(--s5); } .tint { padding: var(--s4) 0; } }
 
 
 .head-ill { display: none; }
@@ -1536,7 +1536,7 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 @media print { .seg { display: none; } .plat[hidden] { display: block; } .plats.is-switch .plat h4 { position: static; width: auto; height: auto; clip: auto; } }
 
 /* Problem-first home (irlcommons.org) and the two-site strip. */
-.home h1.problem-h { font-size: var(--t-h1); line-height: 1.1; letter-spacing: -0.02em; max-width: 24ch; margin: var(--s2) 0 var(--s3); }
+.home h1.problem-h { font-size: var(--t-h1); line-height: 1.06; letter-spacing: -0.02em; max-width: 24ch; margin: 0 0 var(--s3); }
 .problem { list-style: none; margin: 0 0 var(--s5); padding: 0; max-width: var(--measure); font-size: var(--t-lede); line-height: 1.45; }
 .problem li { position: relative; padding: 4px 0 4px 24px; }
 .problem li::before { content: ""; position: absolute; left: 2px; top: calc(4px + 0.72em); width: 10px; height: 2px; background: var(--latch); }
