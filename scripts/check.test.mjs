@@ -96,7 +96,7 @@ assert r.add_permalinks(out) == out
 
 test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups with the agreed card texts', async()=>{
  const text=docs.get('index.html');
- assert.ok(/<h1 class="home-title">How to IRL<\/h1>/.test(text));
+ assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<\/header>/.test(text));
  assert.ok(!text.includes('sims-note')&&!text.includes('How to pick data plans and SIMs')&&!text.includes('class="pager'));
  assert.ok(/<ul class="choices learn" id="sims"/.test(text),'#sims still lands on the Learn section');
  assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
