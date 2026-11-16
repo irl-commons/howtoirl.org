@@ -66,6 +66,11 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
             if 'to' in c and c['to'] not in ids:
                 out.append(f'card "{c["title"]}": no answer #{c["to"]}')
     for a in setup['answers']:
+        back = a.get('back')
+        if isinstance(back, dict) and back.get('to') not in ids:
+            out.append(f'#{a["id"]}: back link to #{back.get("to")}, which is no answer')
+        elif back is not None and not isinstance(back, dict) and back != 'history':
+            out.append(f'#{a["id"]}: back is "{back}" (use history or {{to: <answer id>, label: ...}})')
         for c in a.get('choices', []):
             if c['to'] not in ids:
                 out.append(f'#{a["id"]}: choice "{c["title"]}": no answer #{c["to"]}')
@@ -134,44 +139,25 @@ def home_html(setup: dict) -> str:
         gid = 'grp-' + re.sub('[^a-z0-9]+', '-', g['title'].lower()).strip('-')
         cls = 'choices' + (' learn' if g.get('style') == 'learn' else '')
         cards = '\n          '.join(card(c) for c in g['cards'])
+        anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
         parts.append(f'<h2 class="grp" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
-                     f'        <ul class="{cls}" aria-labelledby="{gid}">\n          {cards}\n        </ul>')
+                     f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>')
     return ('<section class="step start" id="start" tabindex="-1" aria-label="Choose your starting point">\n        '
             + '\n        '.join(parts) + '\n      </section>')
 
 
-def step_bar(a: dict) -> str:
-    back = a.get('back', './')
-    done = a.get('done', [])
-    n = a.get('steps', len(done) + 1)
-    items = []
-    for i, d in enumerate(done, 1):
-        items.append(f'<li class="done"><a href="{d.get("href", "./")}"><svg aria-hidden="true"><use href="#{d["icon"]}"/></svg>'
-                     f'<span class="cap">{esc(d["cap"])}<span class="vh">, Step {i} of {n}, {esc(d["vh"])}</span></span></a></li>')
-    if done:
-        now = a.get('now', 'your answer')
-        items.append(f'<li class="now" aria-current="step"><span class="tile"><svg aria-hidden="true"><use href="#{a.get("now_icon", "i-q" if a.get("question") else "i-tick")}"/></svg></span>'
-                     f'<span class="vh">Step {len(done) + 1} of {n}: {esc(now)}</span></li>')
-        for i in range(len(done) + 2, n + 1):
-            items.append(f'<li class="todo"><span class="tile"><svg aria-hidden="true"><use href="#i-tick"/></svg></span><span class="vh">Step {i} of {n}: your answer</span></li>')
-    else:
-        items.append(f'<li class="now" aria-current="step"><span class="tile"><svg aria-hidden="true"><use href="#{a["now_icon"]}"/></svg></span><span class="vh">{esc(a["now"])}</span></li>')
-    steps = '\n            '.join(items)
-    return (f'<nav class="step-bar" aria-label="Step controls">\n          <a class="btn bar-back" href="{back}"><span aria-hidden="true">← </span>Back</a>\n'
-            f'          <ol class="steps" aria-label="Your steps">\n            {steps}\n          </ol>\n'
-            f'          <a class="all" href="./">All<span class="narrow-vh"> starting points</span></a>\n        </nav>')
+def back_link(a: dict) -> str:
+    """The one way back from an answer, at the top, named after where it goes.
 
-
-def step_nav(a: dict) -> str:
-    back = a.get('back', './')
-    if a.get('back_to'):
-        links = ' · '.join(f'<a href="{h}">{esc(t)}</a>' for t, h in a['back_to'])
-        inner = f'<span class="back-to">← Back to: {links}</span>\n          <a href="./">All starting points</a>'
-    elif back == './':
-        inner = '<a class="btn" href="./"><span aria-hidden="true">← </span>All starting points</a>'
+    `back: history` returns to the previous page through site.js and falls back to the cards."""
+    back = a.get('back')
+    if back == 'history':
+        href, label, extra = './', 'Back', ' data-back="history"'
+    elif back:
+        href, label, extra = f'#{back["to"]}', back['label'], ''
     else:
-        inner = f'<a class="btn" href="{back}"><span aria-hidden="true">← </span>Back</a>\n          <a href="./">All starting points</a>'
-    return f'<nav class="step-nav" aria-label="Step controls">\n          {inner}\n        </nav>'
+        href, label, extra = './', 'All starting points', ''
+    return f'<p class="go-back"><a href="{href}"{extra}><span aria-hidden="true">←</span>{esc(label)}</a></p>'
 
 
 def line(s: dict, note: str | None, by_id: dict) -> str:
@@ -228,8 +214,8 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
         body = (f'<div class="result-body">\n          <div class="result-main">\n        {blocks}\n          </div>\n'
                 f'          <div class="result-side">\n            {side_html(a)}\n          </div>\n        </div>')
         kind = 'result'
-    return (f'<section class="step {kind}" id="{aid}" tabindex="-1" aria-labelledby="{aid}-h">\n        {step_bar(a)}\n'
-            f'        {head}\n        {body}\n        {step_nav(a)}\n      </section>')
+    return (f'<section class="step {kind}" id="{aid}" tabindex="-1" aria-labelledby="{aid}-h">\n        {back_link(a)}\n'
+            f'        {head}\n        {body}\n      </section>')
 
 
 def fill(body: str, setup: dict, services: list[dict]) -> str:

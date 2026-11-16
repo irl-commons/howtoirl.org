@@ -91,19 +91,23 @@ assert r.add_permalinks(out) == out
 `],{stdio:'pipe'});
 });
 
-test('Home: hidden h1, no lede or steps bar, the three groups with the agreed card texts', async()=>{
+test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups with the agreed card texts', async()=>{
  const text=docs.get('index.html');
- assert.ok(/<h1 class="vh">How to IRL<\/h1>/.test(text));
+ assert.ok(/<h1 class="home-title">How to IRL<\/h1>/.test(text));
+ assert.ok(!text.includes('sims-note')&&!text.includes('How to pick data plans and SIMs')&&!text.includes('class="pager'));
+ assert.ok(/<ul class="choices learn" id="sims"/.test(text),'#sims still lands on the Learn section');
  assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
  const start=text.slice(text.indexOf('id="start"'),text.indexOf('</section>',text.indexOf('id="start"')));
  assert.ok(!start.includes('class="steps"'));
- const cards=[...start.matchAll(/<strong>([^<]+)<\/strong><span>([^<]+)<\/span>/g)].map(m=>`${m[1]} — ${m[2]}`.replaceAll('&#39;',"'"));
+ const cards=[...start.matchAll(/<strong>([^<]+)<\/strong><span>([^<]+)<\/span>/g)].map(m=>`${m[1]} — ${m[2]}`.replaceAll('&#39;',"'").replaceAll('&quot;','"'));
  assert.deepEqual(cards,[
   'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
   'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
   'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
   'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
-  'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use']);
+  'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
+  'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
+  'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.']);
  assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
 });
 
@@ -139,5 +143,27 @@ assert 'unknown field "colour"' in run(lambda s, sv: block(s, 'one-phone', 'Apps
 assert 'is tagged camera-in, but no block' in run(lambda s, sv: next(x for x in sv if x['id'] == 'speedify')['tags'].append('camera-in'))
 assert 'note for "irlplus-cast", which this block no longer selects' in run(lambda s, sv: next(x for x in sv if x['id'] == 'irlplus-cast')['tags'].remove('camera-in'))
 assert 'no such service' in run(lambda s, sv: block(s, 'better-picture', 'In a backpack')['before'].append('{no-such-app}'))
+answer = lambda s, aid: next(a for a in s['answers'] if a['id'] == aid)
+assert 'back link to #nowhere, which is no answer' in run(lambda s, sv: answer(s, 'build').update(back={'to': 'nowhere', 'label': 'Nowhere'}))
+assert 'back is "#more"' in run(lambda s, sv: answer(s, 'build').update(back='#more'))
 `],{stdio:'pipe'});
 });
+
+test('Answers: exactly one back link at the top that names where it goes, no steps or bottom nav', ()=>{
+ const text=docs.get('index.html');
+ assert.ok(!/class="(?:steps|step-bar|step-nav|back-to)"/.test(text)&&!text.includes('Back to:'));
+ const want={'more':['./','All starting points'],'build':['#more','Build or buy'],'ready-made':['#more','Build or buy'],
+  'receiver':['./','Back'],'into-obs':['./','Back']};
+ const found=[...text.matchAll(/<section class="step (?:result|question)" id="([^"]+)"[\s\S]*?<\/section>/g)];
+ assert.ok(found.length>=10);
+ for(const m of found){
+  const links=[...m[0].matchAll(/<p class="go-back"><a href="([^"]+)"( data-back="history")?><span aria-hidden="true">←<\/span>([^<]+)<\/a><\/p>/g)];
+  assert.equal(links.length,1,m[1]);
+  assert.ok(m[0].indexOf('class="go-back"')<m[0].indexOf('class="result-head"'),m[1]);
+  const [href,label]=want[m[1]]||['./','All starting points'];
+  assert.deepEqual([links[0][1],links[0][3]],[href,label],m[1]);
+  assert.equal(!!links[0][2],label==='Back',m[1]);
+  assert.ok(m[0].includes('Link to send')||m[1]==='more',m[1]);
+ }
+});
+

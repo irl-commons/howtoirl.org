@@ -12,6 +12,10 @@
 # The build fails on a key or value IRL Commons doesn't know, on a tagged service that no
 # block with that tag picks up, and on a note for a service the block no longer selects.
 # Texts are HTML.
+#
+# Each answer page has one back link at the top. Without `back` it says "All starting points"
+# and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
+# `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
 
 groups:
   - title: Start or add something
@@ -28,16 +32,16 @@ groups:
       - {to: satellite, icon: s-far, title: No signal at all, text: "I stream outdoors, far from cell towers"}
   - title: Learn more and get help
     style: learn
+    anchor: sims  # old links to the removed "How to pick data plans and SIMs" note land here
     cards:
       - {href: glossary.html, icon: i-book, title: Glossary, text: Look up IRL terms and what they mean}
       - {href: help.html, icon: i-help, title: Help, text: Find guides and help for the apps and services you use}
+      - {href: data-plans.html, icon: i-network, title: Data plans and SIMs, text: 'Upload speed, how much data you need, and the limits behind "unlimited"'}
+      - {href: why-bonding.html, icon: i-between, title: "Why more than one network?", text: "One network has short bad moments, even a fast one. A second network covers them."}
 
 answers:
   - id: more
     question: true
-    done: [{icon: s-hot, cap: The phone gives up, vh: "done: the phone gives up. Change"}]
-    now: "build or buy"
-    steps: 3
     icon: a-pack
     title: Maybe it's time for a backpack
     summary: A backpack carries a small streaming computer, mobile modems and a battery. It takes a standalone camera, so your phone doesn't have to do it all.
@@ -70,7 +74,6 @@ answers:
       - {to: ready-made, icon: a-ready, title: "No, I'll buy one", text: "Ready to use, with support."}
 
   - id: one-phone
-    done: [{icon: s-new, cap: Not started yet, vh: "done: not started yet. Change"}]
     icon: i-phone
     title: One phone is enough
     summary: One phone can do a lot, and you carry nothing extra. Stay with it as long as it works.
@@ -83,7 +86,6 @@ answers:
       - else: '<strong>Choose something else when</strong> crowds, long days or heat end your streams: <a href="#second-network">add a second network</a>, or <a href="#more">think about a backpack</a>.'
 
   - id: second-network
-    done: [{icon: s-crowd, cap: The signal drops, vh: "done: the signal drops. Change"}]
     icon: i-network
     title: Add a second network
     summary: 'Add a connection on a different mobile network, with its own radio. Your streaming app then has to use both at once, which is called <a href="glossary.html#bonding">bonding</a>. A hotspot on its own doesn''t do that.'
@@ -102,10 +104,7 @@ answers:
       - sims: true
 
   - id: build
-    back: "#more"
-    done:
-      - {icon: s-hot, cap: The phone gives up, vh: "done: the phone gives up. Change"}
-      - {href: "#more", icon: a-pack, cap: Build it, vh: "done: build it yourself. Change"}
+    back: {to: more, label: Build or buy}
     icon: a-build
     title: Build your own backpack
     summary: A small board, modems and a camera become a streaming backpack. You choose every part.
@@ -119,10 +118,7 @@ answers:
       - sims: true
 
   - id: ready-made
-    back: "#more"
-    done:
-      - {icon: s-hot, cap: The phone gives up, vh: "done: the phone gives up. Change"}
-      - {href: "#more", icon: a-pack, cap: Buy one, vh: "done: buy one ready-made. Change"}
+    back: {to: more, label: Build or buy}
     icon: a-ready
     title: A ready-made backpack, with support
     summary: Bought ready to use, with support. Rentals and warranties depend on the package.
@@ -134,7 +130,6 @@ answers:
       - else: '<strong>Choose something else when</strong> you stream spontaneously on a small budget: start with <a href="#second-network">a second network</a>.'
 
   - id: better-picture
-    done: [{icon: s-camera, cap: A better picture, vh: "done: a better picture. Change"}]
     icon: s-camera
     title: A standalone camera
     summary: "A camera like a DSLR, mirrorless or action camera sends its picture over HDMI or USB. Something then streams it: your phone, a backpack, or a box on the camera."
@@ -163,7 +158,6 @@ answers:
       - next: '<strong>Next:</strong> if it bonds with SRTLA, it needs <a href="#receiver">a receiver</a>.'
 
   - id: several-cameras
-    done: [{icon: s-multicam, cap: Several cameras, vh: "done: several cameras. Change"}]
     icon: s-multicam
     title: Several cameras in one scene
     summary: "Something has to put the pictures together: an app on the phone, OBS on a PC or server, a hub in the cloud, or a box in your backpack."
@@ -194,7 +188,6 @@ answers:
       - else: '<strong>Choose something else when</strong> you switch between places instead of showing them together: <a href="#hybrid">desk and away</a>.'
 
   - id: cloud
-    done: [{icon: s-home, cap: My home setup fails, vh: "done: my home setup fails. Change"}]
     icon: a-cloud
     title: Move production to the cloud
     summary: The show keeps running even if your PC, power or internet at home fails.
@@ -209,7 +202,6 @@ answers:
       - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>. The same steps work for OBS on a server. Going live in your app only starts the feed to the cloud. Start the cloud''s output too.'
 
   - id: hybrid
-    done: [{icon: s-hybrid, cap: Desk and away, vh: "done: desk and away. Change"}]
     icon: a-hybrid
     title: A hub, plus your phone or backpack
     summary: "A hybrid stream mixes your desk or studio with streaming away from it, in another room or out of the house. You switch between them, or bring your phone into a scene at home. You need two parts: a hub, where the show is put together, and a phone or backpack that sends from wherever you are."
@@ -229,9 +221,7 @@ answers:
       - next: '<strong>Next:</strong> if you bond, the hub needs <a href="#receiver">a receiver</a>. Some services include one.'
 
   - id: receiver
-    back: "#second-network"
-    now_icon: i-receiver
-    now: "An extra step, after an answer that bonds"
+    back: history
     icon: i-receiver
     title: A receiver for your bonded stream
     summary: When a stream travels over several networks at once, a server joins it back together. Any app or backpack that uses the same protocol can use this server, with your own settings.
@@ -246,12 +236,9 @@ answers:
     side:
       - else: '<strong>Also think about</strong> where the show itself runs: <a href="#cloud">on your PC or in the cloud</a>.'
       - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>.'
-    back_to: [[a second network, "#second-network"], [build your own, "#build"], [a satellite dish, "#satellite"]]
 
   - id: into-obs
-    back: "#receiver"
-    now_icon: a-chain
-    now: "An extra step, after you have a receiver or a hub"
+    back: history
     icon: a-chain
     title: Into OBS
     summary: Four parts work together. Your app or box sends the stream. A receiver joins it back together. OBS takes one stream from the receiver. A scene switcher shows BRB when the feed drops.
@@ -268,10 +255,8 @@ answers:
         before: ["Hosted services can handle switching when the feed drops; some run the whole production, while others work with your OBS."]
     side:
       - else: '<strong>Choose something else when</strong> you''d rather not run OBS at all. A hosted hub can do the switching: see <a href="#hybrid">hub options</a>.'
-    back_to: [[receivers, "#receiver"], [hybrid, "#hybrid"], [cloud production, "#cloud"]]
 
   - id: satellite
-    done: [{icon: s-far, cap: No signal at all, vh: "done: no signal at all. Change"}]
     icon: i-satellite
     title: Add a satellite dish
     summary: A dish gives you a signal where mobile networks are too busy or missing. It joins the rest as one more connection.
