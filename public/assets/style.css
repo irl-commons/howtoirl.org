@@ -1562,7 +1562,7 @@ details.block ol.picks li { padding-left: 4px; }
 .picks.mix, details.block .picks.mix { list-style: none; padding-left: 0; }
 .picks.mix li, details.block .picks.mix li { position: relative; padding: 0 0 0 26px; margin: 6px 0; border: 0; }
 .picks.mix li::before { content: ""; position: absolute; left: 6px; top: 0.62em; top: calc(0.5lh - 3px); width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.picks.mix li.w::before, .legend .mk-w { content: "!"; content: "!" / ""; left: 0; top: 0.3em; top: calc(0.5lh - 8.5px); width: 17px; height: 17px; box-sizing: border-box; border-radius: 4px; background: none;
+.picks.mix li.w::before { content: "!"; content: "!" / ""; left: 0; top: 0.3em; top: calc(0.5lh - 8.5px); width: 17px; height: 17px; box-sizing: border-box; border-radius: 4px; background: none;
   border: 1.5px solid var(--caution); color: var(--caution); font: 700 12px/14px var(--sans); text-align: center; }
 details.block .picks.mix li.aside { margin-left: 0; padding-left: 0; }
 .picks.mix li.aside::before { content: none; }
