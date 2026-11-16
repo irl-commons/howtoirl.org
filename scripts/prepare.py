@@ -7,6 +7,12 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import setup as setup_answers
 pkg=ROOT/'node_modules/@irl-commons/data'
 data={k:json.loads((pkg/'data'/f'{k}.json').read_text())[k] for k in ['words','services','guides','standards']}
+cfg=json.loads((ROOT/'site.json').read_text())
+words_by_id={w['id']:w for w in data['words']}
+selected=cfg['glossaryWords']
+if len(selected)!=len(set(selected)) or any(wid not in words_by_id for wid in selected):
+ sys.exit('site.json glossaryWords must contain unique ids present in IRL Commons')
+glossary_words=[words_by_id[wid] for wid in selected]
 r.GUIDES[:]=data['guides'];r.SERVICES_BY_ID.update({s['id']:s for s in data['services']})
 r.GUIDE_THUMBS.update({m['for']['guide']:m for m in json.loads((ROOT/'shared/thumbnails.json').read_text())})
 setup,found=setup_answers.check(pkg)
@@ -17,7 +23,7 @@ rendered={}
 for src in (ROOT/'content').glob('*.html'):
  body=src.read_text()
  body=setup_answers.fill(body,setup,data['services'])
- body=r.fill_words(body,data['words'])
+ body=r.fill_words(body,glossary_words)
  body=r.fill_standards(body,data['standards'],data['services'],data['words'])
  body=r.fill_services(body,data['services'])
  body=r.fill_calc(body,r.datause.load_model())

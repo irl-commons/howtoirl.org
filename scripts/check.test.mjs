@@ -399,3 +399,11 @@ assert r.channel_type('Manual', 'https://example.org/manual', 'docs') == 'Help'
 assert not hasattr(r, 'SITE_SUPPORT_EXTRA')
 `],{stdio:'pipe'});
 });
+
+test('The glossary publishes exactly the selected words, independently of package additions',()=>{
+ const text=docs.get('glossary.html');
+ const entries=[...text.matchAll(/<dt data-word="([^"]+)"/g)].map(m=>m[1]);
+ const links=[...text.matchAll(/<li data-for="([^"]+)"/g)].map(m=>m[1]);
+ assert.deepEqual([...entries].sort(),[...config.glossaryWords].sort());
+ assert.deepEqual([...links].sort(),[...config.glossaryWords].sort());
+});
