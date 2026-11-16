@@ -19,14 +19,19 @@ alphabetically with the catalogue description; a block can replace that line
 with a short note for one service. The build stops when the file names a field
 or value IRL Commons doesn't know, when a tagged service lands in no block that
 selects by that tag, or when a note's service has left its block. A daily job
-(`.github/workflows/data-bump.yml`) pins the newest IRL Commons commit, runs
+(`.github/workflows/data-bump.yml`) pins the newest stable npm release of IRL Commons, runs
 every check and opens a pull request.
 
 Edit prose in `content/`, page metadata and navigation in `src/shells.json`,
 and the Astro layout and components in `src/`. The build resolves catalogue
-slots from `@irl-commons/data`, pinned to a public Git commit while the npm
-package is unavailable. No private data copy is needed. To update it, change
-the dependency pin and lockfile together, then run all checks.
+slots from `@irl-commons/data`, pinned to an exact npm version. To update it,
+change the dependency pin, lockfile and `site.json` dataVersion together, then
+run all checks. CI verifies registry signatures and provenance. The daily
+update job follows npm’s `latest` tag and opens a release pull request.
+
+`site.json` lists the published glossary words in `glossaryWords`. Adding a word
+to the data package does not automatically publish it on this site; add its id
+to that list when the page change is ready. The build rejects missing ids.
 
 `shared/` is the same versioned folder in both site repositories: rendering
 functions, calculator formula, thumbnail attribution and the data-use model.
