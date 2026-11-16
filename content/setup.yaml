@@ -11,7 +11,16 @@
 #   before / after: plain lines above or below the services.
 # The build fails on a key or value IRL Commons doesn't know, on a tagged service that no
 # block with that tag picks up, and on a note for a service the block no longer selects.
-# Texts are HTML.
+#   pre:    optional, a short paragraph above the list.
+#   open:   true keeps a block open; the first block is always open.
+#   ordered: true numbers the lines (steps to follow).
+#   split:  [ios, android] shows one list per phone platform, with an iPhone/Android switch.
+# A line that starts with "! " is a watch-out: it gets the outlined "!" mark and "Watch out:" for screen readers.
+# A note that starts with a space follows the service name directly, without a colon.
+# `layout: steps` shows the blocks as numbered steps instead of folds; `sub: true` makes a block a
+# sub-section of the step before it, with an `anchor` id to jump to. `choose` puts option cards
+# (title, text, items, go: {href, label}) side by side. `legend: true` explains the two marks.
+# Texts are HTML. Link glossary words with class="gl".
 #
 # Each answer page has one back link at the top. Without `back` it says "All starting points"
 # and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
@@ -76,13 +85,28 @@ answers:
   - id: one-phone
     icon: i-phone
     title: One phone is enough
-    summary: One phone can do a lot, and you carry nothing extra. Stay with it as long as it works.
+    summary: "A phone with a streaming app has everything a stream needs: camera, mic, mobile data and the app that sends it. Start with it, and add parts only when something stops working."
     blocks:
-      - title: Apps that help
+      - title: Your first stream
+        ordered: true
+        before:
+          - "Install a streaming app from the list below. Log in to your platform in the app, or copy the stream address and stream key from the platform's creator dashboard."
+          - Keep the stream key secret. Anyone who has it can go live on your channel.
+          - On YouTube, switch on live streaming a day early. The first time can take up to 24 hours.
+          - Test at home with Wi-Fi off, and watch on a second device.
+      - title: Streaming apps
+        open: true
         count: [app, apps]
         select: [{class: phone-app}]
-        after: ["The platforms' own apps: the simplest start, without bonding."]
+        split: [ios, android]
+      - title: Good to have
+        open: true
+        before:
+          - "A power bank, in case your phone runs empty. Unplug it when the phone gets hot: charging adds heat."
+          - "A wireless mic. A lot of people add one for their IRL streams: the phone's own mic picks up wind and crowds, and loses your voice at arm's length."
+          - "! Many mic receivers plug into the phone's charging port. Check that yours lets you charge at the same time."
     side:
+      - next: '<strong>Check your data plan.</strong> An hour at 6 Mbit/s uses about 2.7 GB: <a href="data-plans.html">Data plans and SIMs</a>.'
       - else: '<strong>Choose something else when</strong> crowds, long days or heat end your streams: <a href="#second-network">add a second network</a>, or <a href="#more">think about a backpack</a>.'
 
   - id: second-network
@@ -132,30 +156,42 @@ answers:
   - id: better-picture
     icon: s-camera
     title: A standalone camera
-    summary: "A camera like a DSLR, mirrorless or action camera sends its picture over HDMI or USB. Something then streams it: your phone, a backpack, or a box on the camera."
+    summary: "A mirrorless camera or DSLR gives a cleaner picture in low light, optical zoom and a soft background. An action camera is small, wide and steady. Either hands its picture over HDMI, USB or Wi-Fi to something that streams it: your phone, a backpack, or a box on the camera."
     blocks:
+      - title: Before you add a camera
+        small: power, heat, hands, sound
+        before:
+          - "<strong>Power.</strong> The camera has to run for the whole stream. Some run from USB-C power; others need a dummy battery, a battery-shaped adapter on a cable to a power bank."
+          - "! A capture adapter draws from the phone, so the phone empties faster."
+          - "! <strong>Heat.</strong> Some cameras get too hot and switch themselves off, sooner in the sun. Run yours at home for as long as you plan to stream, and turn off auto power-off."
+          - "! <strong>Clean picture.</strong> Look for \"clean HDMI\" in the camera's menu or specs. Without it, viewers see the camera's focus boxes and icons."
+          - "<strong>Hands.</strong> Filming, talking and reading chat at once is hard. An action camera, or a phone, on a chest mount keeps your hands free. A bigger camera needs a mount, a gimbal or someone to run it."
+          - "<strong>Sound into the camera.</strong> The mic plugs into the camera, and the sound travels with the picture over HDMI, in sync. Every backpack and encoder can take it this way."
+          - "<strong>Sound into the phone or backpack.</strong> A USB mic or audio adapter plugs into the phone or the backpack. Easy to swap mics."
+          - "! The picture arrives later than the sound on this route, so set an audio delay in the app or backpack."
       - title: Into your phone
         count: [app, apps]
         select: [{class: phone-app, tags: camera-in}]
         notes:
-          moblin: on iPad, takes USB-C cameras.
+          moblin: 'on iPad, takes USB-C cameras. On iPhone, a camera that streams over Wi-Fi can send to Moblin''s <a class="gl" href="glossary.html#local-ingest">local ingest</a>.'
           irlplus-cast: for Android, in open testing, takes USB and network cameras.
           lifestreamer: "for Android, with USB video in. With {mediasrvr}, an action camera can send its picture to the phone."
           irlwhatever: for Android, in open beta, takes USB cameras.
-        after: [An HDMI camera needs an HDMI-to-USB capture adapter to plug into a phone.]
+        after: [An HDMI camera needs an HDMI-to-USB capture adapter to plug into a phone. A camera with a USB webcam mode plugs in without one.]
       - title: In a backpack
         small: build or buy
-        before: ['A backpack takes an HDMI camera and streams it over several modems: <a href="#build">build one</a> or <a href="#ready-made">buy one</a>.']
+        pre: 'A backpack takes the camera''s HDMI and streams it over several mobile modems. Your phone stays free for chat. <a href="#build">Build one</a> or <a href="#ready-made">buy one</a>.'
       - title: On the camera
         count: [maker, makers]
+        pre: "An encoder that takes the camera's HDMI and streams over its own modems or SIM cards, without a phone."
         select: [{class: hardware, tags: camera-in}]
         notes:
           teradek-prism-mobile: an encoder on the back of the camera that bonds; by subscription or licence.
           yolobox-ultra: an all-in-one box with a screen and HDMI inputs; bonding is a paid service.
           liveu-solo: bonded encoders for creators, by subscription.
     side:
-      - else: '<strong>Choose something else when</strong> the picture is fine but the phone gets hot or runs out: <a href="#more">the phone gives up</a>.'
-      - next: '<strong>Next:</strong> if it bonds with SRTLA, it needs <a href="#receiver">a receiver</a>.'
+      - else: '<strong>Choose something else when</strong> the picture is fine but heat or the battery ends it: <a href="#more">the phone gives up</a>.'
+      - next: '<strong>Next:</strong> to show the camera and your phone together, see <a href="#several-cameras">several cameras</a>.'
 
   - id: several-cameras
     icon: s-multicam
@@ -203,22 +239,77 @@ answers:
 
   - id: hybrid
     icon: a-hybrid
-    title: A hub, plus your phone or backpack
-    summary: "A hybrid stream mixes your desk or studio with streaming away from it, in another room or out of the house. You switch between them, or bring your phone into a scene at home. You need two parts: a hub, where the show is put together, and a phone or backpack that sends from wherever you are."
+    title: Desktop and IRL in one stream
+    summary: 'To switch between desktop and IRL without ending your stream, send both to a <strong><a class="gl" href="glossary.html#hub">hub</a></strong>: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'
+    layout: steps
+    legend: true
     blocks:
-      - title: The hub (it doesn't have to be in the cloud)
-        select: [{id: obs-studio}]
-        notes:
-          obs-studio: 'on your own PC at home, taking your phone''s stream from a relay or receiver. See <a href="#receiver">receivers</a> and <a href="#into-obs">into OBS</a>.'
-        after: ['Production in the cloud: IRLToolkit, IRLhosting, or OBS on a server you run: see <a href="#cloud">cloud production</a>.']
-      - title: Away from the desk
+      - title: Pick where the hub runs
+        choose:
+          - title: On your PC at home
+            text: Free. Good when you already stream from OBS at your desk and your PC and home internet are reliable.
+            items:
+              - "! Your PC, power and home internet have to stay on the whole time."
+              - "! Your phone, and any remote app, need a way in to your home from outside."
+            go: {href: "#hybrid-home", label: Set up the hub at home}
+          - title: In the cloud
+            text: A monthly fee. Good when you're away for long, or your home internet or power isn't reliable.
+            items:
+              - "! At the desk, your PC sends to the hub too, so the hub needs two inputs. Check the plan."
+            go: {href: "#hybrid-cloud", label: Pick a cloud hub}
+      - title: "Hub at home: OBS on your PC"
+        sub: true
+        anchor: hybrid-home
         before:
-          - 'One phone: see <a href="#one-phone">the phone apps</a>.'
-          - 'A phone with a second network: see <a href="#second-network">a second network</a>.'
-          - 'A backpack: <a href="#more">build or buy one</a>.'
+          - Your desk OBS can be your hub. Add the phone as one more source and build a phone scene around it.
+          - On the same Wi-Fi at home, the phone can send straight to OBS.
+          - '! Away from home, your router blocks a stream coming in. Send it to a <a class="gl" href="glossary.html#relay">relay</a> that OBS pulls from: see <a href="#receiver">receivers</a> and <a href="#into-obs">into OBS</a>.'
+          - "! A mic set in OBS's Settings → Audio plays in every scene. Add your desk mic to the desk scenes only, or viewers hear your empty room while you're away."
+      - title: Hub in the cloud
+        sub: true
+        anchor: hybrid-cloud
+        select: [{id: [belabox-cloud-stream-servers, irlhosting, irltoolkit, obs-studio]}]
+        notes:
+          belabox-cloud-stream-servers: 'a hosted hub without OBS, with scene switching, picture-in-picture, web overlays and <a class="gl" href="glossary.html#drop-protection">drop protection</a>.'
+          irlhosting: '<a class="gl" href="glossary.html#cloud-obs">cloud OBS</a> servers, with SRTLA bonding and drop protection.'
+          irltoolkit: cloud production with overlays and drop protection. Desk plus phone needs the plan with several inputs.
+          obs-studio: " on a server you rent: the OBS you know. You can import your scene collection from home."
+        after:
+          - "! Going live in your app only feeds the hub. Before your first stream, check how your hub goes live on the platform, and whether its input has to be switched on."
+      - title: Make three scenes in the hub
+        pre: 'A <a class="gl" href="glossary.html#scene">scene</a> is one saved layout of what viewers see. Switching scenes changes the whole picture at once.'
+        before:
+          - "<strong>Desktop:</strong> your screen or game capture, plus your webcam."
+          - "<strong>Phone:</strong> the stream coming in from your phone or backpack."
+          - '<strong><a class="gl" href="glossary.html#brb">BRB</a>:</strong> a picture, for when the phone''s signal drops or you take a break.'
+      - title: Send to the hub from where you are
+        pre: "In your phone app or backpack, enter the hub's or relay's address instead of the platform's."
+        before:
+          - 'One phone, to start: see <a href="#one-phone">the phone apps</a>.'
+          - 'A phone with a second network, for crowds and trains: see <a href="#second-network">a second network</a>.'
+          - 'A backpack, for a standalone camera or long days: <a href="#more">build or buy one</a>.'
+      - title: Switch scenes while you are away
+        before:
+          - "! Remote apps connect straight to OBS. A cloud OBS works from anywhere; OBS at home needs a way in, like the stream."
+          - Chat commands need no way in, and a mod can type them for you.
+        select: [{tags: scene-control}]
+        notes:
+          irlplus-chat: an Android chat manager with OBS control.
+          irlwhatever: OBS scene switching from the app you stream with, and a browser remote.
+          moblin: changes OBS scenes, starts and stops the stream and mutes inputs, from the app you stream with.
+          noalbs-tool: switches to your BRB scene by itself when the signal drops, and back. Takes chat commands.
+          noalbs-cloud: the hosted NOALBS, with a phone dashboard and chat commands.
+          obs-blade: a remote for OBS on iPhone, iPad and Android.
+          streamer-bot: switches scenes from chat commands or a Stream Deck; runs on the Windows PC next to OBS.
+        after: ['Guide: <a href="https://obsproject.com/kb/remote-control-guide">OBS''s Remote Control Guide</a>.']
+      - title: During the stream
+        before:
+          - "Leaving the desk: go live in the phone app, check that the hub shows the phone's picture, then switch to the phone scene."
+          - "Coming back: switch to the desktop scene first, then stop the phone app."
+          - '! When the phone''s signal drops, drop protection shows your BRB scene instead of a frozen picture. Set it up once: see <a href="#into-obs">into OBS</a>.'
     side:
-      - else: "<strong>Choose something else when</strong> you only stream from one place. Then one of the two parts is enough."
-      - next: '<strong>Next:</strong> if you bond, the hub needs <a href="#receiver">a receiver</a>. Some services include one.'
+      - else: '<strong>Choose something else when</strong> you want desk and phone on screen at the same time: <a href="#several-cameras">several cameras</a>.'
+      - next: '<strong>Next:</strong> a phone that bonds sends to a <a href="#receiver">receiver</a> first, and the hub takes the stream from there. Most hosted hubs include one.'
 
   - id: receiver
     back: history

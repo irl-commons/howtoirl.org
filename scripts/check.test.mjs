@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir,stat} from 'node:fs/promises';
+import {readFileSync} from 'node:fs';
 import path from 'node:path';
 import {HtmlValidate} from 'html-validate';
 const root=path.resolve('dist');
@@ -111,13 +112,78 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
  assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
 });
 
-test('Answer blocks are collapsible, with the first one open', ()=>{
+test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
  const text=docs.get('index.html');
+ const open={'one-phone':[true,true,true],'better-picture':[true,false,false,false]};
  for(const m of text.matchAll(/<section class="step result" id="([^"]+)"[\s\S]*?<\/section>/g)){
   const blocks=[...m[0].matchAll(/<details class="block"( open)?>/g)];
   assert.ok(blocks.length>0,m[1]);
-  assert.deepEqual(blocks.map(b=>!!b[1]),blocks.map((_,i)=>i===0),m[1]);
+  assert.deepEqual(blocks.map(b=>!!b[1]),open[m[1]]||blocks.map((_,i)=>i===0),m[1]);
  }
+ const hybrid=answerHtml(text,'hybrid');
+ assert.ok(hybrid.startsWith('<section class="step result steps" id="hybrid"')&&!hybrid.includes('<details'));
+});
+
+const answerHtml=(text,id)=>text.match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
+const plain=(html)=>html.replace(/<span class="vh">Watch out: <\/span>/g,'! ').replace(/<a class="permalink"[^>]*>#<\/a>/g,'').replace(/<[^>]+>/g,'').replaceAll('&nbsp;',' ').replaceAll('&#39;',"'").replaceAll('&quot;','"').replaceAll('&amp;','&').replace(/\s+/g,' ').trim();
+
+test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser and the scene-control list', ()=>{
+ const h=answerHtml(docs.get('index.html'),'hybrid');
+ assert.ok(h.includes('<h2 id="hybrid-h">Desktop and IRL in one stream'));
+ assert.ok(plain(h).includes('To switch between desktop and IRL without ending your stream, send both to a hub: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'));
+ const steps=[...h.matchAll(/<h3 class="num"[^>]*><span class="n" aria-hidden="true">(\d)<\/span><span class="vh">Step \d: <\/span>([^<]+)</g)].map(m=>`${m[1]} ${m[2]}`);
+ assert.deepEqual(steps,['1 Pick where the hub runs','2 Make three scenes in the hub','3 Send to the hub from where you are','4 Switch scenes while you are away','5 During the stream']);
+ assert.deepEqual([...h.matchAll(/<li class="opt">\s*<h4>([^<]+)/g)].map(m=>m[1]),['On your PC at home','In the cloud']);
+ assert.ok(h.includes('href="#hybrid-home"')&&h.includes('id="hybrid-home"')&&h.includes('href="#hybrid-cloud"')&&h.includes('id="hybrid-cloud"'));
+ const remote=h.slice(h.indexOf('Switch scenes while you are away'),h.indexOf('During the stream'));
+ assert.deepEqual([...remote.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m=>m[1]),['IRL+ Chat','IRLwhatever','Moblin','NOALBS','NOALBS Cloud','OBS Blade','Streamer.bot']);
+ assert.ok(!h.includes('SimpleStreamer')&&!h.includes('NoDrop')&&!/two starts/i.test(h));
+ for(const w of ['hub','scene','brb','relay','cloud-obs','drop-protection']) assert.ok(h.includes(`class="gl" href="glossary.html#${w}"`),w);
+});
+
+test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in all three answers', ()=>{
+ const text=docs.get('index.html');
+ const want={'hybrid':8,'one-phone':1,'better-picture':4};
+ for(const [id,n] of Object.entries(want)){
+  const h=answerHtml(text,id);
+  const marks=[...h.matchAll(/<li class="w">(.*?)<\/li>/g)];
+  assert.equal(marks.length,n,id);
+  for(const m of marks) assert.ok(m[1].startsWith('<span class="vh">Watch out: </span>'),id);
+  assert.ok(/<ul class="picks mix">/.test(h),id);
+ }
+ assert.ok(/\.picks\.mix li\.w::before[^{]*\{[^}]*var\(--caution\)/.test(readFileSync('public/assets/style.css','utf8')));
+});
+
+test('One phone: first stream steps, an iPhone/Android switch that works without script, and the data line', ()=>{
+ const h=answerHtml(docs.get('index.html'),'one-phone');
+ assert.equal([...h.matchAll(/<ol class="picks">[\s\S]*?<\/ol>/g)][0][0].match(/<li/g).length,4);
+ assert.ok(/<div class="seg" role="group" aria-label="Phone" hidden><button type="button" data-platform="ios" aria-pressed="false">iPhone<\/button><button type="button" data-platform="android" aria-pressed="false">Android<\/button><\/div>/.test(h));
+ const list=(p)=>[...h.slice(h.indexOf(`<div class="plat" data-platform="${p}">`)).split('</div>')[0].matchAll(/<li><a href="[^"]+">([^<]+)/g)].map(m=>m[1]);
+ for(const both of ['Larix Broadcaster','TVU Go']) assert.ok(list('ios').includes(both)&&list('android').includes(both),both);
+ assert.ok(list('ios').includes('Moblin')&&!list('android').includes('Moblin'));
+ assert.ok(!/<div class="plat"[^>]* hidden/.test(h),'both lists show without script');
+ assert.ok(plain(h).includes('Check your data plan. An hour at 6 Mbit/s uses about 2.7 GB: Data plans and SIMs.'));
+ assert.ok(!h.includes("platforms' own apps")&&!h.includes('carry nothing extra'));
+});
+
+test('A standalone camera: the camera checklist, the Moblin note and the side line to several cameras', ()=>{
+ const t=plain(answerHtml(docs.get('index.html'),'better-picture'));
+ for(const line of ['! A capture adapter draws from the phone, so the phone empties faster.',
+  'Hands. Filming, talking and reading chat at once is hard. An action camera, or a phone, on a chest mount keeps your hands free.',
+  "On iPhone, a camera that streams over Wi-Fi can send to Moblin's local ingest.",
+  'A camera with a USB webcam mode plugs in without one.','Next: to show the camera and your phone together, see several cameras.'])
+  assert.ok(t.includes(line),line);
+ assert.ok(!/into the hub|through the receiver/i.test(t));
+});
+
+test('The platform switch starts on the visitor\'s own phone', async()=>{
+ const vm=await import('node:vm');
+ // site.js holds two script parts, and each hands its helpers to module.exports.
+ const site={};
+ vm.runInNewContext(readFileSync('public/assets/site.js','utf8'),{module:{get exports(){return site;},set exports(v){Object.assign(site,v);}}});
+ assert.equal(site.pickPlatform('Mozilla/5.0 (Linux; Android 14; Pixel 8)',['ios','android']),'android');
+ assert.equal(site.pickPlatform('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',['ios','android']),'ios');
+ assert.equal(site.pickPlatform('Mozilla/5.0 (Windows NT 10.0)',['ios','android']),'ios');
 });
 
 test('setup.yaml checks catch unknown values, untagged homes and stale notes', async()=>{
@@ -138,14 +204,17 @@ def run(change):
 def block(s, aid, title):
     return next(b for a in s['answers'] if a['id'] == aid for b in a['blocks'] if b['title'] == title)
 assert 'tags "dslr" is not in IRL Commons' in run(lambda s, sv: block(s, 'better-picture', 'Into your phone')['select'][0].update(tags='dslr'))
-assert 'class "phones" is not in IRL Commons' in run(lambda s, sv: block(s, 'one-phone', 'Apps that help')['select'][0].update({'class': 'phones'}))
-assert 'unknown field "colour"' in run(lambda s, sv: block(s, 'one-phone', 'Apps that help')['select'][0].update(colour='red'))
+assert 'class "phones" is not in IRL Commons' in run(lambda s, sv: block(s, 'one-phone', 'Streaming apps')['select'][0].update({'class': 'phones'}))
+assert 'unknown field "colour"' in run(lambda s, sv: block(s, 'one-phone', 'Streaming apps')['select'][0].update(colour='red'))
 assert 'is tagged camera-in, but no block' in run(lambda s, sv: next(x for x in sv if x['id'] == 'speedify')['tags'].append('camera-in'))
 assert 'note for "irlplus-cast", which this block no longer selects' in run(lambda s, sv: next(x for x in sv if x['id'] == 'irlplus-cast')['tags'].remove('camera-in'))
-assert 'no such service' in run(lambda s, sv: block(s, 'better-picture', 'In a backpack')['before'].append('{no-such-app}'))
+assert 'no such service' in run(lambda s, sv: block(s, 'better-picture', 'In a backpack').update(pre='{no-such-app}'))
 answer = lambda s, aid: next(a for a in s['answers'] if a['id'] == aid)
 assert 'back link to #nowhere, which is no answer' in run(lambda s, sv: answer(s, 'build').update(back={'to': 'nowhere', 'label': 'Nowhere'}))
 assert 'back is "#more"' in run(lambda s, sv: answer(s, 'build').update(back='#more'))
+assert 'jumps to #nowhere' in run(lambda s, sv: block(s, 'hybrid', 'Pick where the hub runs')['choose'][0]['go'].update(href='#nowhere'))
+assert 'split by "windows"' in run(lambda s, sv: block(s, 'one-phone', 'Streaming apps').update(split=['ios', 'windows']))
+assert 'is tagged scene-control, but no block' in run(lambda s, sv: block(s, 'hybrid', 'Switch scenes while you are away').update(select=[{'id': 'moblin'}], notes={}))
 `],{stdio:'pipe'});
 });
 
@@ -154,7 +223,7 @@ test('Answers: exactly one back link at the top that names where it goes, no ste
  assert.ok(!/class="(?:steps|step-bar|step-nav|back-to)"/.test(text)&&!text.includes('Back to:'));
  const want={'more':['./','All starting points'],'build':['#more','Build or buy'],'ready-made':['#more','Build or buy'],
   'receiver':['./','Back'],'into-obs':['./','Back']};
- const found=[...text.matchAll(/<section class="step (?:result|question)" id="([^"]+)"[\s\S]*?<\/section>/g)];
+ const found=[...text.matchAll(/<section class="step (?:result|question)(?: steps)?" id="([^"]+)"[\s\S]*?<\/section>/g)];
  assert.ok(found.length>=10);
  for(const m of found){
   const links=[...m[0].matchAll(/<p class="go-back"><a href="([^"]+)"( data-back="history")?><span aria-hidden="true">←<\/span>([^<]+)<\/a><\/p>/g)];

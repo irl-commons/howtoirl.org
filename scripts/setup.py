@@ -74,8 +74,18 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
         for c in a.get('choices', []):
             if c['to'] not in ids:
                 out.append(f'#{a["id"]}: choice "{c["title"]}": no answer #{c["to"]}')
+        anchors = {b['anchor'] for b in a.get('blocks', []) if b.get('anchor')}
+        if a.get('layout') not in (None, 'steps'):
+            out.append(f'#{a["id"]}: layout "{a["layout"]}" (use steps, or leave it out)')
         for b in a.get('blocks', []):
             where = f'#{a["id"]} "{b["title"]}"'
+            for p in b.get('split', []):
+                if p not in PLATFORM_NAMES:
+                    out.append(f'{where}: split by "{p}" (use {", ".join(PLATFORM_NAMES)})')
+            for c in b.get('choose', []):
+                go = c.get('go', {}).get('href', '')
+                if go.startswith('#') and go[1:] not in anchors:
+                    out.append(f'{where}: "{c["title"]}" jumps to {go}, which no block of this answer has as its anchor')
             for m in b.get('select', []):
                 for k, v in m.items():
                     if k not in KEYS:
@@ -110,9 +120,14 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
 def texts(setup: dict):
     for a in setup['answers']:
         for b in a.get('blocks', []):
+            if b.get('pre'):
+                yield b['pre']
             yield from b.get('before', [])
             yield from b.get('after', [])
             yield from b.get('notes', {}).values()
+            for c in b.get('choose', []):
+                yield c['text']
+                yield from c.get('items', [])
 
 
 def link_services(text: str, by_id: dict) -> str:
@@ -165,26 +180,120 @@ def line(s: dict, note: str | None, by_id: dict) -> str:
     name = f'<a href="{html.escape(url)}">{esc(s["name"])}</a>'
     if note is not None:
         note = link_services(note, by_id)
-        return f'<li>{name}{note}</li>' if note.startswith("'s") else f'<li>{name}: {note}</li>'
+        return f'<li>{name}{note}</li>' if note.startswith(("'s", ' ')) else f'<li>{name}: {note}</li>'
     lead = r.first_sentence(s['description'])[0]
     tag = f' <span class="tag">{esc(s["status"][0].upper() + s["status"][1:])}</span>' if s['status'] else ''
     return f'<li>{name}: {esc(lead)}{tag}</li>'
 
 
-def block_html(a: dict, b: dict, first: bool, services: list[dict], by_id: dict) -> str:
-    picked = selected(b, services)
+WATCH = '! '
+
+
+def item(text: str, by_id: dict, cls: str = '') -> str:
+    """One list line. A line that starts with "! " is a watch-out: an outlined "!" mark, read out as "Watch out:"."""
+    if text.startswith(WATCH):
+        return f'<li class="w"><span class="vh">Watch out: </span>{link_services(text[len(WATCH):], by_id)}</li>'
+    attr = f' class="{cls}"' if cls else ''
+    return f'<li{attr}>{link_services(text, by_id)}</li>'
+
+
+def item_list(lines: list[str], tag: str = 'ul', mix: bool = False) -> str:
+    """Lists that mix tips and watch-outs, and all lists in a step-by-step answer, use the dot and "!" marks."""
+    if not lines:
+        return ''
+    cls = 'picks mix' if mix or any('class="w"' in li for li in lines) else 'picks'
+    body = '\n            '.join(lines)
+    return f'<{tag} class="{cls}">\n            {body}\n          </{tag}>'
+
+
+def block_items(b: dict, picked: list[dict], by_id: dict) -> list[str]:
     notes = b.get('notes', {})
-    items = [f'<li class="plain">{link_services(t, by_id)}</li>' for t in b.get('before', [])]
-    items += [line(s, notes.get(s['id']), by_id) for s in picked]
-    items += [f'<li class="aside">{link_services(t, by_id)}</li>' for t in b.get('after', [])]
+    out = [item(t, by_id, 'plain') for t in b.get('before', [])]
+    out += [line(s, notes.get(s['id']), by_id) for s in picked]
+    out += [item(t, by_id, 'aside') for t in b.get('after', [])]
+    return out
+
+
+PLATFORM_NAMES = {'ios': 'iPhone', 'android': 'Android'}
+
+
+def split_html(a: dict, b: dict, picked: list[dict], by_id: dict, mix: bool) -> str:
+    """One list per phone platform. Without script both show, each under its name; site.js turns the names into
+    a two-button switch that starts on the visitor's own platform. Apps for both platforms are in both lists."""
+    plats = b['split']
+    group = f'{a["id"]}-platform'
+    buttons = ''.join(f'<button type="button" data-platform="{p}" aria-pressed="false">{PLATFORM_NAMES[p]}</button>' for p in plats)
+    lists = []
+    for p in plats:
+        mine = [s for s in picked if p in s['platforms']]
+        lis = block_items({**b, 'before': [], 'after': []}, mine, by_id)
+        lists.append(f'<div class="plat" data-platform="{p}">\n          <h4 id="{a["id"]}-{p}">{PLATFORM_NAMES[p]}</h4>\n          '
+                     f'{item_list(lis, mix=mix)}\n          </div>')
+    seg = f'<div class="seg" role="group" aria-label="Phone" hidden>{buttons}</div>'
+    return f'<div class="plats" id="{group}">\n          {seg}\n          ' + '\n          '.join(lists) + '\n          </div>'
+
+
+def choose_html(b: dict, by_id: dict) -> str:
+    """Option cards side by side (stacked on phones), each with its cost and fit, watch-outs, and a jump link."""
+    cards = []
+    for c in b['choose']:
+        go = c.get('go')
+        go = f'\n            <p class="go"><a href="{go["href"]}">{esc(go["label"])}<span aria-hidden="true"> ↓</span></a></p>' if go else ''
+        cards.append(f'<li class="opt">\n            <h4>{esc(c["title"])}</h4>\n            <p>{link_services(c["text"], by_id)}</p>\n            '
+                     f'{item_list([item(t, by_id) for t in c.get("items", [])], mix=True)}{go}\n          </li>')
+    return '<ul class="choose">\n          ' + '\n          '.join(cards) + '\n        </ul>'
+
+
+def block_body(a: dict, b: dict, services: list[dict], by_id: dict, mix: bool) -> str:
+    picked = selected(b, services)
+    parts = []
+    if b.get('pre'):
+        parts.append(f'<p class="pre">{link_services(b["pre"], by_id)}</p>')
+    if b.get('choose'):
+        parts.append(choose_html(b, by_id))
+    if b.get('split'):
+        before = [item(t, by_id, 'plain') for t in b.get('before', [])]
+        if before:
+            parts.append(item_list(before, mix=mix))
+        parts.append(split_html(a, b, picked, by_id, mix))
+        after = [item(t, by_id, 'aside') for t in b.get('after', [])]
+        if after:
+            parts.append(item_list(after, mix=mix))
+    else:
+        parts.append(item_list(block_items(b, picked, by_id), 'ol' if b.get('ordered') else 'ul', mix))
+    return '\n          '.join(p for p in parts if p)
+
+
+def count_html(b: dict, services: list[dict]) -> str:
     small = b.get('small', '')
     if 'count' in b:
+        n = len(selected(b, services))
         one, many = b['count']
-        small = f'{len(picked)} {one if len(picked) == 1 else many}'
-    small = f'<small>{esc(small)}</small>' if small else ''
-    body = '\n            '.join(items)
-    return (f'<details class="block"{" open" if first else ""}><summary><h3>{esc(b["title"])}</h3>{small}</summary>\n'
-            f'          <ul class="picks">\n            {body}\n          </ul>\n        </details>')
+        small = f'{n} {one if n == 1 else many}'
+    return f'<small>{esc(small)}</small>' if small else ''
+
+
+def block_html(a: dict, b: dict, first: bool, services: list[dict], by_id: dict) -> str:
+    """A collapsible block. The first one is open, and so is any block with `open: true`."""
+    is_open = first or b.get('open')
+    return (f'<details class="block"{" open" if is_open else ""}><summary><h3>{esc(b["title"])}</h3>{count_html(b, services)}</summary>\n'
+            f'          {block_body(a, b, services, by_id, False)}\n        </details>')
+
+
+def steps_html(a: dict, services: list[dict], by_id: dict) -> str:
+    """`layout: steps`: numbered steps, each number once, with `sub: true` blocks as sub-sections of the step before."""
+    out, n = [], 0
+    if a.get('legend'):
+        out.append('<p class="legend" aria-hidden="true"><span class="mk-dot"></span>= what to do <span class="mk-w">!</span>= watch out</p>')
+    for b in a['blocks']:
+        anchor = f' id="{b["anchor"]}"' if b.get('anchor') else ''
+        if b.get('sub'):
+            head = f'<h4 class="sub"{anchor}>{esc(b["title"])}</h4>'
+        else:
+            n += 1
+            head = f'<h3 class="num"{anchor}><span class="n" aria-hidden="true">{n}</span><span class="vh">Step {n}: </span>{esc(b["title"])}</h3>'
+        out.append(f'<div class="stepblock{" sub" if b.get("sub") else ""}">\n          {head}\n          {block_body(a, b, services, by_id, True)}\n        </div>')
+    return '\n        '.join(out)
 
 
 SIMS = '<p class="sims-ref"><strong>Picking SIMs?</strong> See <a href="data-plans.html">Data plans and SIMs</a>: upload speed, how much data you need, and the limits behind "unlimited".</p>'
@@ -210,10 +319,13 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
                 f'          <ul class="choices two" aria-labelledby="{aid}-q">\n            {choices}\n          </ul>\n        </div>')
         kind = 'question'
     else:
-        blocks = '\n        '.join(block_html(a, b, i == 0, services, by_id) for i, b in enumerate(a['blocks']))
+        if a.get('layout') == 'steps':
+            blocks = steps_html(a, services, by_id)
+        else:
+            blocks = '\n        '.join(block_html(a, b, i == 0, services, by_id) for i, b in enumerate(a['blocks']))
         body = (f'<div class="result-body">\n          <div class="result-main">\n        {blocks}\n          </div>\n'
                 f'          <div class="result-side">\n            {side_html(a)}\n          </div>\n        </div>')
-        kind = 'result'
+        kind = 'result steps' if a.get('layout') == 'steps' else 'result'
     return (f'<section class="step {kind}" id="{aid}" tabindex="-1" aria-labelledby="{aid}-h">\n        {back_link(a)}\n'
             f'        {head}\n        {body}\n      </section>')
 
