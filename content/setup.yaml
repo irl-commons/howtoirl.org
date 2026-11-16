@@ -262,6 +262,10 @@ answers:
           - 'Add the receiver''s address to OBS as a source, not the phone''s. The receiver can be a service, a rented server or a computer at home: see <a href="#receiver">receivers</a>.'
           - "OBS's own media source was made for playing files. A source made for IRL, such as {obs-irl-source}, recovers on its own after a dropout and keeps the audio clean."
           - "A scene switcher like {noalbs-tool} shows BRB for you when the bitrate drops, and switches back when it recovers. It reads the receiver's stats address, which isn't the address OBS plays. Use one automatic switcher per OBS."
+      - title: Hosted drop protection
+        count: [service, services]
+        select: [{class: cloud}]
+        before: ["Hosted services can handle switching when the feed drops; some run the whole production, while others work with your OBS."]
     side:
       - else: '<strong>Choose something else when</strong> you''d rather not run OBS at all. A hosted hub can do the switching: see <a href="#hybrid">hub options</a>.'
     back_to: [[receivers, "#receiver"], [hybrid, "#hybrid"], [cloud production, "#cloud"]]
