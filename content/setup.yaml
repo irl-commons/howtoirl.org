@@ -13,7 +13,13 @@
 # block with that tag picks up, and on a note for a service the block no longer selects.
 #   pre:    optional, a short paragraph above the list.
 #   open:   true keeps a block open; the first block is always open.
-#   ordered: true numbers the lines (steps to follow).
+#   ordered: true numbers the `before` lines (steps to follow). A "! " watch-out takes no number:
+#           it sits under the step above it.
+#   lead:   a line the services are listed under, as a short list of their own.
+#   also:   plain lines below the services, before any `after` lines.
+# An answer can have `before` / `after` lines of its own, above the first block or below the last.
+# A question page (`question: true`) has `extra` HTML, the question `ask` with an optional `ask_text`
+# under it, the `choices`, and optional `side` lines.
 #   split:  [ios, android] shows one list per phone platform, with an iPhone/Android switch.
 # A line that starts with "! " is a watch-out: it gets the outlined "!" mark and "Watch out:" for screen readers.
 # A note that starts with a space follows the service name directly, without a colon.
@@ -51,24 +57,23 @@ groups:
 answers:
   - id: more
     question: true
-    icon: a-pack
-    title: Maybe it's time for a backpack
-    summary: A backpack carries a small streaming computer, mobile modems and a battery. It takes a standalone camera, so your phone doesn't have to do it all.
-    hint: 'Before you buy one: if heat and battery are the only problems, keep the phone out of the sun and try a power bank. Unplug the power bank when the phone gets hot. If the stream only drops in crowds, <a href="#second-network">a second network</a> is the smaller step.'
+    icon: s-hot
+    title: Keep the phone going
+    summary: When heat or an empty battery ends your stream, try these first.
     extra: |
       <div class="cool-tips">
         <h3 id="cool-h">Keep the phone cool and charged</h3>
-        <ul class="tips" aria-labelledby="cool-h">
-          <li>Keep it out of direct sun, and don't shut it in a bag or pocket where the heat can't get out. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a>, <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung</a></span></li>
-          <li>A weak signal makes the phone work harder and get warmer. So a stronger network also helps with heat. <span class="tip-src">Source: <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung</a></span></li>
-          <li>Heat damages the battery. Very hot conditions can shorten its life permanently. Charging while it's hot makes this worse. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://www.apple.com/batteries/maximizing-performance/">Apple batteries</a></span></li>
-          <li>Charging while streaming adds heat. If it gets hot while charging, unplug it, let it cool down, then charge again. <span class="tip-src">Sources: <a href="https://support.google.com/pixelphone/answer/3333708">Google</a>, <a href="https://www.samsung.com/za/support/mobile-devices/how-to-prevent-the-overheating-of-your-galaxy-device/">Samsung</a></span></li>
-          <li>Lower the resolution, frame rate or <a href="glossary.html#bitrate">bitrate</a> in your streaming app. High-quality video and heavy uploading make a phone warm. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a></span></li>
-          <li>A newer <a href="glossary.html#codec">codec</a>, HEVC (H.265) instead of H.264, needs less data for the same picture. Your receiver and the platform must accept it (Kick takes only H.264). Choosing SRT or RTMP doesn't change the codec. <span class="tip-src">Sources: <a href="https://support.google.com/youtube/answer/2853702">YouTube</a>, <a href="https://help.kick.com/en/articles/7066931-how-to-stream-on-kick-com">Kick</a></span></li>
+        <ul class="picks mix tips" aria-labelledby="cool-h">
+          <li>Carry a power bank for long streams.</li>
+          <li>Keep the phone out of direct sun, and out of bags and pockets where the heat can't get out. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a>, <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung</a></span></li>
+          <li>A weak signal makes the phone work harder and get warmer, so a stronger network helps with heat too. <span class="tip-src">Source: <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung</a></span></li>
+          <li>Lower the resolution, frame rate or <a class="gl" href="glossary.html#bitrate">bitrate</a> in your app. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a></span></li>
+          <li class="w"><span class="vh">Watch out: </span>Charging while streaming adds heat, and heat damages the battery for good. If it gets hot while charging, unplug, let it cool, then charge again. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://www.apple.com/batteries/maximizing-performance/">Apple batteries</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a>, <a href="https://www.samsung.com/za/support/mobile-devices/how-to-prevent-the-overheating-of-your-galaxy-device/">Samsung</a></span></li>
+          <li>HEVC (H.265) needs less data than H.264 for the same picture, so the phone uploads less. Check first that your receiver and platform accept it: Kick takes only H.264. <span class="tip-src">Sources: <a href="https://support.google.com/youtube/answer/2853702">YouTube</a>, <a href="https://help.kick.com/en/articles/7066931-how-to-stream-on-kick-com">Kick</a></span></li>
         </ul>
         <aside class="soon-card wip-card" aria-labelledby="cool-wip-h">
-          <h3 id="cool-wip-h">Extra cooling <span class="soon-tag">Work in progress</span></h3>
-          <p>Tips from other streamers. I haven't tested them yet:</p>
+          <h3 id="cool-wip-h">Extra cooling</h3>
+          <p>Tips from other streamers:</p>
           <ul class="bul">
             <li>Small stick-on heatsinks, the kind sold for Raspberry Pi boards, on the phone's hottest spot.</li>
             <li>Clip-on phone coolers.</li>
@@ -77,10 +82,13 @@ answers:
           <p>Where the hot spot is depends on the phone.</p>
         </aside>
       </div>
-    ask: Do you want to build and look after one yourself?
+    ask: Still too hot or too short?
+    ask_text: A backpack carries a small streaming computer, mobile modems and a battery, so the phone no longer does that work. Do you want to build and look after one yourself?
     choices:
       - {to: build, icon: a-build, title: "Yes, I'll build it", text: "A small board, modems and a camera."}
       - {to: ready-made, icon: a-ready, title: "No, I'll buy one", text: "Ready to use, with support."}
+    side:
+      - else: '<strong>Choose something else when</strong> the stream only drops in crowds: <a href="#second-network">a second network</a> is the smaller step.'
 
   - id: one-phone
     icon: i-phone
@@ -113,46 +121,64 @@ answers:
   - id: second-network
     icon: i-network
     title: Add a second network
-    summary: 'Add a connection on a different mobile network, with its own radio. Your streaming app then has to use both at once, which is called <a href="glossary.html#bonding">bonding</a>. A hotspot on its own doesn''t do that.'
+    summary: 'Add a second internet connection on a different mobile network, and let your streaming app use both at once. That''s called <a class="gl" href="glossary.html#bonding">bonding</a>. If one network has a bad moment, the other can carry the stream.'
+    layout: steps
     blocks:
-      - title: The second connection
-        select: [{role: extra-connections, platforms: [android, ios]}]
+      - title: Get a second connection
         before:
-          - "A second phone's hotspot, on a different network than your main phone."
-          - A pocket 5G hotspot with its own SIM.
+          - "A second phone's hotspot, on a different network: if you have a spare phone."
+          - "A pocket 5G hotspot with a SIM on a different network: if you don't."
+          - 'Two SIMs mean two data plans: see <a href="data-plans.html">Data plans and SIMs</a>.'
+      - title: Bond them
+        before:
+          - 'Use an app that bonds: Moblin, IRL Pro, IRL+ Cast, LifeStreamer, IRLwhatever or TVU Go. See <a href="#one-phone">the phone apps</a>.'
+        lead: "Or a helper that bonds for your app or adds spare phones:"
+        select: [{role: extra-connections, platforms: [android, ios]}]
+        after:
+          - "! Without bonding, a hotspot isn't combined with the phone's mobile data."
+          - '! SRTLA bonding also needs a <a href="#receiver">receiver</a>. Some apps include one; if yours doesn''t, pick a receiver.'
+      - title: Test it
+        before:
+          - "! Connected isn't enough: during a test stream, each connection should show traffic."
     side:
-      - next: '<strong>You also need an app that bonds.</strong> Moblin, IRL Pro, IRL+ Cast, LifeStreamer, IRLwhatever and TVU Go do: see <a href="#one-phone">the phone apps</a>.'
-      - next: "<strong>Test it.</strong> During a test stream, each connection should show traffic. If a connection is connected but shows zero traffic, it isn't helping yet."
       - else: '<strong>Choose something else when</strong> you need many networks, or a standalone camera on your back: <a href="#more">think about a backpack</a>.'
-      - next: '<strong>Next:</strong> bonding with SRTLA needs a receiver that joins the stream back together. Some apps and services include one. If yours doesn''t, <a href="#receiver">pick a receiver</a>.'
-      - next: '<strong>Why it helps:</strong> one network has short bad moments, even a fast one. A second network covers them. <a href="why-bonding.html">Why more than one network?</a>'
-      - sims: true
+      - next: '<strong>Why it works:</strong> <a href="why-bonding.html">Why more than one network?</a>'
 
   - id: build
     back: {to: more, label: Build or buy}
     icon: a-build
     title: Build your own backpack
-    summary: A small board, modems and a camera become a streaming backpack. You choose every part.
+    summary: You put the backpack together from parts and run one of these systems on it. You choose every part, and you set it up and fix it yourself.
     blocks:
       - title: Systems you build yourself
         count: [system, systems]
         select: [{id: [belabox, ceralive, irlbox]}]
+      - title: What you need
+        open: true
+        before:
+          - A small computer board.
+          - Two or more modems with SIMs on different networks.
+          - A way to connect your camera, such as an HDMI capture device or a USB camera.
+          - A battery that lasts the whole stream.
+          - 'If it bonds with SRTLA: a <a href="#receiver">receiver</a> for the bonded stream.'
+          - "! Check the system's list of supported boards and modems before you buy. Not every part works."
     side:
       - else: '<strong>Choose something else when</strong> it has to work right away, with support: <a href="#ready-made">ready-made backpacks</a>.'
-      - next: '<strong>Next:</strong> if your backpack bonds with SRTLA, it needs <a href="#receiver">a receiver</a>.'
-      - sims: true
+      - next: '<strong>Picking SIMs?</strong> <a href="data-plans.html">Data plans and SIMs</a>.'
 
   - id: ready-made
     back: {to: more, label: Build or buy}
     icon: a-ready
     title: A ready-made backpack, with support
-    summary: Bought ready to use, with support. Rentals and warranties depend on the package.
+    summary: Ready to use when it arrives. Some fit in a backpack, others mount on the camera. Rentals and warranties depend on the package.
     blocks:
       - title: Who makes them
         count: [maker, makers]
         select: [{id: [liveu-solo, unlimitedirl, yolobox-ultra, teradek-prism-mobile, tvu-one, haivision-pro, dejero-engo]}]
+        also:
+          - "Many charge a monthly fee for their bonding service on top of the device. Ask what it includes: data, the service, or both."
     side:
-      - else: '<strong>Choose something else when</strong> you stream spontaneously on a small budget: start with <a href="#second-network">a second network</a>.'
+      - else: '<strong>Choose something else when</strong> your phone already does what you need but the connection drops: <a href="#second-network">add a second network</a>.'
 
   - id: better-picture
     icon: s-camera
@@ -202,42 +228,52 @@ answers:
     blocks:
       - title: On the phone
         count: [app, apps]
+        pre: When your phone app can show those cameras.
         select: [{class: phone-app, tags: multi-camera}]
         notes:
           moblin: "for iPhone, shows several of the phone's cameras at once, picture-in-picture. Also takes streams from other phones and cameras into a scene."
           irlwhatever: for Android, in open beta, phone and USB cameras in scenes with picture-in-picture.
       - title: In OBS, at home or anywhere
         count: [tool, tools]
+        pre: When you mix on a computer, at home or on a server.
         select: [{class: production, tags: multi-camera}, {id: moblin}]
         notes:
           obs-studio: each phone or camera is its own source. Runs on your PC or on a server, so it works away from home too.
           moblin: "'s Mobcam: an iPhone as a webcam over USB."
           vdo-ninja: a phone becomes a camera in OBS, from its browser.
-        after: ['Phones that bond come in through a receiver: see <a href="#into-obs">into OBS</a>.']
       - title: In the cloud
         count: [service, services]
+        pre: When the show has to keep running if your PC at home fails.
         select: [{class: cloud, tags: multi-camera}]
         notes:
-          irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and disconnect protection.
+          irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and drop protection.
       - title: In the backpack
         count: [add-on, add-ons]
+        pre: When you mix while you're out.
         select: [{class: parts, tags: multi-camera}]
+    after:
+      - "! Each phone or camera arrives with its own delay. Line them up where you mix, before you go live."
+      - "! Each feed brings its own sound. Take the audio from one and mute the others, or viewers hear echoes."
     side:
-      - else: '<strong>Choose something else when</strong> you switch between places instead of showing them together: <a href="#hybrid">desk and away</a>.'
+      - else: '<strong>Choose something else when</strong> you switch between places instead of showing them together: <a href="#hybrid">Desktop and IRL</a>.'
 
   - id: cloud
     icon: a-cloud
-    title: Move production to the cloud
-    summary: The show keeps running even if your PC, power or internet at home fails.
+    title: Move the hub to the cloud
+    summary: With the hub on a rented server, your away stream keeps running even if the PC, power or internet at home fails. The hub is OBS on that server, or a hosted service.
     blocks:
-      - title: What helps
+      - title: Cloud hubs
         select: [{class: cloud}, {id: [obs-studio, noalbs-tool]}]
         notes:
           irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and disconnect protection.
-          obs-studio: "on a server you run yourself. The software is free and open source, the server isn't."
+          obs-studio: " on a server you rent: the OBS you know."
+        also:
+          - The server or the hosted service costs a monthly fee; OBS itself is free.
+          - "! If you also send your desktop, pick a hub or plan with a second input for it."
+          - "! Going live in your app only feeds the hub. Before your first stream, check how your hub goes live on the platform."
     side:
-      - else: "<strong>Choose something else when</strong> most of your streams are at your desk and your PC is reliable. Then you don't need this."
-      - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>. The same steps work for OBS on a server. Going live in your app only starts the feed to the cloud. Start the cloud''s output too.'
+      - else: "<strong>Choose something else when</strong> most of your streams are at your desk and your PC is reliable."
+      - next: '<strong>Next:</strong> if your hub runs OBS, <a href="#into-obs">get the stream into OBS</a>.'
 
   - id: hybrid
     icon: a-hybrid
@@ -264,7 +300,7 @@ answers:
         before:
           - Your desk OBS can be your hub. Add the phone as one more source and build a phone scene around it.
           - On the same Wi-Fi at home, the phone can send straight to OBS.
-          - '! Away from home, your router blocks a stream coming in. Send it to a <a class="gl" href="glossary.html#relay">relay</a> that OBS pulls from: see <a href="#receiver">receivers</a> and <a href="#into-obs">into OBS</a>.'
+          - '! Away from home, your router blocks a stream coming in. Send it to a <a class="gl" href="glossary.html#relay">receiver</a> that OBS pulls from: see <a href="#receiver">receivers</a> and <a href="#into-obs">into OBS</a>.'
           - "! A mic set in OBS's Settings → Audio plays in every scene. Add your desk mic to the desk scenes only, or viewers hear your empty room while you're away."
       - title: Hub in the cloud
         sub: true
@@ -284,7 +320,7 @@ answers:
           - "<strong>Phone:</strong> the stream coming in from your phone or backpack."
           - '<strong><a class="gl" href="glossary.html#brb">BRB</a>:</strong> a picture, for when the phone''s signal drops or you take a break.'
       - title: Send to the hub from where you are
-        pre: "In your phone app or backpack, enter the hub's or relay's address instead of the platform's."
+        pre: "In your phone app or backpack, enter the hub's or receiver's address instead of the platform's."
         before:
           - 'One phone, to start: see <a href="#one-phone">the phone apps</a>.'
           - 'A phone with a second network, for crowds and trains: see <a href="#second-network">a second network</a>.'
@@ -316,47 +352,56 @@ answers:
     back: history
     icon: i-receiver
     title: A receiver for your bonded stream
-    summary: When a stream travels over several networks at once, a server joins it back together. Any app or backpack that uses the same protocol can use this server, with your own settings.
+    summary: Bonding splits your stream over several connections. A receiver is the server that joins it back together before OBS or the platform. Some apps and cloud hubs include one. If yours doesn't, pick one here.
+    before:
+      - "! Pick one that supports your app's or backpack's bonding protocol."
     blocks:
       - title: Hosted
         count: [service, services]
+        pre: A service runs it for you, often for a fee.
         select: [{class: bonding, hosting: service}]
-        after: ["Cloud production services, and some apps such as IRL Pro, include one too."]
       - title: Run your own
         count: [receiver, receivers]
+        open: true
+        pre: Free software, but you look after the server.
         select: [{class: bonding, hosting: self}]
+        after:
+          - "! It needs a server, or a PC at home that your phone or backpack can reach from the internet. At home that means port forwarding, which some internet connections don't allow."
     side:
-      - else: '<strong>Also think about</strong> where the show itself runs: <a href="#cloud">on your PC or in the cloud</a>.'
       - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>.'
 
   - id: into-obs
     back: history
     icon: a-chain
     title: Into OBS
-    summary: Four parts work together. Your app or box sends the stream. A receiver joins it back together. OBS takes one stream from the receiver. A scene switcher shows BRB when the feed drops.
+    summary: Your app or backpack sends the stream to a receiver. OBS takes it from there. Start Streaming in OBS is what goes live.
     blocks:
       - title: In OBS
         before:
-          - Going live in your app sends the stream to your receiver or hub. A hub goes live on the platform with its own Start, so press that too.
-          - 'Add the receiver''s address to OBS as a source, not the phone''s. The receiver can be a service, a rented server or a computer at home: see <a href="#receiver">receivers</a>.'
-          - "OBS's own media source was made for playing files. A source made for IRL, such as {obs-irl-source}, recovers on its own after a dropout and keeps the audio clean."
-          - "A scene switcher like {noalbs-tool} shows BRB for you when the bitrate drops, and switches back when it recovers. It reads the receiver's stats address, which isn't the address OBS plays. Use one automatic switcher per OBS."
+          - "Add the receiver's address to OBS as a source, not the phone's."
+          - "! OBS's own media source doesn't reliably recover after a dropout, and the audio can drift. A source made for IRL, such as {obs-irl-source} or {smooth-media-source} (Windows), reconnects on its own."
+          - A scene switcher like {noalbs-tool} shows your BRB scene when the bitrate drops, and switches back when it recovers.
+          - Make a BRB scene, then cut a test feed to check the switch away and back.
+          - '! The switcher reads the receiver''s <a class="gl" href="glossary.html#stats-url">stats URL</a>, which isn''t the address OBS plays.'
+          - "! Use one automatic switcher per OBS: two fight over the scenes."
       - title: Hosted drop protection
         count: [service, services]
+        pre: "These switch to BRB for you. Pick one that works with your OBS to keep your scenes, or one that runs the whole show if you don't want OBS."
         select: [{class: cloud}]
-        before: ["Hosted services can handle switching when the feed drops; some run the whole production, while others work with your OBS."]
-    side:
-      - else: '<strong>Choose something else when</strong> you''d rather not run OBS at all. A hosted hub can do the switching: see <a href="#hybrid">hub options</a>.'
 
   - id: satellite
     icon: i-satellite
     title: Add a satellite dish
-    summary: A dish gives you a signal where mobile networks are too busy or missing. It joins the rest as one more connection.
+    summary: Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy.
     blocks:
-      - title: What helps
+      - title: Satellite internet
         select: [{class: connections, platforms: hardware}]
         notes:
           starlink: satellite internet, as one more link for a phone setup or a backpack.
+        also:
+          - "! The dish needs a clear view of the sky. Trees and buildings block it."
+          - "! It needs power for the whole stream: plan a big battery."
+          - "! To use it while moving, you need the right plan and mount."
+          - 'To use it together with mobile networks, your app or backpack has to bond, and SRTLA needs a <a href="#receiver">receiver</a>.'
     side:
-      - else: "<strong>Choose something else when</strong> trees and buildings block the sky. To use it while moving, you need the right plan and mount."
-      - next: '<strong>Next:</strong> using it together with mobile networks is bonding. Your app or backpack has to support it, and SRTLA needs <a href="#receiver">a receiver</a>.'
+      - else: '<strong>Choose something else when</strong> you only lose signal in crowds or weak spots: <a href="#second-network">a second network</a> is the smaller step.'

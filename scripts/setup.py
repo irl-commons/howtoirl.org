@@ -79,6 +79,13 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
             out.append(f'#{a["id"]}: layout "{a["layout"]}" (use steps, or leave it out)')
         for b in a.get('blocks', []):
             where = f'#{a["id"]} "{b["title"]}"'
+            if b.get('ordered'):
+                if b.get('select'):
+                    out.append(f'{where}: an ordered block lists steps only, not services')
+                if b.get('before', [''])[0].startswith(WATCH):
+                    out.append(f'{where}: starts with a watch-out, which needs a step above it')
+            if b.get('lead') and not b.get('select'):
+                out.append(f'{where}: a lead line without services to list under it')
             for p in b.get('split', []):
                 if p not in PLATFORM_NAMES:
                     out.append(f'{where}: split by "{p}" (use {", ".join(PLATFORM_NAMES)})')
@@ -119,11 +126,16 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
 
 def texts(setup: dict):
     for a in setup['answers']:
+        yield from a.get('before', [])
+        yield from a.get('after', [])
         for b in a.get('blocks', []):
             if b.get('pre'):
                 yield b['pre']
             yield from b.get('before', [])
             yield from b.get('after', [])
+            yield from b.get('also', [])
+            if b.get('lead'):
+                yield b['lead']
             yield from b.get('notes', {}).values()
             for c in b.get('choose', []):
                 yield c['text']
@@ -209,9 +221,31 @@ def item_list(lines: list[str], tag: str = 'ul', mix: bool = False) -> str:
 def block_items(b: dict, picked: list[dict], by_id: dict) -> list[str]:
     notes = b.get('notes', {})
     out = [item(t, by_id, 'plain') for t in b.get('before', [])]
-    out += [line(s, notes.get(s['id']), by_id) for s in picked]
+    services = [line(s, notes.get(s['id']), by_id) for s in picked]
+    if b.get('lead') and services:
+        inner = '\n              '.join(services)
+        out.append(f'<li class="plain">{link_services(b["lead"], by_id)}\n            <ul class="picks mix">\n              {inner}\n            </ul></li>')
+    else:
+        out += services
+    out += [item(t, by_id, 'plain') for t in b.get('also', [])]
     out += [item(t, by_id, 'aside') for t in b.get('after', [])]
     return out
+
+
+def steps_list(lines: list[str], by_id: dict) -> str:
+    """Numbered steps. A "! " watch-out takes no number: it sits in a short list under the step above it,
+    so a screen reader hears the steps as one ordered list and each watch-out as part of its step."""
+    steps: list[tuple[str, list[str]]] = []
+    for t in lines:
+        if t.startswith(WATCH) and steps:
+            steps[-1][1].append(item(t, by_id))
+        else:
+            steps.append((link_services(t, by_id), []))
+    out = []
+    for text, notes in steps:
+        sub = ('\n              <ul class="picks mix">\n                ' + '\n                '.join(notes) + '\n              </ul>') if notes else ''
+        out.append(f'<li>{text}{sub}</li>')
+    return '<ol class="picks steps">\n            ' + '\n            '.join(out) + '\n          </ol>'
 
 
 PLATFORM_NAMES = {'ios': 'iPhone', 'android': 'Android'}
@@ -259,8 +293,10 @@ def block_body(a: dict, b: dict, services: list[dict], by_id: dict, mix: bool) -
         after = [item(t, by_id, 'aside') for t in b.get('after', [])]
         if after:
             parts.append(item_list(after, mix=mix))
+    elif b.get('ordered'):
+        parts.append(steps_list(b.get('before', []), by_id))
     else:
-        parts.append(item_list(block_items(b, picked, by_id), 'ol' if b.get('ordered') else 'ul', mix))
+        parts.append(item_list(block_items(b, picked, by_id), 'ul', mix))
     return '\n          '.join(p for p in parts if p)
 
 
@@ -312,15 +348,21 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
             f'            <h2 id="{aid}-h">{esc(a["title"])}</h2>\n            <p class="sum">{a["summary"]}</p>\n          </div>\n        </div>')
     if a.get('question'):
         choices = '\n            '.join(card(c) for c in a['choices'])
-        body = (f'<p class="hint">{a["hint"]}</p>\n        {a["extra"].strip()}\n'
-                f'        <div class="ask-q">\n          <h3 class="q" id="{aid}-q">{esc(a["ask"])}</h3>\n'
+        hint = f'<p class="hint">{a["hint"]}</p>\n        ' if a.get('hint') else ''
+        ask = f'\n          <p class="ask-text">{a["ask_text"]}</p>' if a.get('ask_text') else ''
+        body = (f'{hint}{a["extra"].strip()}\n'
+                f'        <div class="ask-q">\n          <h3 class="q" id="{aid}-q">{esc(a["ask"])}</h3>{ask}\n'
                 f'          <ul class="choices two" aria-labelledby="{aid}-q">\n            {choices}\n          </ul>\n        </div>')
+        if a.get('side'):
+            body += f'\n        <div class="q-side">\n            {side_html(a)}\n        </div>'
         kind = 'question'
     else:
         if a.get('layout') == 'steps':
             blocks = steps_html(a, services, by_id)
         else:
             blocks = '\n        '.join(block_html(a, b, i == 0, services, by_id) for i, b in enumerate(a['blocks']))
+        loose = lambda key: item_list([item(t, by_id) for t in a.get(key, [])], mix=True).replace('class="picks mix"', f'class="picks mix loose {key}"', 1)
+        blocks = '\n        '.join(x for x in (loose('before'), blocks, loose('after')) if x)
         body = (f'<div class="result-body">\n          <div class="result-main">\n        {blocks}\n          </div>\n'
                 f'          <div class="result-side">\n            {side_html(a)}\n          </div>\n        </div>')
         kind = 'result steps' if a.get('layout') == 'steps' else 'result'

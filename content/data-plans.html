@@ -233,7 +233,7 @@
         <details class="more fold" id="eu-routing" open><summary>Where your data goes</summary>
         <p>Inside the EU too, roaming data usually goes to your home network first, which adds delay (see <a href="#abroad">Abroad</a>). The EU rules set prices and quality. They don't say which way your data goes.</p>
         <p>The <a href="glossary.html#srt-latency">SRT latency setting</a> should cover several round trips, about four on a good network. So if home routing adds 60 ms to the round trip, add about 240 ms of latency. IRL setups often run well above the 120 ms default, so this extra delay often fits. Jitter and loss on the roaming connection matter more. In a <a href="glossary.html#bonding">bonded</a> stream, the worst connection decides.</p>
-        <p>Where your <a href="glossary.html#relay">relay</a> is matters too. A relay in your home country adds little, because your data goes there anyway. A relay near you abroad makes every packet travel to your home country and back.</p>
+        <p>Where your <a href="glossary.html#relay">receiver</a> is matters too. A receiver in your home country adds little, because your data goes there anyway. A receiver near you abroad makes every packet travel to your home country and back.</p>
         </details>
 
         <details class="more fold" id="eu-quality" open><summary>Same quality as at home?</summary>
@@ -246,7 +246,7 @@
         <ol class="checklist">
           <li><strong>Find your roaming limit</strong> before the trip. At 6 Mbps, divide it by 3 to get hours of streaming.</li>
           <li><strong>Plan for more delay</strong> than at home. Raise the SRT latency setting if the stats show many lost or late packets.</li>
-          <li><strong>Choose your relay:</strong> one in your home country adds the least extra delay.</li>
+          <li><strong>Choose your receiver:</strong> one in your home country adds the least extra delay.</li>
           <li><strong>Look up which networks give roamers 5G.</strong> Your carrier must publish this for each country and network. If the default network is weak, choose another one by hand.</li>
           <li><strong>Test when you arrive.</strong> Do the "what's my IP" check from <a href="#abroad">Abroad</a> and run three upload tests. Then stream for 10 minutes and watch each connection.</li>
           <li><strong>For a long stay or a big show,</strong> add a local SIM. Its data goes to the internet in the country you're in, and it adds another network.</li>

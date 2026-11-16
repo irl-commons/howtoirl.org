@@ -1580,6 +1580,21 @@ details.block .picks.mix li.aside { margin-left: 0; padding-left: 0; }
 .choose .opt .picks.mix li { margin: 4px 0; }
 .choose .opt .go { margin-top: 8px; }
 .choose .opt .go a { font-weight: 700; }
+/* Numbered steps keep their numbers; a watch-out under a step takes none. */
+ol.picks.steps, details.block ol.picks.steps { list-style: decimal; padding: 0 0 12px 26px; margin: 0; max-width: var(--measure); }
+ol.picks.steps > li, details.block ol.picks.steps > li { padding: 0 0 0 4px; margin: 6px 0; border: 0; }
+ol.picks.steps > li::marker { font-family: var(--mono); font-weight: 700; }
+ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mix { padding: 0; margin: 4px 0 0; }
+.picks.mix.loose { margin: var(--s2) 0; }
+.result-main > .picks.mix.loose.before { margin-bottom: var(--s1); }
+.ask-q .ask-text { margin: 0 0 var(--s2); max-width: var(--measure); }
+.ask-q h3.q:has(+ .ask-text) { margin-bottom: 6px; }
+.q-side { margin-top: var(--s3); border-left: 2px solid var(--rule-strong); padding-left: 14px; max-width: var(--measure); }
+.q-side > :first-child { margin-top: 0; }
+.q-side .send { margin: var(--s2) 0 0; }
+.picks li > a.gl:first-child { font-weight: inherit; }
+@media (min-width: 760px) { .step.question .q-side { margin-left: calc(240px + var(--s4)); } }
+.cool-tips .picks.mix.tips li { padding: 0 0 0 26px; margin: 8px 0; border: 0; }
 .plats { margin: 0 0 12px; }
 .plat h4 { margin: 8px 0 2px; font-size: 16px; }
 .plats.is-switch .plat h4 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }

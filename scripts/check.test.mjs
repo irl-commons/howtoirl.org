@@ -114,7 +114,7 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
  const text=docs.get('index.html');
- const open={'one-phone':[true,true,true],'better-picture':[true,false,false,false]};
+ const open={'one-phone':[true,true,true],'better-picture':[true,false,false,false],'build':[true,true],'receiver':[true,true]};
  for(const m of text.matchAll(/<section class="step result" id="([^"]+)"[\s\S]*?<\/section>/g)){
   const blocks=[...m[0].matchAll(/<details class="block"( open)?>/g)];
   assert.ok(blocks.length>0,m[1]);
@@ -143,13 +143,13 @@ test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser 
 
 test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in all three answers', ()=>{
  const text=docs.get('index.html');
- const want={'hybrid':9,'one-phone':4,'better-picture':5};
+ const want={'hybrid':9,'one-phone':4,'better-picture':5,'second-network':3,'build':1,'several-cameras':2,'cloud':2,'receiver':2,'into-obs':3,'satellite':3};
  for(const [id,n] of Object.entries(want)){
   const h=answerHtml(text,id);
   const marks=[...h.matchAll(/<li class="w">(.*?)<\/li>/g)];
   assert.equal(marks.length,n,id);
   for(const m of marks) assert.ok(m[1].startsWith('<span class="vh">Watch out: </span>'),id);
-  assert.ok(/<ul class="picks mix">/.test(h),id);
+  assert.ok(/<ul class="picks mix[^"]*">/.test(h),id);
  }
  const all=plain(text);
  for(const line of ['! Keep the stream key secret. Anyone who has it can go live on your channel.',
@@ -166,7 +166,6 @@ test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in a
 
 test('One phone: first stream steps, an iPhone/Android switch that works without script, and the data line', ()=>{
  const h=answerHtml(docs.get('index.html'),'one-phone');
- assert.equal([...h.matchAll(/<ol class="picks[^"]*">[\s\S]*?<\/ol>/g)][0][0].match(/<li/g).length,4);
  assert.ok(/<div class="seg" role="group" aria-label="Phone" hidden><button type="button" data-platform="ios" aria-pressed="false">iPhone<\/button><button type="button" data-platform="android" aria-pressed="false">Android<\/button><\/div>/.test(h));
  const list=(p)=>[...h.slice(h.indexOf(`<div class="plat" data-platform="${p}">`)).split('</div>')[0].matchAll(/<li><a href="[^"]+">([^<]+)/g)].map(m=>m[1]);
  for(const both of ['Larix Broadcaster','TVU Go']) assert.ok(list('ios').includes(both)&&list('android').includes(both),both);
@@ -224,6 +223,9 @@ assert 'back link to #nowhere, which is no answer' in run(lambda s, sv: answer(s
 assert 'back is "#more"' in run(lambda s, sv: answer(s, 'build').update(back='#more'))
 assert 'jumps to #nowhere' in run(lambda s, sv: block(s, 'hybrid', 'Pick where the hub runs')['choose'][0]['go'].update(href='#nowhere'))
 assert 'split by "windows"' in run(lambda s, sv: block(s, 'one-phone', 'Streaming apps').update(split=['ios', 'windows']))
+assert 'starts with a watch-out' in run(lambda s, sv: block(s, 'one-phone', 'Your first stream')['before'].insert(0, '! Careful.'))
+assert 'an ordered block lists steps only' in run(lambda s, sv: block(s, 'one-phone', 'Your first stream').update(select=[{'id': 'moblin'}]))
+assert 'a lead line without services' in run(lambda s, sv: block(s, 'build', 'What you need').update(lead='These:'))
 assert 'is tagged scene-control, but no block' in run(lambda s, sv: block(s, 'hybrid', 'Switch scenes while you are away').update(select=[{'id': 'moblin'}], notes={}))
 `],{stdio:'pipe'});
 });
@@ -246,3 +248,59 @@ test('Answers: exactly one back link at the top that names where it goes, no ste
  }
 });
 
+
+test('Numbered steps keep their numbers; watch-outs sit under a step without one', ()=>{
+ const h=answerHtml(docs.get('index.html'),'one-phone');
+ const ol=h.match(/<ol class="picks steps">([\s\S]*?)<\/ol>/)[1];
+ const steps=ol.split(/\n            <li>/).slice(1);
+ assert.equal(steps.length,2);
+ assert.ok(steps[0].startsWith('Install a streaming app')&&steps[1].startsWith('Test at home with Wi-Fi off'));
+ const nested=steps[0].match(/<ul class="picks mix">([\s\S]*?)<\/ul>/)[1];
+ assert.deepEqual([...nested.matchAll(/<li class="w"><span class="vh">Watch out: <\/span>([^.]+)/g)].map(m=>m[1]),['Keep the stream key secret','On YouTube, switch on live streaming a day early']);
+ assert.ok(!/<ol class="picks mix/.test(docs.get('index.html')),'an ordered list never drops its numbers');
+ const css=readFileSync('public/assets/style.css','utf8');
+ assert.ok(/ol\.picks\.steps[^{]*\{[^}]*list-style: decimal/.test(css));
+});
+
+test('Round 4: titles, summaries, steps, lead lines and side lines of the nine answers', ()=>{
+ const text=docs.get('index.html');
+ const want={
+  'second-network':['Add a second network',"Add a second internet connection on a different mobile network, and let your streaming app use both at once. That's called bonding. If one network has a bad moment, the other can carry the stream."],
+  'more':['Keep the phone going','When heat or an empty battery ends your stream, try these first.'],
+  'build':['Build your own backpack','You put the backpack together from parts and run one of these systems on it. You choose every part, and you set it up and fix it yourself.'],
+  'ready-made':['A ready-made backpack, with support','Ready to use when it arrives. Some fit in a backpack, others mount on the camera. Rentals and warranties depend on the package.'],
+  'several-cameras':['Several cameras in one scene','Something has to put the pictures together: an app on the phone, OBS on a PC or server, a hub in the cloud, or a box in your backpack.'],
+  'cloud':['Move the hub to the cloud','With the hub on a rented server, your away stream keeps running even if the PC, power or internet at home fails. The hub is OBS on that server, or a hosted service.'],
+  'receiver':['A receiver for your bonded stream',"Bonding splits your stream over several connections. A receiver is the server that joins it back together before OBS or the platform. Some apps and cloud hubs include one. If yours doesn't, pick one here."],
+  'into-obs':['Into OBS','Your app or backpack sends the stream to a receiver. OBS takes it from there. Start Streaming in OBS is what goes live.'],
+  'satellite':['Add a satellite dish',"Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy."]};
+ for(const [id,[title,sum]] of Object.entries(want)){
+  const h=answerHtml(text,id);
+  assert.equal(plain(h.match(new RegExp(`<h2 id="${id}-h">[\\s\\S]*?<\\/h2>`))[0]),title,id);
+  assert.equal(plain(h.match(/<p class="sum">[\s\S]*?<\/p>/)[0]),sum,id);
+ }
+ const sn=answerHtml(text,'second-network');
+ assert.deepEqual([...sn.matchAll(/<span class="vh">Step \d: <\/span>([^<]+)/g)].map(m=>m[1]),['Get a second connection','Bond them','Test it']);
+ const helper=sn.slice(sn.indexOf('Or a helper that bonds for your app or adds spare phones:'));
+ assert.ok(/^Or a helper[^<]*\n\s*<ul class="picks mix">\s*<li><a /.test(helper),'catalogue list nested under the helper line');
+ assert.ok(!sn.includes('class="sims-ref"'));
+ const sc=plain(answerHtml(text,'several-cameras'));
+ for(const l of ['When your phone app can show those cameras.','When you mix on a computer, at home or on a server.','When the show has to keep running if your PC at home fails.',"When you mix while you're out.",'with SRTLA bonding and drop protection.','Desktop and IRL.']) assert.ok(sc.includes(l),l);
+ const more=answerHtml(text,'more');
+ assert.equal(plain(more.match(/<h3 class="q" id="more-q">[\s\S]*?<\/h3>/)[0]),'Still too hot or too short?');
+ assert.ok(plain(more).includes('Still too hot or too short? A backpack carries a small streaming computer, mobile modems and a battery, so the phone no longer does that work. Do you want to build and look after one yourself?'));
+ assert.ok(plain(more).includes('Extra cooling Tips from other streamers:')&&!more.includes("I haven't tested")&&!more.includes('Work in progress'));
+ assert.equal((more.match(/class="tip-src"/g)||[]).length,5);
+ const obs=plain(answerHtml(text,'into-obs'));
+ assert.ok(obs.includes('OBS IRL Source or Smooth Media Source (Windows), reconnects on its own.')&&obs.includes('two fight over the scenes')&&!obs.includes('Choose something else'));
+});
+
+test('Site copy says receiver; relay is only another name in the glossary and part of product names', ()=>{
+ const ok=[/IRLrelays/g,/Moblink relays/g,/self-hosted relay workflows/g,/relay ID/g,/BELABOX Cloud Relay/g];
+ for(const [f,t] of docs){
+  let txt=plain(t.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<(?:[^>"]|"[^"]*")*>/g,' '));
+  for(const r of ok) txt=txt.replace(r,'');
+  if(f==='glossary.html') txt=txt.replace('Also called: Relay server, Bonding server','');
+  assert.ok(!/relay/i.test(txt),`${f}: ${(txt.match(/.{0,60}relay.{0,30}/i)||[''])[0]}`);
+ }
+});
