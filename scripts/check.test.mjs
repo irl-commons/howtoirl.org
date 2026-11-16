@@ -90,3 +90,54 @@ assert not r.permalink_problems('sample.html', out)
 assert r.add_permalinks(out) == out
 `],{stdio:'pipe'});
 });
+
+test('Home: hidden h1, no lede or steps bar, the three groups with the agreed card texts', async()=>{
+ const text=docs.get('index.html');
+ assert.ok(/<h1 class="vh">How to IRL<\/h1>/.test(text));
+ assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
+ const start=text.slice(text.indexOf('id="start"'),text.indexOf('</section>',text.indexOf('id="start"')));
+ assert.ok(!start.includes('class="steps"'));
+ const cards=[...start.matchAll(/<strong>([^<]+)<\/strong><span>([^<]+)<\/span>/g)].map(m=>`${m[1]} — ${m[2]}`.replaceAll('&#39;',"'"));
+ assert.deepEqual(cards,[
+  'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
+  'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
+  'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
+  'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
+  'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
+});
+
+test('Answer blocks are collapsible, with the first one open', ()=>{
+ const text=docs.get('index.html');
+ for(const m of text.matchAll(/<section class="step result" id="([^"]+)"[\s\S]*?<\/section>/g)){
+  const blocks=[...m[0].matchAll(/<details class="block"( open)?>/g)];
+  assert.ok(blocks.length>0,m[1]);
+  assert.deepEqual(blocks.map(b=>!!b[1]),blocks.map((_,i)=>i===0),m[1]);
+ }
+});
+
+test('setup.yaml checks catch unknown values, untagged homes and stale notes', async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-c', `
+import sys, json, pathlib, copy
+sys.path.insert(0, 'scripts')
+import setup as st
+pkg = pathlib.Path('node_modules/@irl-commons/data')
+base, found = st.check(pkg)
+assert found == [], found
+services = json.loads((pkg / 'data/services.json').read_text())['services']
+allowed = st.allowed_values(json.loads((pkg / 'schema/json/services.schema.json').read_text()), services)
+def run(change):
+    s, sv = copy.deepcopy(base), copy.deepcopy(services)
+    change(s, sv)
+    return ' | '.join(st.problems(s, sv, allowed))
+def block(s, aid, title):
+    return next(b for a in s['answers'] if a['id'] == aid for b in a['blocks'] if b['title'] == title)
+assert 'tags "dslr" is not in IRL Commons' in run(lambda s, sv: block(s, 'better-picture', 'Into your phone')['select'][0].update(tags='dslr'))
+assert 'class "phones" is not in IRL Commons' in run(lambda s, sv: block(s, 'one-phone', 'Apps that help')['select'][0].update({'class': 'phones'}))
+assert 'unknown field "colour"' in run(lambda s, sv: block(s, 'one-phone', 'Apps that help')['select'][0].update(colour='red'))
+assert 'is tagged camera-in, but no block' in run(lambda s, sv: next(x for x in sv if x['id'] == 'speedify')['tags'].append('camera-in'))
+assert 'note for "irlplus-cast", which this block no longer selects' in run(lambda s, sv: next(x for x in sv if x['id'] == 'irlplus-cast')['tags'].remove('camera-in'))
+assert 'no such service' in run(lambda s, sv: block(s, 'better-picture', 'In a backpack')['before'].append('{no-such-app}'))
+`],{stdio:'pipe'});
+});

@@ -1,0 +1,56 @@
+name: Update IRL Commons data
+# Pins the newest IRL Commons commit, builds and runs every check, and opens a pull request.
+# A failed run means the new data doesn't fit the site, for example a newly tagged service
+# that no setup answer shows; content/setup.yaml says how to fix that.
+on:
+  schedule:
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: data-bump
+  cancel-in-progress: false
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+      - name: Pin the newest commit
+        id: pin
+        run: |
+          sha=$(git ls-remote https://github.com/irl-commons/irl-commons.git refs/heads/main | cut -f1)
+          [ -n "$sha" ] || { echo "Could not read the IRL Commons main branch" >&2; exit 1; }
+          current=$(node -p "require('./package.json').dependencies['@irl-commons/data'].split('/').pop()")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          if [ "$sha" = "$current" ]; then echo "Already on $sha."; echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          npm install --save-exact --ignore-scripts "@irl-commons/data@https://codeload.github.com/irl-commons/irl-commons/tar.gz/$sha"
+          node -e 'const fs=require("fs");const c=JSON.parse(fs.readFileSync("site.json","utf8"));c.dataCommit=process.argv[1];fs.writeFileSync("site.json",JSON.stringify(c,null,2)+"\n")' "$sha"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Build and check
+        if: steps.pin.outputs.changed == 'true'
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+      - name: Open a pull request
+        if: steps.pin.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.pin.outputs.sha }}
+        run: |
+          short=${SHA:0:7}
+          branch="data/irl-commons-$short"
+          if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null; then echo "$branch already exists."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add package.json package-lock.json site.json
+          git commit -m "Data: IRL Commons at $short"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Data: IRL Commons at $short" \
+            --body "Pins @irl-commons/data to irl-commons/irl-commons@$SHA. The build and all checks passed in the scheduled run, including the setup.yaml checks. Deploy after merging."

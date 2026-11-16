@@ -9,8 +9,9 @@
     "check": "npm run build && npm test"
   },
   "dependencies": {
-    "@irl-commons/data": "https://codeload.github.com/irl-commons/irl-commons/tar.gz/65d1dbdc363f7c06dc2a9dfcf07d955526ed48d0",
-    "astro": "7.4.12"
+    "@irl-commons/data": "https://codeload.github.com/irl-commons/irl-commons/tar.gz/b65b76a4f4653fe66a34304ce23f75cab37d4f1f",
+    "astro": "7.4.12",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "html-validate": "11.21.1"
