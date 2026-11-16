@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir,stat} from 'node:fs/promises';
 import {readFileSync} from 'node:fs';
+import * as nodeVm from 'node:vm';
+const require_vm=()=>nodeVm;
 import path from 'node:path';
 import {HtmlValidate} from 'html-validate';
 const root=path.resolve('dist');
@@ -303,4 +305,78 @@ test('Site copy says receiver; relay is only another name in the glossary and pa
   if(f==='glossary.html') txt=txt.replace('Also called: Relay server, Bonding server','');
   assert.ok(!/relay/i.test(txt),`${f}: ${(txt.match(/.{0,60}relay.{0,30}/i)||[''])[0]}`);
  }
+});
+
+const helpMain=()=>{const t=docs.get('help.html');return t.slice(t.indexOf('<main'),t.indexOf('</main>'));};
+
+test('Help: four part boxes, rows A-Z with one best-channel button, toggles and search only with script', ()=>{
+ const h=helpMain();
+ const boxes=[...h.matchAll(/<section class="part-box" data-st="([a-z]+)"[\s\S]*?<\/section>/g)];
+ assert.deepEqual(boxes.map(b=>b[1]),['sender','connections','receiver','tools']);
+ assert.deepEqual(boxes.map(b=>plain(b[0].match(/<h2[\s\S]*?<\/h2>/)[0]).replace(/\s*\(?(\d+) apps\)?/,' $1')),
+  boxes.map(b=>{const n=(b[0].match(/<li class="row"/g)||[]).length;return `${{sender:'Camera and sender',connections:'Connections',receiver:'Receiver or cloud',tools:'OBS and tools'}[b[1]]} ${n}`;}));
+ for(const b of boxes){
+  const names=[...b[0].matchAll(/<span class="rn-n">([^<]+)<\/span>/g)].map(m=>plain(m[1]));
+  assert.deepEqual(names,[...names].sort((x,y)=>x.toLowerCase()<y.toLowerCase()?-1:1),b[1]);
+  for(const row of b[0].matchAll(/<li class="row"[\s\S]*?<\/li>/g)){
+   const r=row[0];
+   assert.equal((r.match(/class="rb"/g)||[]).length,1,r.slice(0,80));
+   const types=[...r.matchAll(/data-ct="([A-Za-z]+)"/g)].map(m=>m[1]);
+   assert.equal(new Set(types).size,types.length,'one link per type');
+   const order=['Discord','Forum','Help','Contact','GitHub','Website'];
+   assert.deepEqual(types,[...types].sort((x,y)=>order.indexOf(x)-order.indexOf(y)),'Discord, forum, help, contact, then the website');
+   if(types.includes('GitHub')) assert.deepEqual(types.filter(t=>t!=='Website'),['GitHub'],'GitHub only when it is the only way');
+   assert.ok(/<button type="button" class="tog sm" data-t="[a-z0-9-]+" aria-pressed="false" aria-label="Add [^"]+ to my apps" hidden>\+<\/button>/.test(r));
+  }
+ }
+ assert.ok(/<div class="search" hidden><label class="sbox">[\s\S]*?placeholder="Find your app"/.test(h));
+ assert.ok(/<section class="mine" id="my-stack" hidden/.test(h)&&/<div class="filters" hidden>/.test(h));
+});
+
+test('Help: My apps bar is Share link, Share, Saved on this device, Clear; no helper wording', ()=>{
+ const h=helpMain();
+ const bar=plain(h.match(/<div class="mine-bar">[\s\S]*?<\/div><\/section>/)[0].replace(/<input[^>]*>/g,'').replace(/<\/(?:button|span)>/g,' '));
+ assert.equal(bar,'Share link Share Saved on this device Clear');
+ assert.ok(!/helper/i.test(plain(h.replace(/<[^>]+>/g,' '))));
+ const css=readFileSync('public/assets/style.css','utf8');
+ assert.ok(/\.myapps \.mine-bar > \.share-wrap > #share, \.myapps \.mine-bar > #nshare \{[^}]*height: 36px;[^}]*line-height: 1;/.test(css),'Share link and Share have one height');
+});
+
+test('Help: Guides list the site\'s own pages first, then every IRL Commons guide; old addresses still land', ()=>{
+ const h=helpMain();
+ const own=h.slice(h.indexOf('id="g-own"'),h.indexOf('id="g-other"'));
+ assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['index.html#one-phone','index.html#second-network','index.html#hybrid','index.html#better-picture',
+  'index.html#several-cameras','index.html#cloud','index.html#more','index.html#satellite','index.html#receiver','index.html#into-obs','index.html#build','index.html#ready-made','data-plans.html','why-bonding.html']);
+ for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
+ const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
+ const other=h.slice(h.indexOf('id="g-other"'));
+ assert.deepEqual([...other.matchAll(/<li class="gi" id="([^"]+)"/g)].map(m=>m[1]),guides.map(g=>g.id));
+ const ids=new Set([...docs.get('help.html').matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+ for(const a of ['start-here','guides','my-stack','where-to-ask','listed','guides-camera','guides-obs','guides-platform','kind-video','kind-article','kind-docs','for-moblin']) assert.ok(ids.has(a),a);
+ assert.ok(/<p class="gcount"><span id="gcount" role="status">All 39 guides<\/span>/.test(h)||/All \d+ guides/.test(h));
+});
+
+test('Help script: typo-tolerant search and the addresses it understands', ()=>{
+ const vm=require_vm();
+ const site={};
+ vm.runInNewContext(readFileSync('public/assets/site.js','utf8'),{module:{get exports(){return site;},set exports(v){Object.assign(site,v);}}});
+ const hit=(q,s)=>site.fuzzy(q,s)>0;
+ for(const [q,s] of [['irlpro','IRL Pro irl-pro'],['streamerbot','Streamer.bot streamer-bot'],['moblni','Moblin moblin'],['mobln','Moblin moblin'],['obs studo','OBS Studio obs-studio'],['BELABOX','BELABOX belabox']]) assert.ok(hit(q,s),q);
+ for(const [q,s] of [['zzzz','Moblin moblin'],['speedify','OBS Studio obs-studio']]) assert.ok(!hit(q,s),q);
+ const P=h=>JSON.parse(JSON.stringify(site.parseHash(h)));
+ assert.deepEqual(P('#stack=moblin,irl-pro'),{tab:'help',stack:['moblin','irl-pro'],f:null,open:'',row:''});
+ assert.deepEqual(P('#ask-moblin'),{tab:'help',stack:null,f:null,open:'moblin',row:''});
+ assert.equal(P('#guides-obs').f.st,'tools');assert.equal(P('#guides-camera').f.st,'sender');assert.equal(P('#guides-platform').f.st,'receiver');
+ assert.equal(P('#for-moblin').f.app,'moblin');assert.equal(P('#kind-video').f.k,'video');
+ assert.deepEqual(P('#guides?part=obs&kind=video&for=moblin&q=set%20up').f,{src:'',st:'tools',k:'video',app:'moblin',q:'set up'});
+ assert.equal(P('#where-to-ask').tab,'help');assert.equal(P('#dimadesu-three-android-apps').row,'dimadesu-three-android-apps');
+ assert.equal(site.guidesHash({src:'',st:'',k:'',app:'moblin',q:''}),'#for-moblin');
+ assert.equal(site.guidesHash({src:'own',st:'',k:'',app:'',q:''}),'#guides?from=own');
+ assert.equal(site.guidesHash({src:'',st:'tools',k:'video',app:'',q:'obs'}),'#guides?part=tools&kind=video&q=obs');
+ assert.equal(site.countText(39,39),'All 39 guides');assert.equal(site.countText(3,39),'3 of 39 guides');
+});
+
+test('Privacy pages say what "My apps" keeps, in English and German', ()=>{
+ assert.ok(plain(docs.get('privacy.html')).includes('If you save apps under “My apps” on the Help page, your browser keeps that list only on your device; “Clear” removes it.'));
+ assert.ok(plain(docs.get('datenschutz.html')).includes('Apps, die Sie auf der Hilfeseite unter „My apps“ speichern, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear“ entfernt sie.'));
 });

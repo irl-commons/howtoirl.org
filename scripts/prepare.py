@@ -10,6 +10,7 @@ data={k:json.loads((pkg/'data'/f'{k}.json').read_text())[k] for k in ['words','s
 r.GUIDES[:]=data['guides'];r.SERVICES_BY_ID.update({s['id']:s for s in data['services']})
 r.GUIDE_THUMBS.update({m['for']['guide']:m for m in json.loads((ROOT/'shared/thumbnails.json').read_text())})
 setup,found=setup_answers.check(pkg)
+r.HELP_OWN[:]=setup_answers.help_pages(setup)
 if found:
  sys.exit('content/setup.yaml does not match IRL Commons:\n  '+'\n  '.join(found))
 rendered={}
@@ -38,6 +39,5 @@ for src in (ROOT/'content').glob('*.html'):
  rendered[src.name]=r.add_permalinks(body)
 (ROOT/'.generated').mkdir(exist_ok=True)
 (ROOT/'.generated/content.json').write_text(json.dumps(rendered,ensure_ascii=False))
-(ROOT/'public/assets/help-filters.css').write_text(r.help_filters_css(data['guides']))
 if 'links.html' in json.loads((ROOT/'site.json').read_text())['pages']:
  (ROOT/'public/assets/links-filters.css').write_text(r.links_filters_css(data['services']))
