@@ -19,7 +19,7 @@
 # A note that starts with a space follows the service name directly, without a colon.
 # `layout: steps` shows the blocks as numbered steps instead of folds; `sub: true` makes a block a
 # sub-section of the step before it, with an `anchor` id to jump to. `choose` puts option cards
-# (title, text, items, go: {href, label}) side by side. `legend: true` explains the two marks.
+# (title, text, items, go: {href, label}) side by side.
 # Texts are HTML. Link glossary words with class="gl".
 #
 # Each answer page has one back link at the top. Without `back` it says "All starting points"
@@ -91,8 +91,8 @@ answers:
         ordered: true
         before:
           - "Install a streaming app from the list below. Log in to your platform in the app, or copy the stream address and stream key from the platform's creator dashboard."
-          - Keep the stream key secret. Anyone who has it can go live on your channel.
-          - On YouTube, switch on live streaming a day early. The first time can take up to 24 hours.
+          - "! Keep the stream key secret. Anyone who has it can go live on your channel."
+          - "! On YouTube, switch on live streaming a day early. The first time can take up to 24 hours."
           - Test at home with Wi-Fi off, and watch on a second device.
       - title: Streaming apps
         open: true
@@ -102,7 +102,8 @@ answers:
       - title: Good to have
         open: true
         before:
-          - "A power bank, in case your phone runs empty. Unplug it when the phone gets hot: charging adds heat."
+          - A power bank, in case your phone runs empty.
+          - "! Unplug it when the phone gets hot: charging adds heat."
           - "A wireless mic. A lot of people add one for their IRL streams: the phone's own mic picks up wind and crowds, and loses your voice at arm's length."
           - "! Many mic receivers plug into the phone's charging port. Check that yours lets you charge at the same time."
     side:
@@ -166,7 +167,8 @@ answers:
           - "! <strong>Heat.</strong> Some cameras get too hot and switch themselves off, sooner in the sun. Run yours at home for as long as you plan to stream, and turn off auto power-off."
           - "! <strong>Clean picture.</strong> Look for \"clean HDMI\" in the camera's menu or specs. Without it, viewers see the camera's focus boxes and icons."
           - "<strong>Hands.</strong> Filming, talking and reading chat at once is hard. An action camera, or a phone, on a chest mount keeps your hands free. A bigger camera needs a mount, a gimbal or someone to run it."
-          - "<strong>Sound into the camera.</strong> The mic plugs into the camera, and the sound travels with the picture over HDMI, in sync. Every backpack and encoder can take it this way."
+          - "<strong>Sound into the camera.</strong> The mic plugs into the camera, and the sound travels with the picture over HDMI, in sync."
+          - "! Check that your app or backpack uses the camera's sound. Not all do."
           - "<strong>Sound into the phone or backpack.</strong> A USB mic or audio adapter plugs into the phone or the backpack. Easy to swap mics."
           - "! The picture arrives later than the sound on this route, so set an audio delay in the app or backpack."
       - title: Into your phone
@@ -242,7 +244,6 @@ answers:
     title: Desktop and IRL in one stream
     summary: 'To switch between desktop and IRL without ending your stream, send both to a <strong><a class="gl" href="glossary.html#hub">hub</a></strong>: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'
     layout: steps
-    legend: true
     blocks:
       - title: Pick where the hub runs
         choose:
@@ -305,7 +306,7 @@ answers:
       - title: During the stream
         before:
           - "Leaving the desk: go live in the phone app, check that the hub shows the phone's picture, then switch to the phone scene."
-          - "Coming back: switch to the desktop scene first, then stop the phone app."
+          - "! Coming back: switch to the desktop scene first, then stop the phone app. The other way round, viewers see a frozen picture or BRB."
           - '! When the phone''s signal drops, drop protection shows your BRB scene instead of a frozen picture. Set it up once: see <a href="#into-obs">into OBS</a>.'
     side:
       - else: '<strong>Choose something else when</strong> you want desk and phone on screen at the same time: <a href="#several-cameras">several cameras</a>.'

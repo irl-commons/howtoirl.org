@@ -283,8 +283,6 @@ def block_html(a: dict, b: dict, first: bool, services: list[dict], by_id: dict)
 def steps_html(a: dict, services: list[dict], by_id: dict) -> str:
     """`layout: steps`: numbered steps, each number once, with `sub: true` blocks as sub-sections of the step before."""
     out, n = [], 0
-    if a.get('legend'):
-        out.append('<p class="legend" aria-hidden="true"><span class="mk-dot"></span>= what to do <span class="mk-w">!</span>= watch out</p>')
     for b in a['blocks']:
         anchor = f' id="{b["anchor"]}"' if b.get('anchor') else ''
         if b.get('sub'):

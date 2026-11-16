@@ -1568,9 +1568,6 @@ details.block .picks.mix li.aside { margin-left: 0; padding-left: 0; }
 .picks.mix li.aside::before { content: none; }
 .picks li:is(.plain, .aside) > a:first-child { font-weight: inherit; }
 .picks.mix li.aside { font-size: 15px; color: var(--muted); }
-.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: var(--s2) 0 0; font-size: 13px; color: var(--muted); }
-.legend .mk-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--fg); margin: 0 2px 0 0; }
-.legend .mk-w { display: inline-block; position: static; margin: 0 2px 0 14px; }
 .stepblock > h3.num { display: flex; align-items: baseline; gap: 10px; font-size: 19px; line-height: 1.25; margin: var(--s3) 0 6px; }
 .stepblock > h3.num .n { flex: none; width: 26px; height: 26px; border-radius: 4px; background: var(--fg); color: var(--bg); font-size: 15px; line-height: 26px; text-align: center; }
 .stepblock > h4.sub { font-size: 17px; margin: var(--s2) 0 2px; scroll-margin-top: var(--s3); }
@@ -1595,7 +1592,7 @@ details.block .picks.mix li.aside { margin-left: 0; padding-left: 0; }
 .seg button[aria-pressed="true"]:focus-visible { outline-color: var(--bg); }
 @media (forced-colors: active) {
   .seg button[aria-pressed="true"] { background: Highlight; color: HighlightText; }
-  .picks.mix li::before, .legend .mk-dot { background: CanvasText; }
-  .picks.mix li.w::before, .legend .mk-w { border-color: CanvasText; color: CanvasText; background: none; }
+  .picks.mix li::before { background: CanvasText; }
+  .picks.mix li.w::before { border-color: CanvasText; color: CanvasText; background: none; }
 }
 @media print { .seg { display: none; } .plat[hidden] { display: block; } .plats.is-switch .plat h4 { position: static; width: auto; height: auto; clip: auto; } }

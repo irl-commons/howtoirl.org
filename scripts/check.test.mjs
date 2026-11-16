@@ -143,7 +143,7 @@ test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser 
 
 test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in all three answers', ()=>{
  const text=docs.get('index.html');
- const want={'hybrid':8,'one-phone':1,'better-picture':4};
+ const want={'hybrid':9,'one-phone':4,'better-picture':5};
  for(const [id,n] of Object.entries(want)){
   const h=answerHtml(text,id);
   const marks=[...h.matchAll(/<li class="w">(.*?)<\/li>/g)];
@@ -151,12 +151,22 @@ test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in a
   for(const m of marks) assert.ok(m[1].startsWith('<span class="vh">Watch out: </span>'),id);
   assert.ok(/<ul class="picks mix">/.test(h),id);
  }
+ const all=plain(text);
+ for(const line of ['! Keep the stream key secret. Anyone who has it can go live on your channel.',
+  '! On YouTube, switch on live streaming a day early. The first time can take up to 24 hours.',
+  "! Many mic receivers plug into the phone's charging port. Check that yours lets you charge at the same time.",
+  'A power bank, in case your phone runs empty. ! Unplug it when the phone gets hot: charging adds heat.',
+  '! Coming back: switch to the desktop scene first, then stop the phone app. The other way round, viewers see a frozen picture or BRB.',
+  "! Check that your app or backpack uses the camera's sound. Not all do."])
+  assert.ok(all.includes(line),line);
+ assert.ok(!all.includes('Every backpack and encoder'));
+ for(const [f,t] of docs) assert.ok(!t.includes('class="legend"')&&!/= what to do|= watch out/.test(t),f);
  assert.ok(/\.picks\.mix li\.w::before[^{]*\{[^}]*var\(--caution\)/.test(readFileSync('public/assets/style.css','utf8')));
 });
 
 test('One phone: first stream steps, an iPhone/Android switch that works without script, and the data line', ()=>{
  const h=answerHtml(docs.get('index.html'),'one-phone');
- assert.equal([...h.matchAll(/<ol class="picks">[\s\S]*?<\/ol>/g)][0][0].match(/<li/g).length,4);
+ assert.equal([...h.matchAll(/<ol class="picks[^"]*">[\s\S]*?<\/ol>/g)][0][0].match(/<li/g).length,4);
  assert.ok(/<div class="seg" role="group" aria-label="Phone" hidden><button type="button" data-platform="ios" aria-pressed="false">iPhone<\/button><button type="button" data-platform="android" aria-pressed="false">Android<\/button><\/div>/.test(h));
  const list=(p)=>[...h.slice(h.indexOf(`<div class="plat" data-platform="${p}">`)).split('</div>')[0].matchAll(/<li><a href="[^"]+">([^<]+)/g)].map(m=>m[1]);
  for(const both of ['Larix Broadcaster','TVU Go']) assert.ok(list('ios').includes(both)&&list('android').includes(both),both);
