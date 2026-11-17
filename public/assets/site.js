@@ -820,7 +820,7 @@
       $("keep").hidden = showing !== "shared";
       $("flip").textContent = showing === "shared" ? "Show mine" : "Show shared";
       $("my-stack").hidden = !list.length || searching;
-      $("mine-h").textContent = showing === "shared" ? "Shared apps" : "My apps";
+      $("mine-h").textContent = "Based on your setup";
       $("mine-grid").innerHTML = list.map(function (id) { return card(apps[id], true); }).join("");
       $("saved").hidden = $("clear").hidden = showing === "shared";
       if (!list.length && !popEl.hidden) pop(false);
