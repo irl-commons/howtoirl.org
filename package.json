@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "python3 scripts/prepare.py && astro build",
-    "test": "node --test scripts/check.test.mjs scripts/banned-phrases.test.mjs",
-    "check": "npm run build && npm test"
+    "test": "node --test scripts/check.test.mjs scripts/banned-phrases.test.mjs scripts/budget.test.mjs",
+    "check": "npm run build && npm test",
+    "check:browser": "node --test scripts/browser.test.mjs",
+    "budget": "node scripts/budget.mjs",
+    "snapshots": "node scripts/snapshots.mjs",
+    "serve": "node scripts/serve.mjs"
   },
   "dependencies": {
     "@irl-commons/data": "0.3.0",
@@ -14,7 +18,9 @@
     "yaml": "2.9.1"
   },
   "devDependencies": {
-    "html-validate": "11.21.1"
+    "axe-core": "4.14.0",
+    "html-validate": "11.21.1",
+    "playwright-core": "1.65.0"
   },
   "engines": {
     "node": ">=26"
