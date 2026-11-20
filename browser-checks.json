@@ -1,0 +1,12 @@
+{
+ "themeStorageKey": "osb.theme",
+ "states": {"index.html": "section.step[id]:not(#start)"},
+ "baseline": [
+  {
+   "page": "help.html",
+   "check": "overflow",
+   "variants": ["reflow-320"],
+   "why": "At 320 pixels the Where to ask boxes are 12 pixels wider than the screen: the one-column grid sizes to its widest row. Not fixed yet."
+  }
+ ]
+}
