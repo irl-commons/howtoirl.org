@@ -1106,6 +1106,18 @@ details.sources > .tip-src { display: block; margin-top: 4px; margin-bottom: 8px
 .pieces-fig .pc-in { font-size: 18px; }
 .pc-note { text-anchor: middle; }
 .why-page .read > h3 { font-size: var(--t-h3); margin: var(--s4) 0 var(--s1); scroll-margin-top: var(--s3); }
+/* Guide pages: a short answer under the heading, chains of parts, and figures inside the reading column. */
+.guide-page .read > h3 { font-size: var(--t-h3); margin: var(--s4) 0 var(--s1); scroll-margin-top: var(--s3); }
+.guide-page .short-answer { margin: 0 0 var(--s3); padding: 12px var(--s2); border: 1.5px solid var(--rule-strong); border-radius: var(--radius); background: var(--card); }
+.guide-page .short-answer ul { margin: 6px 0 0; }
+.guide-page .part-chain { margin-bottom: var(--s3); }
+.guide-page .chain-title { margin: var(--s3) 0 var(--s1); font-size: 17px; }
+.guide-page .ask-table { font-size: var(--t-small); }
+@media (max-width: 759px) { .guide-page .ask-table td:nth-child(2) { width: auto; } }
+.guide-page .golive { margin-top: 0; }
+.guide-page .bul li.w { padding-left: 26px; }
+.guide-page .bul li.w::before { content: "!"; content: "!" / ""; left: 0; top: calc(0.5lh - 8.5px); width: 17px; height: 17px; box-sizing: border-box; border-radius: 4px; background: none; border: 1.5px solid var(--caution); color: var(--caution); font: 700 12px/14px var(--sans); text-align: center; }
+@media (forced-colors: active) { .guide-page .bul li.w::before { border-color: CanvasText; color: CanvasText; } }
 @media (forced-colors: active) { .dip-band { fill: none; stroke: CanvasText; stroke-dasharray: 2 4; } .tw-share, .tw-phones rect { stroke: CanvasText; } }
 
 .three-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }

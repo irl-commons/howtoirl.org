@@ -39,6 +39,27 @@ why-bonding.html:
   illustrations: guide
   next: {href: data-plans.html, label: Data plans and SIMs}
 
+something-wrong.html:
+  title: Find what broke while you're live · How to IRL
+  description: When your IRL stream misbehaves, follow it from the camera to your viewers, find the part that stopped, and know what to note before you ask for help.
+  section: help.html
+  illustrations: guide
+  next: {href: protocols.html, label: "RTMP, SRT or SRTLA?"}
+
+protocols.html:
+  title: RTMP, SRT or SRTLA? · How to IRL
+  description: What RTMP, SRT and SRTLA each do, which one fits your connection, caller and listener, three working setups into OBS, and how to pick SRT latency.
+  section: help.html
+  illustrations: guide
+  next: {href: power.html, label: Power and flying with batteries}
+
+power.html:
+  title: Power and flying with batteries · How to IRL
+  description: How long a power bank really runs your IRL stream, measuring your setup's draw, USB-C cables and voltages, and the rules for flying with power banks.
+  section: help.html
+  illustrations: guide
+  next: {href: help.html, label: Help}
+
 links.html:
   title: Apps and services · How to IRL
   description: Phone apps, bonding and receivers, backpacks, cloud production and more for IRL streaming, by what you need and what it runs on.

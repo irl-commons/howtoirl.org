@@ -72,6 +72,9 @@ groups:
       - {href: help.html, icon: i-help, title: Help, text: Find guides and help for the apps and services you use}
       - {href: data-plans.html, icon: i-network, title: Data plans and SIMs, text: 'Upload speed, how much data you need, and the limits behind "unlimited"'}
       - {href: why-bonding.html, icon: i-between, title: "Why more than one network?", text: "One network has short bad moments, even a fast one. A second network covers them."}
+      - {href: something-wrong.html, icon: i-q, title: "Find what broke while you're live", text: "Follow the stream from the camera to your viewers, and find the part that stopped."}
+      - {href: protocols.html, icon: a-chain, title: "RTMP, SRT or SRTLA?", text: "Which one fits your connection, and how to get it into OBS."}
+      - {href: power.html, icon: s-hot, title: Power and flying with batteries, text: "How long a power bank really lasts, the cables that matter, and taking batteries on a plane."}
 
 answers:
   - id: more
@@ -114,6 +117,7 @@ answers:
       - {to: ready-made, icon: a-ready, title: "No, I'll buy one", text: "Ready to use, with support."}
     side:
       - else: '<strong>Choose something else when</strong> the stream only drops in crowds: <a href="#second-network">a second network</a> is the smaller step.'
+      - next: '<strong>How long will it run?</strong> <a href="power.html">Power and flying with batteries</a>.'
 
   - id: one-phone
     icon: i-phone
@@ -446,6 +450,7 @@ answers:
           - "! It needs a server, or a PC at home that your phone or backpack can reach from the internet. At home that means port forwarding, which some internet connections don't allow."
     side:
       - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>.'
+      - next: '<strong>Which protocol?</strong> <a href="protocols.html">RTMP, SRT or SRTLA</a>, caller and listener, and SRT latency.'
 
   - id: into-obs
     back: history
@@ -518,6 +523,7 @@ answers:
           - "Run a short test and watch the platform's own dashboard. It shows whether a stream arrives."
     after:
       - "Still stuck? Before you ask for help, note your app and its version, your phone, the network and the time it happened. Blank out your stream key in screenshots."
+      - 'To check every part, from the camera to the platform: <a href="something-wrong.html">Find what broke while you''re live</a>.'
     sources:
       - {label: "IRLToolkit: Cloud OBS quick start", url: "https://kb.irltoolkit.com/cloudobs/0-QuickStart"}
       - {label: "IRLToolkit: NoDrop quick start", url: "https://kb.irltoolkit.com/nodrop/0-QuickStart"}
@@ -540,6 +546,7 @@ answers:
           - "! OBS's own media source can stay stuck after a dropout. A source made for IRL, such as {obs-irl-source} or {smooth-media-source} (Windows), reconnects on its own."
     after:
       - "Still stuck? Before you ask for help, note your app and its version, your phone, the network and the time it happened. Blank out your stream key in screenshots."
+      - 'To check every part, from the camera to the platform: <a href="something-wrong.html">Find what broke while you''re live</a>.'
     sources:
       - {label: "NOALBS: troubleshooting", url: "https://docs.noalbs.com/guides/troubleshooting/"}
       - {label: "OBS IRL Source README", url: "https://github.com/irlserver/obs-irl-source"}
@@ -565,6 +572,7 @@ answers:
           - 'To reload the alerts each time a scene goes live, switch on "Refresh browser source when scene becomes active". It''s off by default too.'
     after:
       - "Still stuck? Before you ask for help, note your app and its version, your phone, the network and the time it happened. Blank out your stream key in screenshots."
+      - 'To check every part, from the camera to the platform: <a href="something-wrong.html">Find what broke while you''re live</a>.'
     sources:
       - {label: "Moblin: scene settings (source code)", url: "https://github.com/eerimoq/moblin/blob/main/Moblin/View/Settings/Scenes/Scene/SceneSettingsView.swift"}
       - {label: "OBS IRL Source README", url: "https://github.com/irlserver/obs-irl-source"}
@@ -588,6 +596,7 @@ answers:
           - "A spare phone with Moblink: turn off energy saving on that phone, and allow Moblink's notifications."
     after:
       - "Still stuck? Before you ask for help, note your app and its version, your phone, the network and the time it happened. Blank out your stream key in screenshots."
+      - 'To check every part, from the camera to the platform: <a href="something-wrong.html">Find what broke while you''re live</a>.'
     sources:
       - {label: "SRTLA sender (source code)", url: "https://github.com/BELABOX/srtla/blob/main/srtla_send.c"}
       - {label: "Moblin: SRT settings (source code)", url: "https://github.com/eerimoq/moblin/blob/main/Moblin/View/Settings/Streams/Stream/Srt/StreamSrtSettingsView.swift"}
