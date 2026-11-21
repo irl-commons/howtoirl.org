@@ -1724,3 +1724,6 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 .copy-link:hover, .copy-link.is-copied { border-color: var(--fg); }
 .copy-link[hidden] { display: none; }
 .moved-list:not(:has(:target)) { display: none; }
+/* What How to IRL promises, under the name on Home. */
+.page-head > .promise { max-width: 40ch; margin-top: var(--s2); font-size: clamp(19px, 2.2vw, 23px); line-height: 1.4; text-wrap: pretty; }
+.page-head > .promise-by { margin-top: 8px; font-size: var(--t-small); color: var(--muted); }

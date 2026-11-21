@@ -96,7 +96,7 @@ assert r.add_permalinks(out) == out
 
 test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups with the agreed card texts', async()=>{
  const text=docs.get('index.html');
- assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<\/header>/.test(text));
+ assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<p class="promise">Plain, checked answers for streaming away from your desk, from your first phone stream to a full backpack.<\/p>\s*<p class="promise-by">Free, no ads, no sign-up.<\/p>\s*<\/header>/.test(text));
  assert.ok(!text.includes('sims-note')&&!text.includes('How to pick data plans and SIMs')&&!text.includes('class="pager'));
  assert.ok(/<ul class="choices learn" id="sims"/.test(text),'#sims still lands on the Learn section');
  assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
@@ -435,4 +435,15 @@ test('Every answer has its own page, title, description and share image; old hom
  assert.ok(!home.includes('class="step result')&&home.includes('<p class="moved" id="second-network">This answer has its own page now: <a href="second-network.html">Add a second network</a></p>'));
  assert.ok(home.includes('<p class="moved" id="hybrid-home">This answer has its own page now: <a href="hybrid.html#hybrid-home">'));
  assert.ok(/<a href="second-network.html"><svg class="ill"/.test(home),'home cards link to the answer pages');
+});
+
+test('Site nav: Start, Fix, Guides, Glossary on every page; Apps and services and Contact are in the footer', ()=>{
+ const current={'index.html':'Start','help.html':'Guides','data-plans.html':'Guides','why-bonding.html':'Guides','glossary.html':'Glossary'};
+ for(const [name,text] of docs){
+  const nav=text.match(/<nav class="site-nav"[\s\S]*?<\/nav>/)[0];
+  assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(m=>`${m[2]} ${m[1]}`),['Start index.html','Fix index.html#grp-fix-what-breaks','Guides help.html#guides','Glossary glossary.html'],name);
+  assert.deepEqual([...nav.matchAll(/aria-current="page">([^<]+)</g)].map(m=>m[1]),current[name]?[current[name]]:[],name);
+  const foot=text.slice(text.indexOf('<footer'));
+  assert.ok(foot.includes('href="links.html"')&&foot.includes('href="contact.html"'),name);
+ }
 });

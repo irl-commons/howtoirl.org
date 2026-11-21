@@ -541,5 +541,5 @@ def answer_shells(setup: dict, home: dict) -> list[dict]:
             assert n == 1, (name, pattern)
         after = home['after'].replace('howtoirl.org%2F%3A%20', f'howtoirl.org%2F{name}%3A%20')
         out.append({'name': name, 'meta': {**home['meta'], 'title': title, 'description': desc, 'nav': 'answer'},
-                    'head': head, 'before': home['before'], 'after': after})
+                    'head': head, 'before': home['before'].replace(' aria-current="page"', ''), 'after': after})
     return out
