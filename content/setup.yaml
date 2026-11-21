@@ -27,6 +27,9 @@
 # sub-section of the step before it, with an `anchor` id to jump to. `choose` puts option cards
 # (title, text, items, go: {href, label}) side by side.
 # Texts are HTML. Link glossary words with class="gl".
+# `checked: YYYY-MM-DD` shows "Checked <date> · Report a mistake" under the summary. Set it only when every claim
+# on the answer was read against its source that day and no finding is open; a guide page section takes
+# data-checked="YYYY-MM-DD" on its <section> for the same line under its h2.
 #
 # Each answer is a page of its own at <id>.html: list it in site.json pages and run npm run share-images.
 # Links between answers are written as "#<id>" here and point to that page once built.
@@ -71,6 +74,7 @@ groups:
 
 answers:
   - id: more
+    checked: 2026-11-21
     question: true
     icon: s-hot
     title: Keep the phone going
@@ -160,6 +164,7 @@ answers:
       - next: '<strong>Why it works:</strong> <a href="why-bonding.html">Why more than one network?</a>'
 
   - id: build
+    checked: 2026-11-21
     back: {to: more, label: Build or buy}
     icon: a-build
     title: Build your own backpack
@@ -404,6 +409,7 @@ answers:
         select: [{class: cloud}]
 
   - id: satellite
+    checked: 2026-11-21
     icon: i-satellite
     title: Add a satellite dish
     summary: Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy.
@@ -422,6 +428,7 @@ answers:
 
   # "Live, but something's wrong?": the four questions asked most, each a few checks in the order worth trying.
   - id: live-not-on-platform
+    checked: 2026-11-21
     icon: a-chain
     title: "Live in the app, but nobody sees it"
     summary: 'Your app may not send to the platform itself. Often it sends to a <a class="gl" href="glossary.html#hub">hub</a> first: a receiver, a cloud OBS or OBS at home. Then the hub goes live on the platform, with its own start.'
@@ -448,6 +455,7 @@ answers:
       - {label: "IRLToolkit: no destination enabled", url: "https://kb.irltoolkit.com/cloudobs/1-Troubleshooting/NoDestEnabled"}
 
   - id: picture-frozen
+    checked: 2026-11-21
     icon: s-camera
     title: "The picture froze, but you're still live"
     summary: "Something between the camera and your viewers stopped while the stream kept going. Find out which part: the camera's link to the phone, or the feed into OBS."
@@ -469,6 +477,7 @@ answers:
       - {label: "OBS IRL Source README", url: "https://github.com/irlserver/obs-irl-source"}
 
   - id: no-sound-or-alerts
+    checked: 2026-11-21
     icon: s-silent
     title: "No sound, or the alerts are gone"
     summary: 'The picture is fine, so follow the sound from where it starts: the mic, then your app, then OBS. Alerts are web pages inside OBS, and they only play while they are loaded.'
@@ -495,6 +504,7 @@ answers:
       - {label: "OBS: browser source", url: "https://obsproject.com/kb/browser-source"}
 
   - id: second-link-idle
+    checked: 2026-11-21
     icon: i-network
     title: "The second connection carries nothing"
     summary: "Connected isn't the same as carrying. Either your app isn't bonding over that connection, or your receiver can't be reached over it."

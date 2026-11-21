@@ -46,6 +46,7 @@ for src in (ROOT/'content').glob('*.html'):
  body=r.fill_standards(body,data['standards'],data['services'],data['words'])
  body=r.fill_services(body,data['services'])
  body=r.fill_calc(body,r.datause.load_model())
+ body=setup_answers.stamp_sections(body)
  rendered[src.name]=finish(body)
 # Each answer is a page of its own, with its own title, description and share image.
 answer_pages=setup_answers.answer_pages(setup,data['services'])

@@ -1736,3 +1736,7 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 .start .choices.symptoms strong { font-size: 17px; line-height: 1.25; align-self: stretch; }
 .start .choices.symptoms span { font-size: 15px; line-height: 1.35; }
 @media (min-width: 1000px) { .start .choices.symptoms, .fits-page .start .choices.symptoms { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+/* "Checked <date> · Report a mistake" under a section heading or an answer's summary. */
+.stamp { margin: 4px 0 var(--s2); font-size: var(--t-meta); color: var(--muted); }
+.stamp a { color: inherit; }
+.result-head .stamp { margin-top: -8px; }
