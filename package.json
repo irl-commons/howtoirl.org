@@ -10,7 +10,8 @@
     "check:browser": "node --test scripts/browser.test.mjs",
     "budget": "node scripts/budget.mjs",
     "snapshots": "node scripts/snapshots.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "share-images": "node scripts/share-images.mjs"
   },
   "dependencies": {
     "@irl-commons/data": "0.3.0",

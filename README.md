@@ -45,6 +45,11 @@ selects by that tag, or when a note's service has left its block. A daily job
 (`.github/workflows/data-bump.yml`) pins the newest stable npm release of IRL Commons, runs
 every check and opens a pull request.
 
+Each answer is a page of its own, `<answer id>.html`, with the home page's shell and its own
+title, description and share image. A new answer needs its page in `site.json` (the build stops
+without it) and a share image: build, then run `npm run share-images` and commit
+`public/assets/share/`. Old links to an answer on the home page (`/#second-network`) still land.
+
 Edit prose in `content/`, page metadata and navigation in `src/shells.json`,
 and the Astro layout and components in `src/`. The build resolves catalogue
 slots from `@irl-commons/data`, pinned to an exact npm version. To update it,

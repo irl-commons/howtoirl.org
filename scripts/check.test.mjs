@@ -96,7 +96,7 @@ assert r.add_permalinks(out) == out
 
 test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups with the agreed card texts', async()=>{
  const text=docs.get('index.html');
- assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<\/header>/.test(text));
+ assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<p class="promise">Plain, checked answers for streaming away from your desk, from your first phone stream to a full backpack.<\/p>\s*<p class="promise-by">Free, no ads, no sign-up.<\/p>\s*<\/header>/.test(text));
  assert.ok(!text.includes('sims-note')&&!text.includes('How to pick data plans and SIMs')&&!text.includes('class="pager'));
  assert.ok(/<ul class="choices learn" id="sims"/.test(text),'#sims still lands on the Learn section');
  assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
@@ -106,16 +106,18 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
  assert.deepEqual(cards,[
   'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
   'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
+  'Phone says live, nobody sees it — The platform shows you offline','Picture frozen — Viewers see a still picture',
+  "No sound or alerts — The picture is fine, the sound isn't","Second phone or SIM idle — Connected, but the stream doesn't use it",
   'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
   'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
   'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
   'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
   'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.']);
- assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something',"Live, but something's wrong?",'Fix what breaks','Learn more and get help']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
- const text=docs.get('index.html');
+ const text=allAnswers();
  const open={'one-phone':[true,true,true],'better-picture':[true,false,false,false],'build':[true,true],'receiver':[true,true]};
  for(const m of text.matchAll(/<section class="step result" id="([^"]+)"[\s\S]*?<\/section>/g)){
   const blocks=[...m[0].matchAll(/<details class="block"( open)?>/g)];
@@ -126,16 +128,18 @@ test('Answer blocks are collapsible, with the first one open; step-by-step answe
  assert.ok(hybrid.startsWith('<section class="step result steps" id="hybrid"')&&!hybrid.includes('<details'));
 });
 
-const answerHtml=(text,id)=>text.match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
+const answerHtml=(_text,id)=>docs.get(`${id}.html`).match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
+const answerPages=()=>[...docs].filter(([f,t])=>t.includes('class="wrap page fits-page answer-page"'));
+const allAnswers=()=>answerPages().map(([,t])=>t).join('\n');
 const plain=(html)=>html.replace(/<span class="vh">Watch out: <\/span>/g,'! ').replace(/<a class="permalink"[^>]*>#<\/a>/g,'').replace(/<[^>]+>/g,'').replaceAll('&nbsp;',' ').replaceAll('&#39;',"'").replaceAll('&quot;','"').replaceAll('&amp;','&').replace(/\s+/g,' ').trim();
 
 test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser and the scene-control list', ()=>{
  const h=answerHtml(docs.get('index.html'),'hybrid');
- assert.ok(h.includes('<h2 id="hybrid-h">Desktop and IRL in one stream'));
+ assert.ok(h.includes('<h1 id="hybrid-h">Desktop and IRL in one stream'));
  assert.ok(plain(h).includes('To switch between desktop and IRL without ending your stream, send both to a hub: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'));
- const steps=[...h.matchAll(/<h3 class="num"[^>]*><span class="n" aria-hidden="true">(\d)<\/span><span class="vh">Step \d: <\/span>([^<]+)</g)].map(m=>`${m[1]} ${m[2]}`);
+ const steps=[...h.matchAll(/<h2 class="num"[^>]*><span class="n" aria-hidden="true">(\d)<\/span><span class="vh">Step \d: <\/span>([^<]+)</g)].map(m=>`${m[1]} ${m[2]}`);
  assert.deepEqual(steps,['1 Pick where the hub runs','2 Make three scenes in the hub','3 Send to the hub from where you are','4 Switch scenes while you are away','5 During the stream']);
- assert.deepEqual([...h.matchAll(/<li class="opt">\s*<h4>([^<]+)/g)].map(m=>m[1]),['On your PC at home','In the cloud']);
+ assert.deepEqual([...h.matchAll(/<li class="opt">\s*<h3>([^<]+)/g)].map(m=>m[1]),['On your PC at home','In the cloud']);
  assert.ok(h.includes('href="#hybrid-home"')&&h.includes('id="hybrid-home"')&&h.includes('href="#hybrid-cloud"')&&h.includes('id="hybrid-cloud"'));
  const remote=h.slice(h.indexOf('Switch scenes while you are away'),h.indexOf('During the stream'));
  assert.deepEqual([...remote.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m=>m[1]),['IRL+ Chat','IRLwhatever','Moblin','NOALBS','NOALBS Cloud','OBS Blade','Streamer.bot']);
@@ -144,7 +148,7 @@ test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser 
 });
 
 test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in all three answers', ()=>{
- const text=docs.get('index.html');
+ const text=allAnswers();
  const want={'hybrid':9,'one-phone':4,'better-picture':5,'second-network':3,'build':1,'several-cameras':2,'cloud':2,'receiver':2,'into-obs':3,'satellite':3};
  for(const [id,n] of Object.entries(want)){
   const h=answerHtml(text,id);
@@ -234,23 +238,23 @@ assert 'held back in hold_back' in run(lambda s, sv: s.update(hold_back={'obs-ir
 held = copy.deepcopy(base); held['hold_back'] = {'irlhosting': 'Test.'}
 assert all(s['id'] != 'irlhosting' for b in [block(held, 'cloud', 'Cloud hubs')] for s in st.selected(b, st.shown(held, services)))
 name = next(s['name'] for s in services if s['id'] == 'irlhosting')
-assert name in st.fill('<!--setup:answers-->', base, services) and name not in st.fill('<!--setup:answers-->', held, services)
+assert name in ''.join(st.answer_pages(base, services).values()) and name not in ''.join(st.answer_pages(held, services).values())
 assert 'is tagged scene-control, but no block' in run(lambda s, sv: block(s, 'hybrid', 'Switch scenes while you are away').update(select=[{'id': 'moblin'}], notes={}))
 `],{stdio:'pipe'});
 });
 
 test('Answers: exactly one back link at the top that names where it goes, no steps or bottom nav', ()=>{
- const text=docs.get('index.html');
+ const text=allAnswers();
  assert.ok(!/class="(?:steps|step-bar|step-nav|back-to)"/.test(text)&&!text.includes('Back to:'));
- const want={'more':['./','All starting points'],'build':['#more','Build or buy'],'ready-made':['#more','Build or buy'],
-  'receiver':['./','Back'],'into-obs':['./','Back']};
+ const want={'more':['index.html','All starting points'],'build':['more.html','Build or buy'],'ready-made':['more.html','Build or buy'],
+  'receiver':['index.html','Back'],'into-obs':['index.html','Back']};
  const found=[...text.matchAll(/<section class="step (?:result|question)(?: steps)?" id="([^"]+)"[\s\S]*?<\/section>/g)];
  assert.ok(found.length>=10);
  for(const m of found){
   const links=[...m[0].matchAll(/<p class="go-back"><a href="([^"]+)"( data-back="history")?><span aria-hidden="true">←<\/span>([^<]+)<\/a><\/p>/g)];
   assert.equal(links.length,1,m[1]);
   assert.ok(m[0].indexOf('class="go-back"')<m[0].indexOf('class="result-head"'),m[1]);
-  const [href,label]=want[m[1]]||['./','All starting points'];
+  const [href,label]=want[m[1]]||['index.html','All starting points'];
   assert.deepEqual([links[0][1],links[0][3]],[href,label],m[1]);
   assert.equal(!!links[0][2],label==='Back',m[1]);
   assert.ok(m[0].includes('Link to send')||m[1]==='more',m[1]);
@@ -266,13 +270,13 @@ test('Numbered steps keep their numbers; watch-outs sit under a step without one
  assert.ok(steps[0].startsWith('Install a streaming app')&&steps[1].startsWith('Test at home with Wi-Fi off'));
  const nested=steps[0].match(/<ul class="picks mix">([\s\S]*?)<\/ul>/)[1];
  assert.deepEqual([...nested.matchAll(/<li class="w"><span class="vh">Watch out: <\/span>([^.]+)/g)].map(m=>m[1]),['Keep the stream key secret','On YouTube, switch on live streaming a day early']);
- assert.ok(!/<ol class="picks mix/.test(docs.get('index.html')),'an ordered list never drops its numbers');
+ assert.ok(!/<ol class="picks mix/.test(allAnswers()),'an ordered list never drops its numbers');
  const css=readFileSync('public/assets/style.css','utf8');
  assert.ok(/ol\.picks\.steps[^{]*\{[^}]*list-style: decimal/.test(css));
 });
 
 test('Round 4: titles, summaries, steps, lead lines and side lines of the nine answers', ()=>{
- const text=docs.get('index.html');
+ const text=allAnswers();
  const want={
   'second-network':['Add a second network',"Add a second internet connection on a different mobile network, and let your streaming app use both at once. That's called bonding. If one network has a bad moment, the other can carry the stream."],
   'more':['Keep the phone going','When heat or an empty battery ends your stream, try these first.'],
@@ -285,7 +289,7 @@ test('Round 4: titles, summaries, steps, lead lines and side lines of the nine a
   'satellite':['Add a satellite dish',"Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy."]};
  for(const [id,[title,sum]] of Object.entries(want)){
   const h=answerHtml(text,id);
-  assert.equal(plain(h.match(new RegExp(`<h2 id="${id}-h">[\\s\\S]*?<\\/h2>`))[0]),title,id);
+  assert.equal(plain(h.match(new RegExp(`<h1 id="${id}-h">[\\s\\S]*?<\\/h1>`))[0]),title,id);
   assert.equal(plain(h.match(/<p class="sum">[\s\S]*?<\/p>/)[0]),sum,id);
  }
  const sn=answerHtml(text,'second-network');
@@ -296,7 +300,7 @@ test('Round 4: titles, summaries, steps, lead lines and side lines of the nine a
  const sc=plain(answerHtml(text,'several-cameras'));
  for(const l of ['When your phone app can show those cameras.','When you mix on a computer, at home or on a server.','When the show has to keep running if your PC at home fails.',"When you mix while you're out.",'with SRTLA bonding and drop protection.','Desktop and IRL.']) assert.ok(sc.includes(l),l);
  const more=answerHtml(text,'more');
- assert.equal(plain(more.match(/<h3 class="q" id="more-q">[\s\S]*?<\/h3>/)[0]),'Still too hot or too short?');
+ assert.equal(plain(more.match(/<h2 class="q" id="more-q">[\s\S]*?<\/h2>/)[0]),'Still too hot or too short?');
  assert.ok(plain(more).includes('Still too hot or too short? A backpack carries a small streaming computer, mobile modems and a battery, so the phone no longer does that work. Do you want to build and look after one yourself?'));
  assert.ok(plain(more).includes('Extra cooling Tips from other streamers:')&&!more.includes("I haven't tested")&&!more.includes('Work in progress'));
  assert.equal((more.match(/class="tip-src"/g)||[]).length,5);
@@ -352,8 +356,9 @@ test('Help: My apps bar is Share link, Share, Saved on this device, Clear; no he
 test('Help: Guides list the site\'s own pages first, then every IRL Commons guide; old addresses still land', ()=>{
  const h=helpMain();
  const own=h.slice(h.indexOf('id="g-own"'),h.indexOf('id="g-other"'));
- assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['index.html#one-phone','index.html#second-network','index.html#hybrid','index.html#better-picture',
-  'index.html#several-cameras','index.html#cloud','index.html#more','index.html#satellite','index.html#receiver','index.html#into-obs','index.html#build','index.html#ready-made','data-plans.html','why-bonding.html']);
+ assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['one-phone.html','second-network.html','hybrid.html','better-picture.html',
+  'several-cameras.html','cloud.html','more.html','satellite.html','receiver.html','into-obs.html','build.html','ready-made.html',
+  'live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html','data-plans.html','why-bonding.html']);
  for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
  const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
  const other=h.slice(h.indexOf('id="g-other"'));
@@ -383,7 +388,11 @@ test('Help script: typo-tolerant search and the addresses it understands', ()=>{
  assert.equal(site.countText(39,39),'All 39 guides');assert.equal(site.countText(3,39),'3 of 39 guides');
 });
 
-test('Privacy pages say what "My apps" keeps, in English and German', ()=>{
+test('Privacy pages say what "My apps", the checklists and Back keep, in English and German', ()=>{
+ assert.ok(plain(docs.get('privacy.html')).includes('Ticks you set in a “Before you go live” list stay only in your browser on your device; “Clear ticks” removes them. So that “Back” on an answer returns to the page you came from, your browser keeps the address of the last page of this site you opened, until you close the tab.'));
+ assert.ok(plain(docs.get('datenschutz.html')).includes('Haken, die Sie in einer Liste „Before you go live“ setzen, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear ticks“ entfernt sie. Damit „Back“ auf einer Antwortseite zur vorigen Seite zurückführt'));
+ const js=readFileSync('public/assets/site.js','utf8');
+ assert.ok(js.includes('"howtoirl.golive.v1"')&&js.includes('"howtoirl.last"'),'the storage the privacy pages describe');
  assert.ok(plain(docs.get('privacy.html')).includes('If you save apps under “My apps” on the Help page, your browser keeps that list only on your device; “Clear” removes it.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Apps, die Sie auf der Hilfeseite unter „My apps“ speichern, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear“ entfernt sie.'));
 });
@@ -413,4 +422,74 @@ test('The glossary publishes exactly the selected words, independently of packag
  const links=[...text.matchAll(/<li data-for="([^"]+)"/g)].map(m=>m[1]);
  assert.deepEqual([...entries].sort(),[...config.glossaryWords].sort());
  assert.deepEqual([...links].sort(),[...config.glossaryWords].sort());
+});
+
+test('Every answer has its own page, title, description and share image; old home links still land', async()=>{
+ const pages=answerPages();
+ assert.equal((docs.get('index.html').match(/<p class="moved" id="[^"]+">/g)||[]).length,pages.length+2,'one moved line per answer and per anchor inside one (hybrid-home, hybrid-cloud)');
+ for(const [name,text] of pages){
+  const id=name.replace(/\.html$/,'');
+  const title=plain(text.match(/<h1 id="[^"]+">[\s\S]*?<\/h1>/)[0]);
+  assert.ok(text.includes(`<title>${title.replaceAll("'",'&#39;')} · How to IRL</title>`)||text.includes(`<title>${title} · How to IRL</title>`),name);
+  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${id}.png">`),name);
+  assert.ok(text.includes('<meta name="twitter:card" content="summary_large_image">'),name);
+  const png=await readFile(`public/assets/share/${id}.png`);
+  assert.deepEqual([png.readUInt32BE(16),png.readUInt32BE(20)],[1200,630],name);
+  assert.ok(text.includes(`Link to send: <a href="${name}">howtoirl.org/<wbr>${name}</a> <button type="button" class="copy-link" data-copy="https://howtoirl.org/${name}" hidden>Copy link for chat</button>`)||id==='more'&&text.includes('Link to send'),name);
+  assert.ok(!/href="#(?:one-phone|second-network|hybrid|more|receiver|into-obs|build|ready-made|cloud|satellite)"/.test(text),name);
+ }
+ const home=docs.get('index.html');
+ assert.ok(!home.includes('class="step result')&&home.includes('<p class="moved" id="second-network">This answer has its own page now: <a href="second-network.html">Add a second network</a></p>'));
+ assert.ok(home.includes('<p class="moved" id="hybrid-home">This answer has its own page now: <a href="hybrid.html#hybrid-home">'));
+ assert.ok(/<a href="second-network.html"><svg class="ill"/.test(home),'home cards link to the answer pages');
+});
+
+test('Site nav: Start, Fix, Guides, Glossary on every page; Apps and services and Contact are in the footer', ()=>{
+ const current={'index.html':'Start','help.html':'Guides','data-plans.html':'Guides','why-bonding.html':'Guides','glossary.html':'Glossary'};
+ for(const [name,text] of docs){
+  const nav=text.match(/<nav class="site-nav"[\s\S]*?<\/nav>/)[0];
+  assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(m=>`${m[2]} ${m[1]}`),['Start index.html','Fix index.html#grp-live-but-something-s-wrong','Guides help.html#guides','Glossary glossary.html'],name);
+  assert.deepEqual([...nav.matchAll(/aria-current="page">([^<]+)</g)].map(m=>m[1]),current[name]?[current[name]]:[],name);
+  const foot=text.slice(text.indexOf('<footer'));
+  assert.ok(foot.includes('href="links.html"')&&foot.includes('href="contact.html"'),name);
+ }
+});
+
+test("Live, but something's wrong?: four symptom cards, each a page of checks with its sources and a still-stuck line", ()=>{
+ const home=docs.get('index.html');
+ assert.ok(/<h2 class="grp live" id="grp-live-but-something-s-wrong"[^>]*>Live, but something's wrong\?<\/h2>\s*<ul class="choices symptoms"/.test(home));
+ for(const id of ['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle']){
+  const h=answerHtml(null,id);
+  assert.ok(h.includes('<details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://'),id);
+  assert.ok(plain(h).includes('Still stuck? Before you ask for help, note your app and its version'),id);
+  assert.ok((h.match(/<h2 class="num"/g)||[]).length>=2,id);
+ }
+});
+
+test('Checked stamps: a date and Report a mistake, only where the last fact-check left nothing open', ()=>{
+ const line=/<p class="stamp">Checked <time datetime="(\d{4}-\d\d-\d\d)">\d{1,2} [A-Z][a-z]+ \d{4}<\/time> · <a href="contact.html">Report a mistake<\/a><\/p>/g;
+ const stamped=name=>[...docs.get(name).matchAll(line)].length;
+ assert.equal(stamped('data-plans.html'),7);
+ assert.equal(stamped('why-bonding.html'),2);
+ for(const id of ['more','build','satellite','live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle'])assert.equal(stamped(`${id}.html`),1,id);
+ for(const [name,text] of docs){
+  assert.ok(!text.includes('data-checked='),name);
+  assert.equal((text.match(/class="stamp"/g)||[]).length,[...text.matchAll(line)].length,name);
+ }
+ // Sections with an open finding stay unstamped until it is fixed.
+ for(const id of ['upload','data','maker-data'])assert.ok(!new RegExp(`id="${id}"[^>]*>\\s*<h2(?:(?!</h2>)[\\s\\S])*</h2>\\s*<p class="stamp"`).test(docs.get('data-plans.html')),id);
+});
+
+test('Before you go live: a checklist on every answer but the symptom checks, that ticks without script', ()=>{
+ const symptoms=['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle'];
+ for(const [name,text] of answerPages()){
+  const id=name.replace(/\.html$/,'');
+  const box=text.match(/<div class="golive" id="before-you-go-live" role="group" aria-labelledby="[^"]+" data-checklist="([^"]+)">[\s\S]*?<\/ul>[\s\S]*?<\/div>/);
+  if(symptoms.includes(id)){assert.ok(!box,id);continue;}
+  assert.ok(box&&box[1]===id,id);
+  const items=[...box[0].matchAll(/<li><label><input type="checkbox" value="(\d+)" data-nojs-ok> /g)];
+  assert.ok(items.length>=3&&items.length<=7,id);
+  assert.deepEqual(items.map(m=>m[1]),items.map((_,i)=>String(i)),id);
+  assert.ok(/<p class="golive-count" hidden><\/p>/.test(box[0])&&/<p class="golive-note" hidden>/.test(box[0]),'count and storage note only with script');
+ }
 });

@@ -551,35 +551,94 @@
     });
   }
 
-  // A "Back" link with data-back="history" returns to the step the visitor came from on this page. The site sends
-  // no referrer, so arriving from anywhere else (or without script) the link follows its href to the cards.
+  // A "Back" link with data-back="history" returns to the page the visitor came from on this site. The site sends
+  // no referrer, so each page notes its address for the next one in sessionStorage. Arriving from anywhere else,
+  // after a reload, or without script, the link follows its href to the cards.
   function initBack() {
-    if (!document.querySelector('a[data-back="history"]')) return;
-    // Count the steps taken inside this page in the history entries themselves, so Back and Forward keep it right.
-    var depth = function () { var s = window.history.state; return s && typeof s.backDepth === "number" ? s.backDepth : null; };
-    var mark = function (n) {
-      var s = window.history.state && typeof window.history.state === "object" ? window.history.state : {};
-      var next = {}; for (var k in s) next[k] = s[k];
-      next.backDepth = n;
-      try { window.history.replaceState(next, ""); } catch (e) {  }
-    };
-    var last = depth();
-    if (last === null) { last = 0; mark(0); }
-    window.addEventListener("hashchange", function () {
-      var d = depth();
-      if (d === null) { d = last + 1; mark(d); }
-      last = d;
-    });
+    var store = null;
+    try { store = window.sessionStorage; } catch (e) {  }
+    var here = window.location.pathname;
+    var prev = null;
+    try { prev = store && store.getItem("howtoirl.last"); store && store.setItem("howtoirl.last", here); } catch (e) {  }
+    if (!prev || prev === here) return;
     document.addEventListener("click", function (ev) {
       var a = ev.target && ev.target.closest ? ev.target.closest('a[data-back="history"]') : null;
       if (!a || ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
-      if (!(depth() > 0)) return;
       ev.preventDefault();
       window.history.back();
     });
   }
 
-  function start() { initFold(); initBack(); initPlatforms(); initTheme(); initNav(); initBeta(); initWords(); initStandards(); initClear(); initPermalinks(); initCalc(); landTarget(); }
+  // "Before you go live": ticks are kept on this device only, per answer, and counted.
+  var GOLIVE_KEY = "howtoirl.golive.v1";
+  function initChecklists() {
+    var lists = Array.prototype.slice.call(document.querySelectorAll(".golive[data-checklist]"));
+    if (!lists.length) return;
+    var store = storageOrNull();
+    var saved = {};
+    try { saved = JSON.parse((store && store.getItem(GOLIVE_KEY)) || "{}") || {}; } catch (e) { saved = {}; }
+    function save() {
+      if (!store) return;
+      try {
+        if (Object.keys(saved).length) store.setItem(GOLIVE_KEY, JSON.stringify(saved)); else store.removeItem(GOLIVE_KEY);
+      } catch (e) {  }
+    }
+    lists.forEach(function (list) {
+      var id = list.getAttribute("data-checklist");
+      var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+      var count = list.querySelector(".golive-count");
+      var note = list.querySelector(".golive-note");
+      var mine = Array.isArray(saved[id]) ? saved[id] : [];
+      boxes.forEach(function (b) { b.checked = mine.indexOf(b.value) !== -1; });
+      function update(store_) {
+        var on = boxes.filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+        count.textContent = on.length + " of " + boxes.length + " ready";
+        list.classList.toggle("is-done", on.length === boxes.length);
+        if (store_) { if (on.length) saved[id] = on; else delete saved[id]; save(); }
+      }
+      list.addEventListener("change", function () { update(true); });
+      list.querySelector(".golive-clear").addEventListener("click", function () {
+        boxes.forEach(function (b) { b.checked = false; });
+        update(true);
+      });
+      count.hidden = false;
+      if (store) note.hidden = false;
+      update(false);
+    });
+  }
+
+  // Old links to an answer on the home page (/#second-network) go on to the answer's own page.
+  function initMoved() {
+    var t = document.getElementById(hashId(window.location.hash));
+    var a = t && t.classList.contains("moved") ? t.querySelector("a[href]") : null;
+    if (a) window.location.replace(a.getAttribute("href"));
+    return !!a;
+  }
+
+  // "Copy link for chat": copies the answer's address, and says so where the button was.
+  function initCopy() {
+    Array.prototype.forEach.call(document.querySelectorAll("button.copy-link[data-copy]"), function (b) {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+      var label = b.textContent;
+      var timer = null;
+      var said = document.createElement("span");
+      said.className = "vh";
+      said.setAttribute("role", "status");
+      b.parentNode.appendChild(said);
+      b.hidden = false;
+      b.addEventListener("click", function () {
+        navigator.clipboard.writeText(b.getAttribute("data-copy")).then(function () {
+          b.textContent = "Copied. Paste it in chat.";
+          said.textContent = "Link copied.";
+          b.classList.add("is-copied");
+          clearTimeout(timer);
+          timer = setTimeout(function () { b.textContent = label; said.textContent = ""; b.classList.remove("is-copied"); }, 4000);
+        }, function () {  });
+      });
+    });
+  }
+
+  function start() { if (initMoved()) return; initFold(); initCopy(); initChecklists(); initBack(); initPlatforms(); initTheme(); initNav(); initBeta(); initWords(); initStandards(); initClear(); initPermalinks(); initCalc(); landTarget(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 })();
