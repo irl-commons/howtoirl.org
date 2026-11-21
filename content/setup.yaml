@@ -27,6 +27,9 @@
 # sub-section of the step before it, with an `anchor` id to jump to. `choose` puts option cards
 # (title, text, items, go: {href, label}) side by side.
 # Texts are HTML. Link glossary words with class="gl".
+# `checked: YYYY-MM-DD` shows "Checked <date> · Report a mistake" under the summary. Set it only when every claim
+# on the answer was read against its source that day and no finding is open; a guide page section takes
+# data-checked="YYYY-MM-DD" on its <section> for the same line under its h2.
 #
 # Each answer is a page of its own at <id>.html: list it in site.json pages and run npm run share-images.
 # Links between answers are written as "#<id>" here and point to that page once built.
@@ -71,6 +74,7 @@ groups:
 
 answers:
   - id: more
+    checked: 2026-11-21
     question: true
     icon: s-hot
     title: Keep the phone going
@@ -160,6 +164,7 @@ answers:
       - next: '<strong>Why it works:</strong> <a href="why-bonding.html">Why more than one network?</a>'
 
   - id: build
+    checked: 2026-11-21
     back: {to: more, label: Build or buy}
     icon: a-build
     title: Build your own backpack
@@ -404,6 +409,7 @@ answers:
         select: [{class: cloud}]
 
   - id: satellite
+    checked: 2026-11-21
     icon: i-satellite
     title: Add a satellite dish
     summary: Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy.

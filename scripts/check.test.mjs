@@ -453,3 +453,17 @@ test("Live, but something's wrong?: four symptom cards, each with checks, source
   assert.ok((h.match(/<h2 class="num"/g)||[]).length>=2,id);
  }
 });
+
+test('Checked stamps: a date and Report a mistake, only where the last fact-check left nothing open', ()=>{
+ const line=/<p class="stamp">Checked <time datetime="(\d{4}-\d\d-\d\d)">\d{1,2} [A-Z][a-z]+ \d{4}<\/time> · <a href="contact.html">Report a mistake<\/a><\/p>/g;
+ const stamped=name=>[...docs.get(name).matchAll(line)].length;
+ assert.equal(stamped('data-plans.html'),7);
+ assert.equal(stamped('why-bonding.html'),2);
+ for(const id of ['more','build','satellite']) assert.equal([...answerHtml(docs.get('index.html'),id).matchAll(line)].length,1,id);
+ for(const [name,text] of docs){
+  assert.ok(!text.includes('data-checked='),name);
+  assert.equal((text.match(/class="stamp"/g)||[]).length,[...text.matchAll(line)].length,name);
+ }
+ // Sections with an open finding stay unstamped until it is fixed.
+ for(const id of ['upload','data','maker-data']) assert.ok(!new RegExp(`id="${id}"[^>]*>\\s*<h2(?:(?!</h2>)[\\s\\S])*</h2>\\s*<p class="stamp"`).test(docs.get('data-plans.html')),id);
+});
