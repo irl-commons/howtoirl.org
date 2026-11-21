@@ -170,9 +170,17 @@ def esc(t: str) -> str:
 
 
 def card(c: dict) -> str:
-    href = c.get('href') or f'#{c["to"]}'
+    href = c.get('href') or page(c['to'])
     return (f'<li><a href="{href}"><svg class="ill" aria-hidden="true"><use href="#{c["icon"]}"/></svg>'
             f'<strong>{esc(c["title"])}</strong><span>{esc(c["text"])}</span></a></li>')
+
+
+SITE = 'https://howtoirl.org/'
+
+
+def page(aid: str) -> str:
+    """Each answer is a page of its own, at the answer's id."""
+    return f'{aid}.html'
 
 
 def home_html(setup: dict) -> str:
@@ -194,11 +202,11 @@ def back_link(a: dict) -> str:
     `back: history` returns to the previous page through site.js and falls back to the cards."""
     back = a.get('back')
     if back == 'history':
-        href, label, extra = './', 'Back', ' data-back="history"'
+        href, label, extra = 'index.html', 'Back', ' data-back="history"'
     elif back:
-        href, label, extra = f'#{back["to"]}', back['label'], ''
+        href, label, extra = page(back['to']), back['label'], ''
     else:
-        href, label, extra = './', 'All starting points', ''
+        href, label, extra = 'index.html', 'All starting points', ''
     return f'<p class="go-back"><a href="{href}"{extra}><span aria-hidden="true">←</span>{esc(label)}</a></p>'
 
 
@@ -353,7 +361,9 @@ def side_html(a: dict) -> str:
     for item in a.get('side', []):
         (k, v), = item.items()
         out.append(SIMS if k == 'sims' else f'<p class="{k}">{v}</p>')
-    out.append(f'<p class="send">Link to send: <a href="#{a["id"]}">howtoirl.org/<wbr>#{a["id"]}</a></p>')
+    url = SITE + page(a['id'])
+    out.append(f'<p class="send">Link to send: <a href="{page(a["id"])}">howtoirl.org/<wbr>{page(a["id"])}</a>'
+               f' <button type="button" class="copy-link" data-copy="{url}" hidden>Copy link for chat</button></p>')
     return '\n            '.join(out)
 
 
@@ -385,13 +395,65 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
             f'        {head}\n        {body}\n      </section>')
 
 
+def relink(body: str, aid: str, owner: dict[str, str]) -> str:
+    """Answers link to each other by id ("#receiver"). On a page of its own, a link to another answer, or to an
+    anchor inside one, goes to that page; an anchor on this answer's own page stays a fragment."""
+    def one(m):
+        target = m[1]
+        home = owner.get(target)
+        if home is None or home == aid and target != aid:
+            return m[0]
+        return f'href="{page(home)}{"" if target == home else "#" + target}"'
+    return re.sub(r'href="#([A-Za-z0-9_-]+)"', one, body)
+
+
+def headings_up(body: str) -> str:
+    """On its own page the answer's title is the h1, so every heading in it moves up one level."""
+    return re.sub(r'<(/?)h([2-5])\b', lambda m: f'<{m[1]}h{int(m[2]) - 1}', body)
+
+
+def owners(setup: dict) -> dict[str, str]:
+    """Which answer each id belongs to: the answer ids, and the anchors of their blocks."""
+    out = {}
+    for a in setup['answers']:
+        out[a['id']] = a['id']
+        for b in a.get('blocks', []):
+            if b.get('anchor'):
+                out[b['anchor']] = a['id']
+    return out
+
+
+def moved_html(setup: dict) -> str:
+    """Old links to an answer on the home page (howtoirl.org/#second-network) still land: site.js forwards them to
+    the answer's page, and without script the fragment shows a line that links there."""
+    lines = [f'<p class="moved" id="{i}">This answer has its own page now: <a href="{page(a)}{"" if i == a else "#" + i}">'
+             f'{esc(next(x["title"] for x in setup["answers"] if x["id"] == a))}</a></p>' for i, a in owners(setup).items()]
+    return '<div class="moved-list">\n        ' + '\n        '.join(lines) + '\n      </div>'
+
+
+def answer_page(a: dict, setup: dict, services: list[dict], by_id: dict) -> str:
+    body = headings_up(relink(answer_html(a, services, by_id), a['id'], owners(setup)))
+    return (f'<div class="wrap page fits-page answer-page">\n  <div class="parts">\n    <div class="flow">\n      '
+            f'{body}\n    </div>\n  </div>\n</div>\n')
+
+
+def answer_pages(setup: dict, services: list[dict]) -> dict[str, str]:
+    services = shown(setup, services)
+    by_id = {s['id']: s for s in services}
+    return {page(a['id']): answer_page(a, setup, services, by_id) for a in setup['answers']}
+
+
+def plain_text(t: str) -> str:
+    return html.unescape(re.sub(r'<[^>]+>', '', t))
+
+
 def fill(body: str, setup: dict, services: list[dict]) -> str:
     services = shown(setup, services)
     by_id = {s['id']: s for s in services}
     if '<!--setup:start-->' in body:
         body = body.replace('<!--setup:start-->', home_html(setup))
     if '<!--setup:answers-->' in body:
-        body = body.replace('<!--setup:answers-->', '\n\n      '.join(answer_html(a, services, by_id) for a in setup['answers']))
+        body = body.replace('<!--setup:answers-->', moved_html(setup))
     return body
 
 # The site's own pages in Help's Guides tab, in this order, each with the part colour of its topic.
@@ -416,7 +478,7 @@ def help_pages(setup: dict) -> list[dict]:
             summary = html.unescape(re.sub(r'<[^>]+>', '', a.get('summary', '')))
             sub = re.split(r'(?<=[.!?])\s', summary)[0] if summary else ''
         out.append({'id': key.removesuffix('.html'), 'title': title, 'sub': sub, 'step': step,
-                    'href': key if key.endswith('.html') else f'index.html#{key}'})
+                    'href': key if key.endswith('.html') else page(key)})
     return out
 
 
@@ -438,3 +500,46 @@ if __name__ == '__main__':
     _, found = check(pkg, pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'content/setup.yaml')
     print('\n'.join(found) or 'setup.yaml: ok')
     sys.exit(1 if found else 0)
+
+
+SHARE_SIZE = (1200, 630)
+
+
+def share_image(aid: str) -> str:
+    """The picture a chat app shows for a link to the page: its drawing, title and first line (scripts/share-images.mjs)."""
+    return f'assets/share/{aid}.png'
+
+
+def share_line(a: dict) -> str:
+    """The first sentence of the summary, for the description and the share image."""
+    return re.split(r'(?<=[.!?])\s', plain_text(a['summary']).strip())[0]
+
+
+def answer_shells(setup: dict, home: dict) -> list[dict]:
+    """A shell per answer page, from the home page's: its own title, description, address and share image."""
+    out = []
+    for a in setup['answers']:
+        name = page(a['id'])
+        title = f'{a["title"]} · How to IRL'
+        desc = plain_text(a['summary']).strip()
+        url = SITE + name
+        image = SITE + share_image(a['id'])
+        q = lambda t: html.escape(t, quote=True)
+        head = home['head']
+        for pattern, value in [(r'<title>[^<]*</title>', f'<title>{esc(title)}</title>'),
+                               (r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{q(desc)}">'),
+                               (r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{url}">'),
+                               (r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{q(a["title"])}">'),
+                               (r'<meta property="og:description" content="[^"]*">', f'<meta property="og:description" content="{q(desc)}">'),
+                               (r'<meta property="og:url" content="[^"]*">', f'<meta property="og:url" content="{url}">\n'
+                                f'<meta property="og:image" content="{image}">\n'
+                                f'<meta property="og:image:width" content="{SHARE_SIZE[0]}">\n'
+                                f'<meta property="og:image:height" content="{SHARE_SIZE[1]}">\n'
+                                f'<meta property="og:image:alt" content="{q(a["title"] + ": " + share_line(a))}">\n'
+                                f'<meta name="twitter:card" content="summary_large_image">')]:
+            head, n = re.subn(pattern, lambda _m, v=value: v, head)
+            assert n == 1, (name, pattern)
+        after = home['after'].replace('howtoirl.org%2F%3A%20', f'howtoirl.org%2F{name}%3A%20')
+        out.append({'name': name, 'meta': {**home['meta'], 'title': title, 'description': desc, 'nav': 'answer'},
+                    'head': head, 'before': home['before'], 'after': after})
+    return out

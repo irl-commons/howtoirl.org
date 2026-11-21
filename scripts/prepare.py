@@ -19,18 +19,11 @@ setup,found=setup_answers.check(pkg)
 r.HELP_OWN[:]=setup_answers.help_pages(setup)
 if found:
  sys.exit('content/setup.yaml does not match IRL Commons:\n  '+'\n  '.join(found))
-rendered={}
-for src in (ROOT/'content').glob('*.html'):
- body=src.read_text()
- body=setup_answers.fill(body,setup,data['services'])
- body=r.fill_words(body,glossary_words)
- body=r.fill_standards(body,data['standards'],data['services'],data['words'])
- body=r.fill_services(body,data['services'])
- body=r.fill_calc(body,r.datause.load_model())
+cfg=json.loads((ROOT/'site.json').read_text())
+other='irlcommons.org' if cfg['domain']=='howtoirl.org' else 'howtoirl.org'
+def finish(body):
  # Resolve data-generated links across the two public sites.
- cfg=json.loads((ROOT/'site.json').read_text())
  body=body.replace('>Data and standards</a>', '>Open data at IRL Commons</a>' if cfg['domain']=='howtoirl.org' else '>Open data</a>')
- other='irlcommons.org' if cfg['domain']=='howtoirl.org' else 'howtoirl.org'
  def cross(match):
   page=match[1]
   return match[0] if page in cfg['pages'] else f'href="https://{other}/{page}'
@@ -44,7 +37,29 @@ for src in (ROOT/'content').glob('*.html'):
   return match[0] if seen[label]==1 else match[0][:-1]+f', part {seen[label]}"'
  body=re.sub(r'<nav[^>]+aria-label="([^"]+)"',landmark,body)
  body=re.sub(r'<nav(?![^>]*aria-label)([^>]*)>',lambda m: '<nav aria-label="Steps '+str(m.start())+'"'+m[1]+'>',body)
- rendered[src.name]=r.add_permalinks(body)
+ return r.add_permalinks(body)
+rendered={}
+for src in (ROOT/'content').glob('*.html'):
+ body=src.read_text()
+ body=setup_answers.fill(body,setup,data['services'])
+ body=r.fill_words(body,glossary_words)
+ body=r.fill_standards(body,data['standards'],data['services'],data['words'])
+ body=r.fill_services(body,data['services'])
+ body=r.fill_calc(body,r.datause.load_model())
+ rendered[src.name]=finish(body)
+# Each answer is a page of its own, with its own title, description and share image.
+answer_pages=setup_answers.answer_pages(setup,data['services'])
+missing=[n for n in answer_pages if n not in cfg['pages']]
+if missing:
+ sys.exit('site.json pages must list every answer page: '+', '.join(missing))
+for name,body in answer_pages.items():
+ rendered[name]=finish(body)
+shells=json.loads((ROOT/'src/shells.json').read_text())
+(ROOT/'.generated').mkdir(exist_ok=True)
+(ROOT/'.generated/answer-shells.json').write_text(json.dumps(setup_answers.answer_shells(setup,next(x for x in shells if x['name']=='index.html')),ensure_ascii=False))
+# The sitemap lists every page in site.json.
+(ROOT/'public/sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+ +''.join(f'  <url><loc>https://{cfg["domain"]}/{"" if n=="index.html" else n}</loc></url>\n' for n in cfg['pages'])+'</urlset>\n')
 (ROOT/'.generated').mkdir(exist_ok=True)
 (ROOT/'.generated/content.json').write_text(json.dumps(rendered,ensure_ascii=False))
 if 'links.html' in json.loads((ROOT/'site.json').read_text())['pages']:

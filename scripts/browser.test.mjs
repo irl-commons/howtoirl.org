@@ -103,8 +103,12 @@ async function checkPage(browser,origin,path,variant){
  page.on('console',msg=>{if(msg.type()==='error'&&!msg.text().startsWith('Failed to load resource'))add('console',local(msg.text()).slice(0,200),local(msg.location().url||''));});
  page.on('pageerror',error=>add('console',local(String(error.message)).slice(0,200),'uncaught exception'));
  page.on('response',response=>{if(response.status()>=400)add('request',local(response.url()),`HTTP ${response.status()}`);});
- page.on('requestfailed',request=>{if(request.url().startsWith(origin))add('request',local(request.url()),request.failure()?.errorText||'failed');});
+ const failed=[];
+ page.on('requestfailed',request=>{if(request.url().startsWith(origin))failed.push([local(request.url()),request.failure()?.errorText||'failed']);});
  await page.goto(`${origin}/${path}`,{waitUntil:'load'});
+ // An old address that site.js forwards to a new page cancels the loads it had started; that is not a failure.
+ const forwarded=local(page.url())!==`/${path}`;
+ for(const [url,why] of failed)if(!(forwarded&&why==='net::ERR_ABORTED'))add('request',url,why);
  await page.evaluate(()=>document.fonts.ready.then(()=>true));
  // Open every fold so that what is inside them is checked too.
  await page.evaluate(()=>{for(const d of document.querySelectorAll('details'))d.open=true;});

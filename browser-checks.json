@@ -1,5 +1,5 @@
 {
  "themeStorageKey": "osb.theme",
- "states": {"index.html": "section.step[id]:not(#start)"},
+ "states": {"index.html": "p.moved[id]"},
  "baseline": []
 }

@@ -28,6 +28,8 @@
 # (title, text, items, go: {href, label}) side by side.
 # Texts are HTML. Link glossary words with class="gl".
 #
+# Each answer is a page of its own at <id>.html: list it in site.json pages and run npm run share-images.
+# Links between answers are written as "#<id>" here and point to that page once built.
 # Each answer page has one back link at the top. Without `back` it says "All starting points"
 # and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
 # `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
