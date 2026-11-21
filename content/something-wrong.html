@@ -1,0 +1,130 @@
+<div class="wrap page plans-page guide-page">
+  <header class="page-head">
+    <h1>Find what broke while you're live</h1>
+    <p class="lede">Your stream passes through several parts on its way to your viewers. When something goes wrong, one of them stopped. Check them in order, from the camera to the platform, and you find it faster than by changing settings at random.</p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#chain">Follow the stream</a></li>
+      <li><a href="#symptoms">Four common problems</a></li>
+      <li><a href="#drops">Drops on the move</a></li>
+      <li><a href="#ask-for-help">Before you ask for help</a></li>
+      <li><a href="#next-steps">Where next</a></li>
+    </ul>
+  </nav>
+
+  <div class="parts">
+    <section class="part" id="chain" aria-labelledby="chain-h">
+      <h2 id="chain-h">Follow the stream from the camera to your viewers</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> find the last part where everything still looks right. The part after it is the one to fix.</p>
+        <ol class="part-chain" aria-label="The parts a stream passes, from camera to platform">
+          <li><strong>Camera</strong><span>the phone's own, or one on a cable or Wi-Fi</span></li>
+          <li><strong>Your app</strong><span>on the phone, or a backpack's encoder</span></li>
+          <li><strong>Networks</strong><span>mobile, Wi-Fi or satellite</span></li>
+          <li><strong>Receiver</strong><span>joins bonded connections back together</span></li>
+          <li><strong>Hub</strong><span>OBS at home or in the cloud: your scenes</span></li>
+          <li><strong>Platform</strong><span>Twitch, YouTube, Kick</span></li>
+        </ol>
+        <p>Not every setup has every part. A phone that streams straight to the platform has no receiver and no hub. <a href="glossary.html#bonding">Bonding</a> needs a <a href="glossary.html#relay">receiver</a>. Scenes like BRB need a <a href="glossary.html#hub">hub</a>.</p>
+        <h3 id="where-to-look">Where to look at each part</h3>
+        <ul class="bul">
+          <li><strong>Camera:</strong> the preview in your app. If it moves there, the camera and its link to the phone are fine.</li>
+          <li><strong>Your app:</strong> the bitrate it sends. When it bonds, each connection's traffic too. Moblin shows upload statistics per connection, and BELABOX lists each connection's throughput and the total.</li>
+          <li><strong>Receiver:</strong> most have a <a class="gl" href="glossary.html#stats-url">statistics page</a> that shows whether a stream arrives, and at what bitrate. A scene switcher such as <a class="gl" href="glossary.html#noalbs">NOALBS</a> reads the same numbers.</li>
+          <li><strong>Hub:</strong> the preview and the audio mixer in OBS, or the cloud service's own preview.</li>
+          <li><strong>Platform:</strong> its own dashboard shows what really arrives. On Twitch that's Twitch Inspector at inspector.twitch.tv, with a graph of your bitrate as it reaches Twitch. On YouTube, the Live Control Room shows your stream's health and messages such as a bitrate lower than recommended. On Kick, the Creator Dashboard shows a preview of what Kick receives, and a Session Health badge.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/eerimoq/moblin">Moblin README</a> (upload statistics per active connection), <a href="https://github.com/BELABOX/belaUI/blob/ws_nodejs/public/script.js">BELABOX's web interface (source code)</a>, <a href="https://docs.noalbs.com/">NOALBS documentation</a>, <a href="https://help.twitch.tv/s/article/guide-to-using-twitch-inspector?language=en_US">Twitch: Twitch Inspector</a>, <a href="https://help.twitch.tv/s/article/guide-to-broadcast-health?language=en_US">Twitch: Broadcast Health</a>, <a href="https://support.google.com/youtube/answer/3006768">YouTube: live stream health</a>, <a href="https://help.kick.com/en/articles/7120642-understanding-your-kick-creator-dashboard">Kick: the Creator Dashboard</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="symptoms" aria-labelledby="symptoms-h">
+      <h2 id="symptoms-h">Four common problems, and where they usually start</h2>
+      <div class="read">
+        <p>These four are the questions streamers ask most in app communities. Where each one usually starts is a tip from streamers, not a rule. Each has a page of checks in the order worth trying.</p>
+        <table class="ask-table">
+          <thead><tr><th scope="col">What you see</th><th scope="col">Usually starts at</th><th scope="col">Check first</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><a href="live-not-on-platform.html">Live in the app, but nobody sees it</a></th><td data-label="Usually starts at">The hub</td><td data-label="Check first">Is the hub live too? OBS needs its own Start Streaming, and a cloud hub its own start.</td></tr>
+            <tr><th scope="row"><a href="picture-frozen.html">The picture froze, but you're still live</a></th><td data-label="Usually starts at">The camera, or the source in OBS</td><td data-label="Check first">Does the preview on the phone still move?</td></tr>
+            <tr><th scope="row"><a href="no-sound-or-alerts.html">No sound, or the alerts are gone</a></th><td data-label="Usually starts at">The mic, OBS or the alerts' browser source</td><td data-label="Check first">Does the mic level move in your app when you speak?</td></tr>
+            <tr><th scope="row"><a href="second-link-idle.html">The second connection carries nothing</a></th><td data-label="Usually starts at">Your app, or that network</td><td data-label="Check first">Is bonding on, and does each connection show traffic?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="part" id="drops" aria-labelledby="drops-h">
+      <h2 id="drops-h">Drops and freezes on the move</h2>
+      <div class="read">
+        <p>A short glitch while you move is normal: when your phone switches to another cell tower, the connection can lose data or stall for a moment (<a href="why-bonding.html#handover">more on why, with sources</a>). You can't fully avoid that. You can change how long a bad moment lasts, and what your viewers see during it.</p>
+
+        <h3 id="lower-bitrate">Let the bitrate drop before the stream does</h3>
+        <p>A high <a href="glossary.html#bitrate">bitrate</a> doesn't look better if the connection can't carry it. Then the picture freezes instead. With <a href="glossary.html#adaptive-bitrate">adaptive bitrate</a> on, your app lowers the bitrate when the connection gets weak and raises it again when it recovers. Moblin and BELABOX both have it. VDO.Ninja's IRL guide says the same: if it still freezes while you move, try a lower profile before you raise the bitrate. Smaller frames recover faster after a loss.</p>
+
+        <h3 id="time-to-recover">Give the stream time to recover</h3>
+        <p>With SRT and SRTLA, the receiver waits a set time for late and resent pieces of the stream. That time is the <a href="glossary.html#srt-latency">SRT latency</a>. Longer means more delay, but fewer glitches. <a href="protocols.html#latency">How to pick it.</a></p>
+        <p>With SRTLA, your app stops using a connection when it has heard nothing back from the receiver on it for a few seconds: 4 in BELABOX's sender, 5 in Moblin. It keeps trying, and uses the connection again once the receiver answers.</p>
+
+        <h3 id="show-something">Show your viewers something while it's down</h3>
+        <p>A <a href="glossary.html#brb">BRB scene</a> doesn't stop a drop. It shows your viewers something better than a frozen picture until the feed comes back. A scene switcher does this for you. NOALBS, for example, reads your receiver's bitrate every second. It switches to a LOW scene when the bitrate falls to a limit you set, to BRB when the feed is gone, and back to LIVE when it recovers.</p>
+        <p>On Twitch, <a href="glossary.html#disconnect-protection">Disconnect Protection</a> covers a drop between Twitch and whatever sends it your stream: your hub, or your app if it streams straight to Twitch. You switch it on yourself in Stream Settings, with "Temporary Backup Image" on too. If your connection to Twitch drops, viewers see a placeholder for up to 90 seconds, and the recording stays in one piece. If you don't reconnect in that time, the stream ends as normal.</p>
+        <ul class="bul">
+          <li class="w"><span class="vh">Watch out: </span>If your phone streams straight to the platform, viewers see no BRB scene while its connection is down, whatever the phone shows. At most they see the platform's own placeholder, if it has one. A BRB scene needs a hub between your app and the platform.</li>
+          <li class="w"><span class="vh">Watch out: </span>After a dropout, OBS's own media source can leave the sound glitchy and out of sync until you restart the source. NOALBS's <code>!fix</code> chat command restarts it. A source made for IRL such as OBS IRL Source tries to reconnect every 2 seconds, where the media source waits 10. Its makers say the sound survives a bad connection.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">Adaptive bitrate: <a href="https://github.com/eerimoq/moblin">Moblin README</a>, <a href="https://belabox.net/">BELABOX</a> ("dynamic bitrate control"), <a href="https://docs.vdo.ninja/guides/irl-streaming-stability">VDO.Ninja: IRL streaming stability</a>. A silent connection: the <a href="https://github.com/BELABOX/srtla/blob/main/srtla_send.c">BELABOX SRTLA sender</a> (<code>CONN_TIMEOUT 4</code>) and <a href="https://github.com/eerimoq/moblin/blob/main/Moblin/Media/Srtla/Client/RemoteConnection.swift">Moblin's SRTLA client</a> ("No packet received in 5 seconds"), both source code. Scene switching: <a href="https://docs.noalbs.com/guides/switching/">NOALBS: switching</a>. Twitch: <a href="https://help.twitch.tv/s/article/Disconnect-Protection?language=en_US">Disconnect Protection</a>. OBS: <a href="https://belabox.net/obs-audio-glitching.html">BELABOX on audio glitches in OBS</a>, <a href="https://github.com/irlserver/obs-irl-source">OBS IRL Source README</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="ask-for-help" aria-labelledby="ask-for-help-h">
+      <h2 id="ask-for-help-h">Before you ask for help</h2>
+      <div class="read">
+        <p>A tip from the people who help in app communities: these are the questions they ask first. Have the answers ready, and you get help sooner.</p>
+        <ul class="bul">
+          <li>Your app and its version, and your phone or encoder with its system version.</li>
+          <li>Your networks: which carriers, and whether it's a SIM, a hotspot or Wi-Fi.</li>
+          <li>When it happened, with your time zone, and how long it lasted.</li>
+          <li>The last part in the chain above where everything still looked right.</li>
+          <li>What you already tried.</li>
+          <li>A screenshot of your app's statistics and of the receiver's statistics page, if you have one.</li>
+          <li class="w"><span class="vh">Watch out: </span>Blank out your stream key, passwords and any stream ID in an address before you share a screenshot. On many services, any of them is enough for someone else to stream as you.</li>
+        </ul>
+        <p>Where to ask: <a href="help.html#where-to-ask">Help</a> lists the support channels of each app and service.</p>
+      </div>
+    </section>
+
+    <section class="part" id="go-live" aria-labelledby="go-live-h">
+      <h2 id="go-live-h" class="vh">Before you go live</h2>
+      <div class="read">
+        <div class="golive" id="before-you-go-live" role="group" aria-labelledby="something-wrong-go-h" data-checklist="guide-something-wrong">
+          <h3 id="something-wrong-go-h">Before you go live</h3>
+          <p class="golive-count" hidden></p>
+          <ul class="golive-list">
+            <li><label><input type="checkbox" value="0" data-nojs-ok> A short test stream, watched on the platform's own dashboard.</label></li>
+            <li><label><input type="checkbox" value="1" data-nojs-ok> The hub started too, if you use one.</label></li>
+            <li><label><input type="checkbox" value="2" data-nojs-ok> Adaptive bitrate on in your app.</label></li>
+            <li><label><input type="checkbox" value="3" data-nojs-ok> Every connection shows traffic, if you bond.</label></li>
+            <li><label><input type="checkbox" value="4" data-nojs-ok> BRB tested: cut the feed, see BRB, see the stream come back.</label></li>
+            <li><label><input type="checkbox" value="5" data-nojs-ok> On Twitch: Disconnect Protection switched on.</label></li>
+          </ul>
+          <p class="golive-note" hidden>Your ticks stay on this device. <button type="button" class="golive-clear">Clear ticks</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="next-steps" aria-labelledby="next-steps-h">
+      <h2 id="next-steps-h">Where next</h2>
+      <div class="read">
+        <ul class="bul">
+          <li><strong><a href="protocols.html">RTMP, SRT or SRTLA?</a></strong> What each one does, and how to get it into OBS.</li>
+          <li><strong><a href="into-obs.html">Into OBS</a>:</strong> a source that reconnects on its own, and a BRB scene that switches by itself.</li>
+          <li><strong><a href="second-network.html">Add a second network</a></strong> when the stream drops in crowds or weak spots.</li>
+          <li><strong><a href="power.html">Power</a></strong>, when the phone or backpack gives up before the stream does.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

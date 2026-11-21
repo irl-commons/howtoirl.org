@@ -1,0 +1,146 @@
+<div class="wrap page plans-page guide-page">
+  <header class="page-head">
+    <h1>RTMP, SRT or SRTLA?</h1>
+    <p class="lede">These are the three most common ways your app sends video over the internet. Which one fits depends on how steady your connection is, and how many connections you have. Here's what each does, and how to get it into OBS.</p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#pick">Pick one</a></li>
+      <li><a href="#caller-listener">Caller and listener</a></li>
+      <li><a href="#setups">Three working setups</a></li>
+      <li><a href="#latency">SRT latency</a></li>
+      <li><a href="#next-steps">Where next</a></li>
+    </ul>
+  </nav>
+
+  <div class="parts">
+    <section class="part" id="pick" aria-labelledby="pick-h">
+      <h2 id="pick-h">Pick one</h2>
+      <div class="read">
+        <div class="short-answer">
+          <p><strong>In short:</strong></p>
+          <ul class="bul">
+            <li>One place, a steady connection, straight to the platform: <strong>RTMP</strong>.</li>
+            <li>On the move with one connection: <strong>SRT</strong>, to OBS, a receiver or a cloud hub.</li>
+            <li>On the move with two or more connections: <strong>SRTLA</strong>. It needs a receiver.</li>
+          </ul>
+        </div>
+
+        <h3 id="rtmp">RTMP: simple, and every big platform takes it</h3>
+        <p>RTMP sends your stream over TCP. TCP delivers everything, in order. When a piece goes missing, it's sent again, and everything behind it waits. On a steady connection you never notice. On a mobile connection that loses pieces now and then, those waits can add up, and the stream stutters or drops.</p>
+        <p>Twitch, YouTube and Kick all take RTMP, or RTMPS, which is RTMP with encryption. OBS uses it to stream to them.</p>
+
+        <h3 id="srt">SRT: made for connections that lose pieces</h3>
+        <p><a href="glossary.html#srt">SRT</a> sends over UDP and handles losses itself. The receiver keeps a short buffer, the <a href="glossary.html#srt-latency">latency</a>. When a piece goes missing, the receiver asks for it again, and the resend has until the buffer runs out to arrive. In live mode, a piece that's still missing by then is dropped, so the rest of the stream doesn't wait for it.</p>
+        <p>SRT needs something on the other end that takes SRT: OBS, a receiver or a cloud hub. The ingest pages of Twitch, YouTube and Kick don't list SRT, so a hub sits in between and streams on with RTMP.</p>
+
+        <h3 id="srtla">SRTLA: SRT over several connections at once</h3>
+        <p><a href="glossary.html#srtla">SRTLA</a> spreads one SRT stream over two or more connections, for example two SIMs, or a SIM and a hotspot. A receiver on the internet joins the pieces back together and passes one SRT stream on to OBS or a cloud hub. OBS and the platforms don't take SRTLA directly. <a href="why-bonding.html#pieces">How SRTLA splits a stream.</a></p>
+
+        <table class="ask-table">
+          <thead><tr><th scope="col">Protocol</th><th scope="col">Good for</th><th scope="col">Needs</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">RTMP</th><td data-label="Good for">One place, a steady connection</td><td data-label="Needs">Nothing extra: the platform takes it</td></tr>
+            <tr><th scope="row">SRT</th><td data-label="Good for">One mobile connection</td><td data-label="Needs">OBS, a receiver or a cloud hub that takes SRT</td></tr>
+            <tr><th scope="row">SRTLA</th><td data-label="Good for">Two or more connections</td><td data-label="Needs">An SRTLA <a href="receiver.html">receiver</a>, then SRT on to OBS or a cloud hub</td></tr>
+          </tbody>
+        </table>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">RTMP: the <a href="https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf">RTMP 1.0 specification</a> ("over a reliable stream transport, such as TCP"), <a href="https://www.rfc-editor.org/rfc/rfc9293">RFC 9293</a> (TCP: "reliable, in-order"). SRT: the <a href="https://datatracker.ietf.org/doc/html/draft-sharabayko-srt-01">SRT protocol draft</a>, <a href="https://github.com/Haivision/srt/blob/master/docs/API/API-socket-options.md">SRT socket options</a> (too-late packet drop). Platforms: <a href="https://dev.twitch.tv/docs/video-broadcast/">Twitch: video broadcast</a>, <a href="https://ingest.twitch.tv/ingests">Twitch ingest servers</a> (RTMP and RTMPS addresses), <a href="https://developers.google.com/youtube/data/live/guides/ingestion-protocol-comparison">YouTube: ingestion protocols</a> (RTMP, RTMPS, HLS and DASH), <a href="https://help.kick.com/en/articles/7066931-how-to-stream-on-kick-com">Kick: how to stream</a>. SRTLA: the <a href="https://github.com/BELABOX/srtla">SRTLA README</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="caller-listener" aria-labelledby="caller-listener-h">
+      <h2 id="caller-listener-h">Caller and listener: who connects to whom</h2>
+      <div class="read">
+        <p>An SRT connection has two ends. The <strong>listener</strong> waits for a connection on a port. The <strong>caller</strong> connects to it. Your phone app is usually the caller, and whatever receives the stream listens.</p>
+        <ul class="bul">
+          <li class="w"><span class="vh">Watch out: </span>The listener has to be reachable from where the caller is. A PC at home is hidden behind your router, so a phone on mobile data can't reach it until you forward the port on the router (SRT uses UDP).</li>
+          <li class="w"><span class="vh">Watch out: </span>Some internet connections share one public address among many customers (carrier-grade NAT). Then a forwarded port on your own router isn't enough: the port would also have to be opened on your provider's side, and that's up to your provider. A server or a hosted receiver avoids the problem.</li>
+        </ul>
+        <h3 id="obs-listens">Let OBS listen</h3>
+        <p>OBS can take SRT in a Media Source. Untick "Local File" and enter an address with <code>mode=listener</code> at the end, like <code>srt://0.0.0.0:9000?mode=listener</code>. Here <code>0.0.0.0</code> means "on every network this PC is on", and 9000 is the port your app sends to. In your app, enter the PC's address and the same port.</p>
+        <p>OBS can also call: to take a stream from a receiver, enter the receiver's address without <code>mode=listener</code>.</p>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/Haivision/srt/blob/master/docs/apps/srt-live-transmit.md">SRT: caller, listener and rendezvous</a>, <a href="https://obsproject.com/kb/srt-protocol-streaming-guide">OBS: SRT protocol streaming guide</a>, <a href="https://ffmpeg.org/ffmpeg-protocols.html#srt">FFmpeg: SRT options</a>. Carrier-grade NAT: <a href="https://www.rfc-editor.org/rfc/rfc6269#section-5.2.1">RFC 6269, section 5.2.1</a> ("the port must also be opened in the CGN").</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="setups" aria-labelledby="setups-h">
+      <h2 id="setups-h">Three working setups</h2>
+      <div class="read">
+        <h3 class="chain-title" id="setup-home">To test at home, on the same Wi-Fi</h3>
+        <ol class="part-chain" aria-label="Phone to OBS on the same Wi-Fi">
+          <li><strong>Phone app</strong><span>SRT, calls</span></li>
+          <li><strong>OBS</strong><span>Media Source, listens on the PC's local address</span></li>
+          <li><strong>Platform</strong><span>OBS streams with RTMP</span></li>
+        </ol>
+        <p>The quickest way to try SRT. It works only while the phone is on the same network as the PC.</p>
+
+        <h3 class="chain-title" id="setup-hosted">On the move, with a hosted receiver</h3>
+        <ol class="part-chain" aria-label="Phone to a hosted receiver, then OBS">
+          <li><strong>Phone app</strong><span>SRT or SRTLA, calls</span></li>
+          <li><strong>Hosted receiver</strong><span>a service runs it</span></li>
+          <li><strong>OBS</strong><span>at home or in the cloud, calls the receiver</span></li>
+          <li><strong>Platform</strong><span>RTMP</span></li>
+        </ol>
+        <p>No port forwarding, and no server to look after. <a href="receiver.html">Hosted receivers</a> are listed on the receiver page.</p>
+
+        <h3 class="chain-title" id="setup-own">On the move, with your own receiver</h3>
+        <ol class="part-chain" aria-label="Phone to your own receiver on a rented server, then OBS">
+          <li><strong>Phone app</strong><span>SRTLA, calls</span></li>
+          <li><strong>SRTLA receiver</strong><span>on a rented server, joins the connections</span></li>
+          <li><strong>SRT server</strong><span>on the same server</span></li>
+          <li><strong>OBS</strong><span>calls the SRT server</span></li>
+          <li><strong>Platform</strong><span>RTMP</span></li>
+        </ol>
+        <p>Free software on a server you rent. OpenIRL's srtla-receiver puts both on one server, with a statistics page that NOALBS can read. irl-srt-server is an SRT server with its own port for bonded streams, which arrive through an SRTLA receiver running next to it. BELABOX's original SRTLA receiver is marked unsupported and not for production use.</p>
+        <p>In OBS, a source made for IRL reconnects on its own after a drop, and a scene switcher shows BRB while the feed is gone: see <a href="into-obs.html">Into OBS</a>.</p>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/OpenIRL/srtla-receiver">OpenIRL srtla-receiver README</a>, <a href="https://github.com/irlserver/irl-srt-server">irl-srt-server README</a>, <a href="https://github.com/BELABOX/srtla">BELABOX SRTLA README</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="latency" aria-labelledby="latency-h">
+      <h2 id="latency-h">Choosing SRT latency</h2>
+      <div class="read">
+        <p>Latency is how long the receiver waits for late and resent pieces. More latency means more delay before your viewers see you, and fewer glitches when the connection stumbles.</p>
+        <ul class="bul">
+          <li><strong>SRT's own default is 120 ms.</strong> Both ends can set a latency, and the higher of the two is used.</li>
+          <li><strong>The rule of thumb</strong> from Haivision, who made SRT: latency is the round-trip time times a multiplier. On a good network with little loss, about 4 times the round trip. With more loss, more: 8 times at up to 10 % loss. It should also be longer than the longest burst of loss you expect.</li>
+          <li><strong>On the move,</strong> losses can come in bursts, for example while the phone switches towers. That's likely why phone apps start much higher than the rule gives for a ping: Moblin's default is 3000 ms (3 seconds). BELABOX starts at 2000 ms and recommends 1500 to 2500 ms.</li>
+          <li class="w"><span class="vh">Watch out: </span>In an SRT address in OBS, latency is in microseconds, not milliseconds: 2 seconds is <code>latency=2000000</code>. Without it, OBS asks for SRT's 120 ms, and the stream uses the other end's setting if that's higher. Moblin and BELABOX count in milliseconds.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/Haivision/srt/blob/master/docs/API/API-socket-options.md">SRT socket options</a> (<code>SRTO_LATENCY</code>), <a href="https://doc.haivision.com/SRT/1.5.7/latency">Haivision: SRT latency</a>, <a href="https://doc.haivision.com/SRT/1.5.7/rtt-multiplier">Haivision: RTT multiplier</a> (the table by packet loss), <a href="https://doc.haivision.com/SRT/1.5.7/packet-loss-rate">Haivision: packet loss rate</a> (longer than the worst burst), <a href="https://github.com/eerimoq/moblin/blob/main/Moblin/Various/Settings/Settings.swift">Moblin's settings (source code)</a>, <a href="https://github.com/BELABOX/belaUI/blob/ws_nodejs/public/script.js">BELABOX's web interface</a> (<a href="https://github.com/BELABOX/belaUI/blob/ws_nodejs/public/index.html">"Recommended latency: 1500-2500ms"</a>), <a href="https://obsproject.com/kb/srt-protocol-streaming-guide">OBS: SRT protocol streaming guide</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="go-live" aria-labelledby="go-live-h">
+      <h2 id="go-live-h" class="vh">Before you go live</h2>
+      <div class="read">
+        <div class="golive" id="before-you-go-live" role="group" aria-labelledby="protocols-go-h" data-checklist="guide-protocols">
+          <h3 id="protocols-go-h">Before you go live</h3>
+          <p class="golive-count" hidden></p>
+          <ul class="golive-list">
+            <li><label><input type="checkbox" value="0" data-nojs-ok> A protocol that fits your connection: RTMP, SRT or SRTLA.</label></li>
+            <li><label><input type="checkbox" value="1" data-nojs-ok> For SRTLA: a receiver, hosted or your own.</label></li>
+            <li><label><input type="checkbox" value="2" data-nojs-ok> The listener reachable from where you'll be: a server, a hosted receiver or a forwarded port.</label></li>
+            <li><label><input type="checkbox" value="3" data-nojs-ok> SRT latency set, at least a few round trips, more on the move.</label></li>
+            <li><label><input type="checkbox" value="4" data-nojs-ok> Test: switch off one connection, see the stream carry on.</label></li>
+          </ul>
+          <p class="golive-note" hidden>Your ticks stay on this device. <button type="button" class="golive-clear">Clear ticks</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="next-steps" aria-labelledby="next-steps-h">
+      <h2 id="next-steps-h">Where next</h2>
+      <div class="read">
+        <ul class="bul">
+          <li><strong><a href="receiver.html">A receiver for your bonded stream</a>:</strong> hosted ones, and ones you run yourself.</li>
+          <li><strong><a href="into-obs.html">Into OBS</a>:</strong> a source that reconnects, and a BRB scene that switches by itself.</li>
+          <li><strong><a href="why-bonding.html">Why more than one network?</a></strong> What bonding fixes, and what it can't.</li>
+          <li><strong><a href="something-wrong.html">Find what broke while you're live</a></strong>, when the stream misbehaves.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
