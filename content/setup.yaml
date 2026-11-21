@@ -27,6 +27,7 @@
 # sub-section of the step before it, with an `anchor` id to jump to. `choose` puts option cards
 # (title, text, items, go: {href, label}) side by side.
 # Texts are HTML. Link glossary words with class="gl".
+# `checklist`: "Before you go live", lines to tick that only restate the answer's own steps.
 # `checked: YYYY-MM-DD` shows "Checked <date> · Report a mistake" under the summary. Set it only when every claim
 # on the answer was read against its source that day and no finding is open; a guide page section takes
 # data-checked="YYYY-MM-DD" on its <section> for the same line under its h2.
@@ -79,6 +80,11 @@ answers:
     icon: s-hot
     title: Keep the phone going
     summary: When heat or an empty battery ends your stream, try these first.
+    checklist:
+      - "Power bank charged, for a long stream."
+      - "A spot out of direct sun, and the phone out of bags and pockets."
+      - "Resolution, frame rate or bitrate lowered, if the phone got hot last time."
+      - "A codec your receiver and platform accept. Kick takes only H.264."
     extra: |
       <div class="cool-tips">
         <h3 id="cool-h">Keep the phone cool and charged</h3>
@@ -113,6 +119,13 @@ answers:
     icon: i-phone
     title: One phone is enough
     summary: "A phone with a streaming app has everything a stream needs: camera, mic, mobile data and the app that sends it. Start with it, and add parts only when something stops working."
+    checklist:
+      - "Streaming app installed, and logged in to your platform or set up with the stream address and key."
+      - "On YouTube: live streaming switched on at least a day before."
+      - "Test stream at home with Wi-Fi off, watched on a second device."
+      - "Phone charged, and a power bank with you."
+      - "Data left on your plan for the hours you'll stream."
+      - "Mic plugged in, and the phone still charges with it."
     blocks:
       - title: Your first stream
         ordered: true
@@ -141,6 +154,12 @@ answers:
     icon: i-network
     title: Add a second network
     summary: 'Add a second internet connection on a different mobile network, and let your streaming app use both at once. That''s called <a class="gl" href="glossary.html#bonding">bonding</a>. If one network has a bad moment, the other can carry the stream.'
+    checklist:
+      - "Second connection on a different network from the first."
+      - "Bonding switched on in your app."
+      - "Receiver address set, if your app bonds with SRTLA and has no receiver of its own."
+      - "Test stream: each connection shows traffic."
+      - "Data left on both plans."
     layout: steps
     blocks:
       - title: Get a second connection
@@ -169,6 +188,12 @@ answers:
     icon: a-build
     title: Build your own backpack
     summary: You put the backpack together from parts and run one of these systems on it. You choose every part, and you set it up and fix it yourself.
+    checklist:
+      - "Board and modems on the system's list of supported parts."
+      - "SIMs on different networks."
+      - "Camera connected: HDMI capture or a USB camera."
+      - "A battery that lasts the whole stream."
+      - "A receiver, if it bonds with SRTLA."
     blocks:
       - title: Systems you build yourself
         count: [system, systems]
@@ -191,6 +216,10 @@ answers:
     icon: a-ready
     title: A ready-made backpack, with support
     summary: Ready to use when it arrives. Some fit in a backpack, others mount on the camera. Rentals and warranties depend on the package.
+    checklist:
+      - "Device set up, and its bonding service switched on if it needs one."
+      - "You know what the monthly fee includes: data, the service, or both."
+      - "Test stream from where you'll stream."
     blocks:
       - title: Who makes them
         count: [maker, makers]
@@ -204,6 +233,13 @@ answers:
     icon: s-camera
     title: A standalone camera
     summary: "A mirrorless camera or DSLR gives a cleaner picture in low light, optical zoom and a soft background. An action camera is small, wide and steady. Either hands its picture over HDMI, USB or Wi-Fi to something that streams it: your phone, a backpack, or a box on the camera."
+    checklist:
+      - "Camera powered for the whole stream: USB-C power or a dummy battery."
+      - "Auto power-off turned off, and a run at home as long as the stream."
+      - "Clean HDMI on, so viewers don't see focus boxes and icons."
+      - "Your app or backpack uses the mic you picked."
+      - "Picture and sound in sync in a test."
+      - "Hands free: a chest mount, a gimbal or someone to run the camera."
     blocks:
       - title: Before you add a camera
         small: power, heat, hands, sound
@@ -245,6 +281,11 @@ answers:
     icon: s-multicam
     title: Several cameras in one scene
     summary: "Something has to put the pictures together: an app on the phone, OBS on a PC or server, a hub in the cloud, or a box in your backpack."
+    checklist:
+      - "Something that puts the pictures together: an app on the phone, OBS, a cloud hub or a box in the backpack."
+      - "Each feed's delay lined up where you mix."
+      - "Sound from one feed only; the others muted."
+      - "Test with every camera on at once."
     blocks:
       - title: On the phone
         count: [app, apps]
@@ -281,6 +322,11 @@ answers:
     icon: a-cloud
     title: Move the hub to the cloud
     summary: With the hub on a rented server, your away stream keeps running even if the PC, power or internet at home fails. The hub is OBS on that server, or a hosted service.
+    checklist:
+      - "Server or hosted service running."
+      - "Your app or backpack sends to the cloud hub's address."
+      - "You know how the hub goes live on the platform, and tested it."
+      - "A second input, if you also send your desktop."
     blocks:
       - title: Cloud hubs
         select: [{class: cloud}, {id: [obs-studio, noalbs-tool]}]
@@ -299,6 +345,13 @@ answers:
     icon: a-hybrid
     title: Desktop and IRL in one stream
     summary: 'To switch between desktop and IRL without ending your stream, send both to a <strong><a class="gl" href="glossary.html#hub">hub</a></strong>: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'
+    checklist:
+      - "Hub set up: OBS on your PC, or a cloud hub with an input for the desk and one for the phone."
+      - "Three scenes in the hub: desktop, phone and BRB."
+      - "Phone app or backpack sends to the hub's or receiver's address, not the platform's."
+      - "Desk mic only in the desk scenes."
+      - "Scene switching from away tested, with a remote app or a chat command."
+      - "Drop protection shows BRB when the phone's signal drops."
     layout: steps
     blocks:
       - title: Pick where the hub runs
@@ -372,6 +425,11 @@ answers:
     icon: i-receiver
     title: A receiver for your bonded stream
     summary: Bonding splits your stream over several connections. A receiver is the server that joins it back together before OBS or the platform. Some apps and cloud hubs include one. If yours doesn't, pick one here.
+    checklist:
+      - "A receiver that supports your app's or backpack's bonding protocol."
+      - "Reachable from the internet: a server, or port forwarding at home."
+      - "Your app or backpack sends to the receiver's address."
+      - "OBS or your hub takes the stream from the receiver."
     before:
       - "! Pick one that supports your app's or backpack's bonding protocol."
     blocks:
@@ -394,6 +452,13 @@ answers:
     icon: a-chain
     title: Into OBS
     summary: Your app or backpack sends the stream to a receiver. OBS takes it from there. Start Streaming in OBS is what goes live.
+    checklist:
+      - "OBS source set to the receiver's address, not the phone's."
+      - "A source made for IRL, which reconnects on its own."
+      - "A BRB scene."
+      - "Scene switcher set to the receiver's stats URL."
+      - "Only one automatic switcher on this OBS."
+      - "Test: cut the feed, see BRB, and see the stream come back."
     blocks:
       - title: In OBS
         before:
@@ -413,6 +478,11 @@ answers:
     icon: i-satellite
     title: Add a satellite dish
     summary: Satellite internet works far from cell towers. Use it on its own where there's no mobile signal, or as one more connection where mobile networks are busy.
+    checklist:
+      - "A clear view of the sky where you'll stream."
+      - "A battery that powers the dish for the whole stream."
+      - "On the move: a Roam or Priority plan, and a dish made for motion, fixed in place."
+      - "Bonding on in your app, and a receiver for SRTLA, if you add mobile networks."
     blocks:
       - title: Satellite internet
         select: [{class: connections, platforms: hardware}]

@@ -3,111 +3,111 @@
  "pages": {
   "index.html": {
    "html": 31744,
-   "total": 234496
+   "total": 238592
   },
   "one-phone.html": {
-   "html": 29696,
-   "total": 233472
+   "html": 31744,
+   "total": 238592
   },
   "second-network.html": {
-   "html": 28672,
-   "total": 231424
-  },
-  "hybrid.html": {
-   "html": 34816,
+   "html": 29696,
    "total": 237568
   },
+  "hybrid.html": {
+   "html": 35840,
+   "total": 243712
+  },
   "better-picture.html": {
-   "html": 30720,
-   "total": 233472
+   "html": 32768,
+   "total": 239616
   },
   "several-cameras.html": {
-   "html": 28672,
-   "total": 231424
+   "html": 29696,
+   "total": 236544
   },
   "cloud.html": {
-   "html": 27648,
-   "total": 230400
+   "html": 28672,
+   "total": 235520
   },
   "more.html": {
-   "html": 29696,
-   "total": 232448
+   "html": 30720,
+   "total": 237568
   },
   "satellite.html": {
-   "html": 26624,
-   "total": 229376
+   "html": 27648,
+   "total": 235520
   },
   "receiver.html": {
-   "html": 28672,
-   "total": 231424
+   "html": 29696,
+   "total": 236544
   },
   "into-obs.html": {
-   "html": 27648,
-   "total": 231424
+   "html": 29696,
+   "total": 236544
   },
   "build.html": {
-   "html": 27648,
-   "total": 230400
+   "html": 28672,
+   "total": 235520
   },
   "ready-made.html": {
-   "html": 26624,
-   "total": 230400
+   "html": 28672,
+   "total": 235520
   },
   "live-not-on-platform.html": {
    "html": 28672,
-   "total": 231424
+   "total": 235520
   },
   "picture-frozen.html": {
    "html": 27648,
-   "total": 230400
+   "total": 234496
   },
   "no-sound-or-alerts.html": {
    "html": 28672,
-   "total": 231424
+   "total": 235520
   },
   "second-link-idle.html": {
    "html": 27648,
-   "total": 230400
+   "total": 234496
   },
   "help.html": {
    "html": 104448,
-   "total": 320512
+   "total": 324608
   },
   "glossary.html": {
    "html": 77824,
-   "total": 280576
+   "total": 284672
   },
   "data-plans.html": {
    "html": 83968,
-   "total": 286720
+   "total": 290816
   },
   "why-bonding.html": {
    "html": 66560,
-   "total": 269312
+   "total": 273408
   },
   "links.html": {
    "html": 88064,
-   "total": 296960
+   "total": 301056
   },
   "contact.html": {
    "html": 9216,
-   "total": 211968
+   "total": 216064
   },
   "legal-notice.html": {
    "html": 10240,
-   "total": 212992
+   "total": 217088
   },
   "impressum.html": {
    "html": 10240,
-   "total": 212992
+   "total": 217088
   },
   "privacy.html": {
    "html": 14336,
-   "total": 217088
+   "total": 221184
   },
   "datenschutz.html": {
    "html": 15360,
-   "total": 218112
+   "total": 222208
   }
  },
  "assets": {
@@ -117,7 +117,7 @@
   "assets/fonts/ibm-plex-mono-latin-500-normal.woff2": 17408,
   "assets/fonts/ibm-plex-mono-latin-600-normal.woff2": 18432,
   "assets/links-filters.css": 6144,
-  "assets/site.js": 64512,
-  "assets/style.css": 139264
+  "assets/site.js": 66560,
+  "assets/style.css": 141312
  }
 }
