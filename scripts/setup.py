@@ -88,6 +88,9 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
             if c['to'] not in ids:
                 out.append(f'#{a["id"]}: choice "{c["title"]}": no answer #{c["to"]}')
         anchors = {b['anchor'] for b in a.get('blocks', []) if b.get('anchor')}
+        for x in a.get('sources', []):
+            if not str(x.get('url', '')).startswith('https://') or not x.get('label'):
+                out.append(f'#{a["id"]}: a source needs a label and an https:// url')
         if a.get('layout') not in (None, 'steps'):
             out.append(f'#{a["id"]}: layout "{a["layout"]}" (use steps, or leave it out)')
         for b in a.get('blocks', []):
@@ -171,7 +174,8 @@ def esc(t: str) -> str:
 
 def card(c: dict) -> str:
     href = c.get('href') or page(c['to'])
-    return (f'<li><a href="{href}"><svg class="ill" aria-hidden="true"><use href="#{c["icon"]}"/></svg>'
+    ill = f'<svg class="ill" aria-hidden="true"><use href="#{c["icon"]}"/></svg>' if c.get('icon') else ''
+    return (f'<li><a href="{href}">{ill}'
             f'<strong>{esc(c["title"])}</strong><span>{esc(c["text"])}</span></a></li>')
 
 
@@ -187,10 +191,11 @@ def home_html(setup: dict) -> str:
     parts = []
     for i, g in enumerate(setup['groups']):
         gid = 'grp-' + re.sub('[^a-z0-9]+', '-', g['title'].lower()).strip('-')
-        cls = 'choices' + (' learn' if g.get('style') == 'learn' else '')
+        cls = 'choices' + {'learn': ' learn', 'symptoms': ' symptoms'}.get(g.get('style'), '')
+        hcls = 'grp live' if g.get('style') == 'symptoms' else 'grp'
         cards = '\n          '.join(card(c) for c in g['cards'])
         anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
-        parts.append(f'<h2 class="grp" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
+        parts.append(f'<h2 class="{hcls}" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
                      f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>')
     return ('<section class="step start" id="start" tabindex="-1" aria-label="Choose your starting point">\n        '
             + '\n        '.join(parts) + '\n      </section>')
@@ -367,6 +372,14 @@ def side_html(a: dict) -> str:
     return '\n            '.join(out)
 
 
+def sources_html(a: dict) -> str:
+    """The public pages an answer's checks rest on, under the answer, like the Sources on the guide pages."""
+    if not a.get('sources'):
+        return ''
+    links = ', '.join(f'<a href="{html.escape(x["url"])}">{esc(x["label"])}</a>' for x in a['sources'])
+    return f'<details class="more fold sources" open><summary>Sources</summary><p class="tip-src">{links}</p></details>'
+
+
 def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
     aid = a['id']
     head = (f'<div class="result-head">\n          <svg class="ill big" aria-hidden="true"><use href="#{a["icon"]}"/></svg>\n          <div>\n'
@@ -387,7 +400,7 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
         else:
             blocks = '\n        '.join(block_html(a, b, i == 0, services, by_id) for i, b in enumerate(a['blocks']))
         loose = lambda key: item_list([item(t, by_id) for t in a.get(key, [])], mix=True).replace('class="picks mix"', f'class="picks mix loose {key}"', 1)
-        blocks = '\n        '.join(x for x in (loose('before'), blocks, loose('after')) if x)
+        blocks = '\n        '.join(x for x in (loose('before'), blocks, loose('after'), sources_html(a)) if x)
         body = (f'<div class="result-body">\n          <div class="result-main">\n        {blocks}\n          </div>\n'
                 f'          <div class="result-side">\n            {side_html(a)}\n          </div>\n        </div>')
         kind = 'result steps' if a.get('layout') == 'steps' else 'result'
@@ -459,7 +472,8 @@ def fill(body: str, setup: dict, services: list[dict]) -> str:
 # The site's own pages in Help's Guides tab, in this order, each with the part colour of its topic.
 HELP_PAGES = {'one-phone': 'sender', 'second-network': 'connections', 'hybrid': 'tools', 'better-picture': 'sender',
               'several-cameras': 'tools', 'cloud': 'receiver', 'more': 'sender', 'satellite': 'connections', 'receiver': 'receiver',
-              'into-obs': 'tools', 'build': 'sender', 'ready-made': 'sender', 'data-plans.html': 'connections', 'why-bonding.html': 'connections'}
+              'into-obs': 'tools', 'build': 'sender', 'ready-made': 'sender', 'live-not-on-platform': 'tools', 'picture-frozen': 'sender',
+              'no-sound-or-alerts': 'tools', 'second-link-idle': 'connections', 'data-plans.html': 'connections', 'why-bonding.html': 'connections'}
 HELP_SKIP = {'a', 'in', 'one', 'the', 'and', 'to', 'your'}
 
 

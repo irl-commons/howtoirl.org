@@ -1729,3 +1729,13 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 @media (forced-colors: active) { .copy-link.is-copied { background: Highlight; color: HighlightText; } }
 @media print { .copy-link { display: none; } }
 .moved-list:not(:has(:target)) { display: none; }
+
+/* "Live, but something's wrong?": four symptom cards, two by two on a phone, text only, so they fit one screen.
+   The heading's dot is the tally light of a camera that is on air. */
+.step.start > .grp.live::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--live); vertical-align: 0; }
+.start .choices.symptoms { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 10px; }
+.start .choices.symptoms li { display: block; grid-row: auto; }
+.start .choices.symptoms a { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; grid-row: auto; padding: 12px 14px 14px; }
+.start .choices.symptoms strong { font-size: 17px; line-height: 1.25; align-self: stretch; }
+.start .choices.symptoms span { font-size: 15px; line-height: 1.35; }
+@media (min-width: 1000px) { .start .choices.symptoms, .fits-page .start .choices.symptoms { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
