@@ -197,7 +197,7 @@ test('The platform switch starts on the visitor\'s own phone', async()=>{
  assert.equal(site.pickPlatform('Mozilla/5.0 (Windows NT 10.0)',['ios','android']),'ios');
 });
 
-test('setup.yaml checks catch unknown values, untagged homes and stale notes', async()=>{
+test('setup.yaml checks catch unknown values, untagged homes, stale notes and bad hold_back entries', async()=>{
  const {execFileSync}=await import('node:child_process');
  execFileSync('python3',['-c', `
 import sys, json, pathlib, copy
@@ -228,6 +228,13 @@ assert 'split by "windows"' in run(lambda s, sv: block(s, 'one-phone', 'Streamin
 assert 'starts with a watch-out' in run(lambda s, sv: block(s, 'one-phone', 'Your first stream')['before'].insert(0, '! Careful.'))
 assert 'an ordered block lists steps only' in run(lambda s, sv: block(s, 'one-phone', 'Your first stream').update(select=[{'id': 'moblin'}]))
 assert 'a lead line without services' in run(lambda s, sv: block(s, 'build', 'What you need').update(lead='These:'))
+assert 'hold_back: "no-such-app" is no service' in run(lambda s, sv: s.update(hold_back={'no-such-app': 'Gone.'}))
+assert 'needs the reason it is held back' in run(lambda s, sv: s.update(hold_back={'moblin': ''}))
+assert 'held back in hold_back' in run(lambda s, sv: s.update(hold_back={'obs-irl-source': 'Test.'}))
+held = copy.deepcopy(base); held['hold_back'] = {'irlhosting': 'Test.'}
+assert all(s['id'] != 'irlhosting' for b in [block(held, 'cloud', 'Cloud hubs')] for s in st.selected(b, st.shown(held, services)))
+name = next(s['name'] for s in services if s['id'] == 'irlhosting')
+assert name in st.fill('<!--setup:answers-->', base, services) and name not in st.fill('<!--setup:answers-->', held, services)
 assert 'is tagged scene-control, but no block' in run(lambda s, sv: block(s, 'hybrid', 'Switch scenes while you are away').update(select=[{'id': 'moblin'}], notes={}))
 `],{stdio:'pipe'});
 });

@@ -52,12 +52,25 @@ def fits(s: dict, match: dict) -> bool:
     return True
 
 
+def shown(setup: dict, services: list[dict]) -> list[dict]:
+    """The catalogue without the services `hold_back` keeps off this page."""
+    held = setup.get('hold_back') or {}
+    return [s for s in services if s['id'] not in held]
+
+
 def selected(block: dict, services: list[dict]) -> list[dict]:
     return r.by_name(s for s in services if any(fits(s, m) for m in block.get('select', [])))
 
 
 def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list[str]:
     out = []
+    known = {s['id'] for s in services}
+    for sid, why in (setup.get('hold_back') or {}).items():
+        if sid not in known:
+            out.append(f'hold_back: "{sid}" is no service in IRL Commons')
+        if not str(why or '').strip():
+            out.append(f'hold_back: "{sid}" needs the reason it is held back')
+    services = shown(setup, services)
     by_id = {s['id']: s for s in services}
     tagged_home: dict[tuple[str, str], bool] = {}
     ids = {a['id'] for a in setup['answers']}
@@ -119,7 +132,9 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
                 out.append(f'{s["name"]} ({s["id"]}) is tagged {t}, but no block that selects by {t} shows it')
     for text in texts(setup):
         for sid in re.findall(r'\{([a-z0-9-]+)\}', text):
-            if sid not in by_id:
+            if sid in (setup.get('hold_back') or {}):
+                out.append(f'{{{sid}}}: held back in hold_back, so it can\'t be linked')
+            elif sid not in by_id:
                 out.append(f'{{{sid}}}: no such service in IRL Commons')
     return out
 
@@ -371,6 +386,7 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
 
 
 def fill(body: str, setup: dict, services: list[dict]) -> str:
+    services = shown(setup, services)
     by_id = {s['id']: s for s in services}
     if '<!--setup:start-->' in body:
         body = body.replace('<!--setup:start-->', home_html(setup))
