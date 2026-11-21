@@ -52,12 +52,25 @@ def fits(s: dict, match: dict) -> bool:
     return True
 
 
+def shown(setup: dict, services: list[dict]) -> list[dict]:
+    """The catalogue without the services `hold_back` keeps off this page."""
+    held = setup.get('hold_back') or {}
+    return [s for s in services if s['id'] not in held]
+
+
 def selected(block: dict, services: list[dict]) -> list[dict]:
     return r.by_name(s for s in services if any(fits(s, m) for m in block.get('select', [])))
 
 
 def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list[str]:
     out = []
+    known = {s['id'] for s in services}
+    for sid, why in (setup.get('hold_back') or {}).items():
+        if sid not in known:
+            out.append(f'hold_back: "{sid}" is no service in IRL Commons')
+        if not str(why or '').strip():
+            out.append(f'hold_back: "{sid}" needs the reason it is held back')
+    services = shown(setup, services)
     by_id = {s['id']: s for s in services}
     tagged_home: dict[tuple[str, str], bool] = {}
     ids = {a['id'] for a in setup['answers']}
@@ -119,7 +132,9 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
                 out.append(f'{s["name"]} ({s["id"]}) is tagged {t}, but no block that selects by {t} shows it')
     for text in texts(setup):
         for sid in re.findall(r'\{([a-z0-9-]+)\}', text):
-            if sid not in by_id:
+            if sid in (setup.get('hold_back') or {}):
+                out.append(f'{{{sid}}}: held back in hold_back, so it can\'t be linked')
+            elif sid not in by_id:
                 out.append(f'{{{sid}}}: no such service in IRL Commons')
     return out
 
@@ -371,6 +386,7 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
 
 
 def fill(body: str, setup: dict, services: list[dict]) -> str:
+    services = shown(setup, services)
     by_id = {s['id']: s for s in services}
     if '<!--setup:start-->' in body:
         body = body.replace('<!--setup:start-->', home_html(setup))
@@ -378,12 +394,43 @@ def fill(body: str, setup: dict, services: list[dict]) -> str:
         body = body.replace('<!--setup:answers-->', '\n\n      '.join(answer_html(a, services, by_id) for a in setup['answers']))
     return body
 
+# The site's own pages in Help's Guides tab, in this order, each with the part colour of its topic.
+HELP_PAGES = {'one-phone': 'sender', 'second-network': 'connections', 'hybrid': 'tools', 'better-picture': 'sender',
+              'several-cameras': 'tools', 'cloud': 'receiver', 'more': 'sender', 'satellite': 'connections', 'receiver': 'receiver',
+              'into-obs': 'tools', 'build': 'sender', 'ready-made': 'sender', 'data-plans.html': 'connections', 'why-bonding.html': 'connections'}
+HELP_SKIP = {'a', 'in', 'one', 'the', 'and', 'to', 'your'}
+
+
+def help_pages(setup: dict) -> list[dict]:
+    """Title, one subtitle line and link for each own page: the home card's line, or the summary's first sentence when
+    the card line would only repeat the title."""
+    cards = {c.get('to') or c.get('href'): c for g in setup['groups'] for c in g['cards']}
+    answers = {a['id']: a for a in setup['answers']}
+    out = []
+    for key, step in HELP_PAGES.items():
+        a, c = answers.get(key, {}), cards.get(key, {})
+        title = c['title'] if key.endswith('.html') else a['title']
+        sub = c.get('text', '')
+        words = set(re.findall(r'[a-z]+', title.lower())) - HELP_SKIP
+        if not sub or len(words & set(re.findall(r'[a-z]+', sub.lower()))) >= max(1, len(words) * 0.6):
+            summary = html.unescape(re.sub(r'<[^>]+>', '', a.get('summary', '')))
+            sub = re.split(r'(?<=[.!?])\s', summary)[0] if summary else ''
+        out.append({'id': key.removesuffix('.html'), 'title': title, 'sub': sub, 'step': step,
+                    'href': key if key.endswith('.html') else f'index.html#{key}'})
+    return out
+
+
+def help_problems(setup: dict) -> list[str]:
+    known = {a['id'] for a in setup['answers']}
+    return ([f'answer #{i} has no part colour in HELP_PAGES (scripts/setup.py), so Help\'s Guides tab would miss it' for i in sorted(known - set(HELP_PAGES))]
+            + [f'HELP_PAGES names #{i}, which is no answer' for i in sorted(set(k for k in HELP_PAGES if not k.endswith('.html')) - known)])
+
 
 def check(pkg: pathlib.Path, path: pathlib.Path = ROOT / 'content/setup.yaml') -> tuple[dict, list[str]]:
     services = json.loads((pkg / 'data/services.json').read_text())['services']
     schema = json.loads((pkg / 'schema/json/services.schema.json').read_text())
     setup = load_yaml(path)
-    return setup, problems(setup, services, allowed_values(schema, services))
+    return setup, problems(setup, services, allowed_values(schema, services)) + help_problems(setup)
 
 
 if __name__ == '__main__':

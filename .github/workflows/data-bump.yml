@@ -1,12 +1,16 @@
 name: Update IRL Commons data
-# Follow npm releases after the reviewed migration from the git pin.
+# Follow stable npm releases; every update is reviewed in a pull request.
 on:
   schedule:
-    - cron: "23 5 * * *"
+    # Hourly, so a new data release reaches the site's pull request within the hour.
+    - cron: "23 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
   pull-requests: write
+  # Pull requests opened with the workflow token start no workflows by themselves,
+  # so the update job starts the preview build for its pull request directly.
+  actions: write
 concurrency:
   group: data-bump
   cancel-in-progress: false
@@ -19,18 +23,15 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
       - name: Find the latest npm release
         id: release
         run: |
-          version=$(npm view @irl-commons/data version)
+          version=$(npm view @irl-commons/data@latest version)
           [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected a stable npm version" >&2; exit 1; }
           current=$(node -p "require('./package.json').dependencies['@irl-commons/data']")
-          if [[ ! "$current" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::warning::Keep the git pin until a reviewed npm release includes the data already used by the site."
-            exit 0
-          fi
+          [[ "$current" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected an exact npm dependency version" >&2; exit 1; }
           if [ "$version" = "$current" ]; then echo "Already on $version."; exit 0; fi
           # Never downgrade if latest has been moved back to an older release.
           node -e 'const [a,b]=process.argv.slice(1).map(v=>v.split(".").map(Number)); for(let i=0;i<3;i++){if(a[i]>b[i])process.exit(0);if(a[i]<b[i])process.exit(1)}process.exit(1)' "$version" "$current"
@@ -57,7 +58,11 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm audit signatures
-          npm run check
+          npm run build
+          # Data pages may grow with a release; raise their page weight limits in this
+          # pull request, where the diff shows it, instead of failing the update.
+          npm run budget -- --raise
+          npm test
       - name: Open or update the pull request
         if: steps.release.outputs.version != ''
         env:
@@ -65,7 +70,7 @@ jobs:
           VERSION: ${{ steps.release.outputs.version }}
         run: |
           branch="data/irl-commons-$VERSION"
-          git add package.json package-lock.json site.json
+          git add package.json package-lock.json site.json page-budget.json
           if ! git diff --cached --quiet; then
             git commit -m "Data: update @irl-commons/data to $VERSION"
           fi
@@ -74,13 +79,21 @@ jobs:
           # Recheck if main changed while the release was being tested.
           npm ci --ignore-scripts
           npm audit signatures
-          npm run check
+          npm run build
+          npm run budget -- --raise
+          npm test
+          git add page-budget.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Data: raise page weight limits for @irl-commons/data $VERSION"
+          fi
           git push origin "$branch"
           title="Data: update @irl-commons/data to $VERSION"
-          body="Pins @irl-commons/data to npm release $VERSION. Clean install, signature and provenance verification, build and site checks passed in the update job. Deploy after merging."
+          body="Pins @irl-commons/data to npm release $VERSION. Clean install, signature and provenance verification, build and site checks passed in the update job. The preview link follows in a comment; merging puts it live."
           pr=$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')
           if [ -n "$pr" ]; then
             gh pr edit "$pr" --title "$title" --body "$body"
           else
             gh pr create --base main --head "$branch" --title "$title" --body "$body"
+            pr=$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number')
           fi
+          gh workflow run preview.yml --ref "$branch" -f pr="$pr"

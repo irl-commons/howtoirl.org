@@ -7,16 +7,23 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import setup as setup_answers
 pkg=ROOT/'node_modules/@irl-commons/data'
 data={k:json.loads((pkg/'data'/f'{k}.json').read_text())[k] for k in ['words','services','guides','standards']}
+cfg=json.loads((ROOT/'site.json').read_text())
+words_by_id={w['id']:w for w in data['words']}
+selected=cfg['glossaryWords']
+if len(selected)!=len(set(selected)) or any(wid not in words_by_id for wid in selected):
+ sys.exit('site.json glossaryWords must contain unique ids present in IRL Commons')
+glossary_words=[words_by_id[wid] for wid in selected]
 r.GUIDES[:]=data['guides'];r.SERVICES_BY_ID.update({s['id']:s for s in data['services']})
 r.GUIDE_THUMBS.update({m['for']['guide']:m for m in json.loads((ROOT/'shared/thumbnails.json').read_text())})
 setup,found=setup_answers.check(pkg)
+r.HELP_OWN[:]=setup_answers.help_pages(setup)
 if found:
  sys.exit('content/setup.yaml does not match IRL Commons:\n  '+'\n  '.join(found))
 rendered={}
 for src in (ROOT/'content').glob('*.html'):
  body=src.read_text()
  body=setup_answers.fill(body,setup,data['services'])
- body=r.fill_words(body,data['words'])
+ body=r.fill_words(body,glossary_words)
  body=r.fill_standards(body,data['standards'],data['services'],data['words'])
  body=r.fill_services(body,data['services'])
  body=r.fill_calc(body,r.datause.load_model())
@@ -28,16 +35,17 @@ for src in (ROOT/'content').glob('*.html'):
   page=match[1]
   return match[0] if page in cfg['pages'] else f'href="https://{other}/{page}'
  body=re.sub(r'href="([a-z0-9-]+\.html)',cross,body)
- # The repeated step navigation needs a distinct accessible name at each location.
- count=[0]
+ # Each navigation needs a distinct accessible name. Keep the authored label;
+ # only a label that repeats on the page gets "part 2", "part 3" and so on.
+ seen={}
  def landmark(match):
-  count[0]+=1
-  return match[0].replace('aria-label="','aria-label="Step navigation '+str(count[0])+': ')
- body=re.sub(r'<nav[^>]+aria-label="[^"]+"',landmark,body)
+  label=match[1]
+  seen[label]=seen.get(label,0)+1
+  return match[0] if seen[label]==1 else match[0][:-1]+f', part {seen[label]}"'
+ body=re.sub(r'<nav[^>]+aria-label="([^"]+)"',landmark,body)
  body=re.sub(r'<nav(?![^>]*aria-label)([^>]*)>',lambda m: '<nav aria-label="Steps '+str(m.start())+'"'+m[1]+'>',body)
  rendered[src.name]=r.add_permalinks(body)
 (ROOT/'.generated').mkdir(exist_ok=True)
 (ROOT/'.generated/content.json').write_text(json.dumps(rendered,ensure_ascii=False))
-(ROOT/'public/assets/help-filters.css').write_text(r.help_filters_css(data['guides']))
 if 'links.html' in json.loads((ROOT/'site.json').read_text())['pages']:
  (ROOT/'public/assets/links-filters.css').write_text(r.links_filters_css(data['services']))

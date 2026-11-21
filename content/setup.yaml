@@ -31,6 +31,12 @@
 # Each answer page has one back link at the top. Without `back` it says "All starting points"
 # and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
 # `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
+#
+# hold_back keeps a catalogue service out of every block on these pages, with the reason. Use it when
+# the site can't point to a public page for what the catalogue says, and take it out once it can.
+
+hold_back:
+  belabox-cloud-stream-servers: Its features are only described behind a login; no public BELABOX page lists them yet.
 
 groups:
   - title: Start or add something
@@ -216,7 +222,7 @@ answers:
         notes:
           teradek-prism-mobile: an encoder on the back of the camera that bonds; by subscription or licence.
           yolobox-ultra: an all-in-one box with a screen and HDMI inputs; bonding is a paid service.
-          liveu-solo: bonded encoders for creators, by subscription.
+          liveu-solo: bonded encoders for creators. Bonding is a subscription ($45/month); one connection works without.
     side:
       - else: '<strong>Choose something else when</strong> the picture is fine but heat or the battery ends it: <a href="#more">the phone gives up</a>.'
       - next: '<strong>Next:</strong> to show the camera and your phone together, see <a href="#several-cameras">several cameras</a>.'
@@ -305,10 +311,9 @@ answers:
       - title: Hub in the cloud
         sub: true
         anchor: hybrid-cloud
-        select: [{id: [belabox-cloud-stream-servers, irlhosting, irltoolkit, obs-studio]}]
+        select: [{id: [irlhosting, irltoolkit, obs-studio]}]
         notes:
-          belabox-cloud-stream-servers: 'a hosted hub without OBS, with scene switching, picture-in-picture, web overlays and <a class="gl" href="glossary.html#drop-protection">drop protection</a>.'
-          irlhosting: '<a class="gl" href="glossary.html#cloud-obs">cloud OBS</a> servers, with SRTLA bonding and drop protection.'
+          irlhosting: '<a class="gl" href="glossary.html#cloud-obs">cloud OBS</a> servers, with SRTLA bonding and <a class="gl" href="glossary.html#drop-protection">drop protection</a>.'
           irltoolkit: cloud production with overlays and drop protection. Desk plus phone needs the plan with several inputs.
           obs-studio: " on a server you rent: the OBS you know. You can import your scene collection from home."
         after:
@@ -379,7 +384,7 @@ answers:
       - title: In OBS
         before:
           - "Add the receiver's address to OBS as a source, not the phone's."
-          - "! OBS's own media source doesn't reliably recover after a dropout, and the audio can drift. A source made for IRL, such as {obs-irl-source} or {smooth-media-source} (Windows), reconnects on its own."
+          - "! After a dropout, OBS's own media source can glitch or lose audio sync until you restart it. A source made for IRL, such as {obs-irl-source} or {smooth-media-source} (Windows), reconnects on its own."
           - A scene switcher like {noalbs-tool} shows your BRB scene when the bitrate drops, and switches back when it recovers.
           - Make a BRB scene, then cut a test feed to check the switch away and back.
           - '! The switcher reads the receiver''s <a class="gl" href="glossary.html#stats-url">stats URL</a>, which isn''t the address OBS plays.'
@@ -401,7 +406,7 @@ answers:
         also:
           - "! The dish needs a clear view of the sky. Trees and buildings block it."
           - "! It needs power for the whole stream: plan a big battery."
-          - "! To use it while moving, you need the right plan and mount."
+          - "! Using it while moving needs a Roam or Priority plan, used where Starlink allows it, and a dish made for motion (Mini, Standard or Performance), fixed in place. Residential plans don't allow it."
           - 'To use it together with mobile networks, your app or backpack has to bond, and SRTLA needs a <a href="#receiver">receiver</a>.'
     side:
       - else: '<strong>Choose something else when</strong> you only lose signal in crowds or weak spots: <a href="#second-network">a second network</a> is the smaller step.'
