@@ -35,6 +35,10 @@
   --caution: #805100;
   --latch: #a63f20;
   --live: #e5484d;
+  /* How to IRL's own accent (brand direction A): the tally light's red for the mark and small marks, never for text;
+     highlighter yellow behind ink for short answers and checklists. The IRL Commons mark keeps its copper. */
+  --accent: var(--live);
+  --highlight: #ffe27a;
   --sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
@@ -61,14 +65,14 @@
   :root:not([data-theme="light"]) {
     --bg: #14211e; --card: #1d302a; --sunk: #263c35; --fg: #f4f1e8; --muted: #bccbc2;
     --rule: #3d5048; --rule-strong: #6b8073; --decision: #f4f1e8; --decision-fg: #14211e;
-    --caution: #f0c56d; --latch: #ffaf88; --live: #ff6b62;
+    --caution: #f0c56d; --latch: #ffaf88; --live: #ff6b62; --highlight: #6a5414;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #14211e; --card: #1d302a; --sunk: #263c35; --fg: #f4f1e8; --muted: #bccbc2;
   --rule: #3d5048; --rule-strong: #6b8073; --decision: #f4f1e8; --decision-fg: #14211e;
-  --caution: #f0c56d; --latch: #ffaf88; --live: #ff6b62;
+  --caution: #f0c56d; --latch: #ffaf88; --live: #ff6b62; --highlight: #6a5414;
   color-scheme: dark;
 }
 @media (max-width: 759px) { :root { --t-body: 17px; --t-lede: 19px; --s6: 64px; --s5: 48px; } }
@@ -303,7 +307,7 @@ details.more > p { font-size: 16px; padding-left: calc(1ch + 10px); }
 .phone::before { content: ""; position: absolute; top: 10px; left: 50%; width: 46px; height: 5px; margin-left: -23px; background: var(--rule); border-radius: 3px; }
 .phone .carrier { font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .livedot { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: var(--fg); }
-.livedot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--live); }
+.livedot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
 .verdict { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 14px; font-weight: 600; letter-spacing: 0.06em; }
 .verdict::before { content: ""; display: inline-block; width: 12px; height: 12px; flex: none; }
 .verdict.caution { color: var(--caution); }
@@ -400,6 +404,7 @@ details.more > p { font-size: 16px; padding-left: calc(1ch + 10px); }
 
 .mk-line { fill: none; stroke: currentColor; stroke-width: 4; }
 .mk-latch { fill: var(--latch); }
+.mk-dot { fill: var(--accent); }
 
 
 @media (forced-colors: active) {
@@ -1741,7 +1746,7 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 .page-head > .promise-by { margin-top: 8px; font-size: var(--t-small); color: var(--muted); }
 /* "Live, but something's wrong?": four symptom cards, two by two on a phone, text only, so they fit one screen.
    The heading's dot is the tally light of a camera that is on air. */
-.step.start > .grp.live::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--live); vertical-align: 0; }
+.step.start > .grp.live::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--accent); vertical-align: 0; }
 .start .choices.symptoms { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 10px; }
 .start .choices.symptoms li { display: block; grid-row: auto; }
 .start .choices.symptoms a { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; grid-row: auto; padding: 12px 14px 14px; }
@@ -1768,3 +1773,14 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 .golive-clear:hover { border-color: var(--fg); }
 @media (min-width: 760px) { .step.question .q-check { padding-left: calc(240px + var(--s4)); } }
 @media print { .golive-note { display: none; } }
+
+/* Brand direction A: a highlighter stroke under short answers and checklist headings, a small stamp for check dates. */
+.short-answer > strong:first-child, .short-answer > p:first-child > strong:first-child, .golive :is(h2, h3) {
+  background: linear-gradient(transparent 40%, var(--highlight) 40%, var(--highlight) 94%, transparent 94%);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 3px; margin-left: -3px;
+}
+.stamp { display: inline-block; padding: 2px 8px; border: 1.5px solid var(--rule-strong); border-radius: 3px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; color: var(--fg); }
+@media (forced-colors: active) {
+  .short-answer > strong:first-child, .short-answer > p:first-child > strong:first-child, .golive :is(h2, h3) { background: none; text-decoration: underline; }
+  .stamp { border-color: CanvasText; }
+}
