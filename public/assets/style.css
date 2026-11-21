@@ -150,7 +150,7 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--sunk); bor
 .lede { font-size: var(--t-lede); line-height: 1.45; max-width: 56ch; }
 .toc { font-size: var(--t-small); margin-bottom: var(--s4); }
 @media (max-width: 759px) { .toc { margin-bottom: var(--s3); } }
-@media (max-width: 999px) { .toc li { white-space: nowrap; } .toc li a { display: inline-block; padding: 6px 0; white-space: normal; } .links .toc li { display: block; } .links .toc li + li::before { content: none; } .links .toc li a { padding: 4px 0; } }
+@media (max-width: 999px) { .toc li { white-space: nowrap; } .toc li a { display: inline-block; max-width: 100%; padding: 6px 0; white-space: normal; } .links .toc li { display: block; } .links .toc li + li::before { content: none; } .links .toc li a { padding: 4px 0; } }
 .toc .label { display: none; }
 .toc li { display: inline; }
 .toc li + li::before { content: " · "; color: var(--muted); }
