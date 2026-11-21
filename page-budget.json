@@ -2,96 +2,112 @@
  "about": "Byte limits checked by scripts/budget.test.mjs: the size when last set plus 15 percent, rounded up to the next KB. After an intended change, run npm run budget -- --write and review the diff.",
  "pages": {
   "index.html": {
-   "html": 29696,
-   "total": 230400
+   "html": 31744,
+   "total": 233472
   },
   "one-phone.html": {
    "html": 29696,
-   "total": 231424
+   "total": 232448
   },
   "second-network.html": {
    "html": 28672,
-   "total": 229376
+   "total": 231424
   },
   "hybrid.html": {
-   "html": 33792,
-   "total": 235520
+   "html": 34816,
+   "total": 237568
   },
   "better-picture.html": {
    "html": 30720,
-   "total": 231424
+   "total": 233472
   },
   "several-cameras.html": {
    "html": 28672,
-   "total": 229376
+   "total": 231424
   },
   "cloud.html": {
    "html": 27648,
-   "total": 228352
+   "total": 230400
   },
   "more.html": {
-   "html": 28672,
-   "total": 230400
+   "html": 29696,
+   "total": 231424
   },
   "satellite.html": {
    "html": 26624,
-   "total": 227328
+   "total": 229376
   },
   "receiver.html": {
-   "html": 27648,
-   "total": 229376
+   "html": 28672,
+   "total": 230400
   },
   "into-obs.html": {
    "html": 27648,
-   "total": 229376
+   "total": 230400
   },
   "build.html": {
-   "html": 26624,
-   "total": 228352
+   "html": 27648,
+   "total": 229376
   },
   "ready-made.html": {
    "html": 26624,
-   "total": 228352
+   "total": 229376
+  },
+  "live-not-on-platform.html": {
+   "html": 28672,
+   "total": 230400
+  },
+  "picture-frozen.html": {
+   "html": 27648,
+   "total": 230400
+  },
+  "no-sound-or-alerts.html": {
+   "html": 28672,
+   "total": 231424
+  },
+  "second-link-idle.html": {
+   "html": 27648,
+   "total": 230400
   },
   "help.html": {
-   "html": 101376,
-   "total": 317440
+   "html": 104448,
+   "total": 320512
   },
   "glossary.html": {
    "html": 77824,
-   "total": 279552
+   "total": 280576
   },
   "data-plans.html": {
    "html": 82944,
-   "total": 283648
+   "total": 285696
   },
   "why-bonding.html": {
    "html": 65536,
-   "total": 267264
+   "total": 268288
   },
   "links.html": {
    "html": 88064,
-   "total": 295936
+   "total": 296960
   },
   "contact.html": {
    "html": 9216,
-   "total": 210944
+   "total": 211968
   },
   "legal-notice.html": {
    "html": 10240,
-   "total": 210944
+   "total": 211968
   },
   "impressum.html": {
    "html": 10240,
-   "total": 210944
+   "total": 212992
   },
   "privacy.html": {
    "html": 14336,
-   "total": 216064
+   "total": 217088
   },
   "datenschutz.html": {
    "html": 15360,
-   "total": 216064
+   "total": 218112
   }
  },
  "assets": {
@@ -102,6 +118,6 @@
   "assets/fonts/ibm-plex-mono-latin-600-normal.woff2": 18432,
   "assets/links-filters.css": 6144,
   "assets/site.js": 64512,
-  "assets/style.css": 138240
+  "assets/style.css": 139264
  }
 }

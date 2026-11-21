@@ -106,12 +106,14 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
  assert.deepEqual(cards,[
   'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
   'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
+  'Phone says live, nobody sees it — The platform shows you offline','Picture frozen — Viewers see a still picture',
+  "No sound or alerts — The picture is fine, the sound isn't","Second phone or SIM idle — Connected, but the stream doesn't use it",
   'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
   'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
   'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
   'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
   'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.']);
- assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something',"Live, but something's wrong?",'Fix what breaks','Learn more and get help']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
@@ -355,7 +357,8 @@ test('Help: Guides list the site\'s own pages first, then every IRL Commons guid
  const h=helpMain();
  const own=h.slice(h.indexOf('id="g-own"'),h.indexOf('id="g-other"'));
  assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['one-phone.html','second-network.html','hybrid.html','better-picture.html',
-  'several-cameras.html','cloud.html','more.html','satellite.html','receiver.html','into-obs.html','build.html','ready-made.html','data-plans.html','why-bonding.html']);
+  'several-cameras.html','cloud.html','more.html','satellite.html','receiver.html','into-obs.html','build.html','ready-made.html',
+  'live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html','data-plans.html','why-bonding.html']);
  for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
  const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
  const other=h.slice(h.indexOf('id="g-other"'));
@@ -441,9 +444,20 @@ test('Site nav: Start, Fix, Guides, Glossary on every page; Apps and services an
  const current={'index.html':'Start','help.html':'Guides','data-plans.html':'Guides','why-bonding.html':'Guides','glossary.html':'Glossary'};
  for(const [name,text] of docs){
   const nav=text.match(/<nav class="site-nav"[\s\S]*?<\/nav>/)[0];
-  assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(m=>`${m[2]} ${m[1]}`),['Start index.html','Fix index.html#grp-fix-what-breaks','Guides help.html#guides','Glossary glossary.html'],name);
+  assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map(m=>`${m[2]} ${m[1]}`),['Start index.html','Fix index.html#grp-live-but-something-s-wrong','Guides help.html#guides','Glossary glossary.html'],name);
   assert.deepEqual([...nav.matchAll(/aria-current="page">([^<]+)</g)].map(m=>m[1]),current[name]?[current[name]]:[],name);
   const foot=text.slice(text.indexOf('<footer'));
   assert.ok(foot.includes('href="links.html"')&&foot.includes('href="contact.html"'),name);
+ }
+});
+
+test("Live, but something's wrong?: four symptom cards, each a page of checks with its sources and a still-stuck line", ()=>{
+ const home=docs.get('index.html');
+ assert.ok(/<h2 class="grp live" id="grp-live-but-something-s-wrong"[^>]*>Live, but something's wrong\?<\/h2>\s*<ul class="choices symptoms"/.test(home));
+ for(const id of ['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle']){
+  const h=answerHtml(null,id);
+  assert.ok(h.includes('<details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://'),id);
+  assert.ok(plain(h).includes('Still stuck? Before you ask for help, note your app and its version'),id);
+  assert.ok((h.match(/<h2 class="num"/g)||[]).length>=2,id);
  }
 });
