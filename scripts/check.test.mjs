@@ -334,7 +334,7 @@ test('Round 4: titles, summaries, steps, lead lines and side lines of the nine a
  const want={
   'second-network':['Add a second network',"Add a second internet connection on a different mobile network, and let your streaming app use both at once. That's called bonding. If one network has a bad moment, the other can carry the stream."],
   'more':['Keep the phone going','When heat or an empty battery ends your stream, try these first.'],
-  'build':['Build your own backpack','You put the backpack together from parts and run one of these systems on it. You choose every part, and you set it up and fix it yourself.'],
+  'build':['Build your own backpack','You put the backpack together from parts and run one of these systems on it. You set it up and fix it yourself.'],
   'ready-made':['A ready-made backpack, with support','Ready to use when it arrives. Some fit in a backpack, others mount on the camera. Rentals and warranties depend on the package.'],
   'several-cameras':['Several cameras in one scene','Something has to put the pictures together: an app on the phone, OBS on a PC or server, a hub in the cloud, or a box in your backpack.'],
   'cloud':['Move the hub to the cloud','With the hub on a rented server, your away stream keeps running even if the PC, power or internet at home fails. The hub is OBS on that server, or a hosted service.'],
@@ -352,7 +352,7 @@ test('Round 4: titles, summaries, steps, lead lines and side lines of the nine a
  assert.ok(/^Or a helper[^<]*\n\s*<ul class="picks mix">\s*<li><a /.test(helper),'catalogue list nested under the helper line');
  assert.ok(!sn.includes('class="sims-ref"'));
  const sc=plain(answerHtml(text,'several-cameras'));
- for(const l of ['When your phone app can show those cameras.','When you mix on a computer, at home or on a server.','When the show has to keep running if your PC at home fails.',"When you mix while you're out.",'with SRTLA bonding and drop protection.','Desktop and IRL.']) assert.ok(sc.includes(l),l);
+ for(const l of ['When your phone app can show those cameras.','When you mix on a computer, at home or on a server.','When the show has to keep running if your PC at home fails.',"When you mix while you're out.",'with a receiver for bonded streams, and drop protection.','Desktop and IRL.']) assert.ok(sc.includes(l),l);
  const more=answerHtml(text,'more');
  assert.equal(plain(more.match(/<h2 class="q" id="more-q">[\s\S]*?<\/h2>/)[0]),'Still too hot or too short?');
  assert.ok(plain(more).includes('Still too hot or too short? A backpack carries a small streaming computer, mobile modems and a battery, so the phone no longer does that work. Do you want to build and look after one yourself?'));
