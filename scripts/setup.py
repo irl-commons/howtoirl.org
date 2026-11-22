@@ -381,10 +381,28 @@ def sources_html(a: dict) -> str:
     return f'<details class="more fold sources" open><summary>Sources</summary><p class="tip-src">{links}</p></details>'
 
 
+MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+
+def stamp_html(day: str) -> str:
+    """When the claims under a heading were last checked against their sources, and where to say one is wrong.
+    Only sections with no open finding from the last fact-check carry one."""
+    y, m, d = (int(x) for x in str(day)[:10].split('-'))
+    return f'<p class="stamp">Checked <time datetime="{y:04}-{m:02}-{d:02}">{d} {MONTHS[m - 1]} {y}</time> · <a href="contact.html">Report a mistake</a></p>'
+
+
+def stamp_sections(body: str) -> str:
+    """A section marked data-checked="YYYY-MM-DD" gets its stamp under its h2; the attribute stays out of the page."""
+    def one(m):
+        return f'{m[1]}{m[3]}>{m[4]}\n      {stamp_html(m[2])}'
+    return re.sub(r'(<section\b[^>]*?) data-checked="([0-9-]+)"([^>]*)>(\s*<h2\b[\s\S]*?</h2>)', one, body)
+
+
 def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
     aid = a['id']
     head = (f'<div class="result-head">\n          <svg class="ill big" aria-hidden="true"><use href="#{a["icon"]}"/></svg>\n          <div>\n'
-            f'            <h2 id="{aid}-h">{esc(a["title"])}</h2>\n            <p class="sum">{a["summary"]}</p>\n          </div>\n        </div>')
+            f'            <h2 id="{aid}-h">{esc(a["title"])}</h2>\n            <p class="sum">{a["summary"]}</p>'
+            + (f'\n            {stamp_html(a["checked"])}' if a.get('checked') else '') + '\n          </div>\n        </div>')
     if a.get('question'):
         choices = '\n            '.join(card(c) for c in a['choices'])
         hint = f'<p class="hint">{a["hint"]}</p>\n        ' if a.get('hint') else ''
