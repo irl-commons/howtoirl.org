@@ -51,11 +51,11 @@ protocols.html:
   description: What RTMP, SRT and SRTLA each do, which one fits your connection, caller and listener, three working setups into OBS, and how to pick SRT latency.
   section: help.html
   illustrations: guide
-  next: {href: power.html, label: Power and batteries on a plane}
+  next: {href: power.html, label: "Power, and taking power banks on a flight"}
 
 power.html:
-  title: Power and batteries on a plane · How to IRL
-  description: How long a power bank really runs your IRL stream, measuring your setup's draw, USB-C cables and voltages, and the rules for power banks on a plane.
+  title: Power, and taking power banks on a flight · How to IRL
+  description: How long a power bank really runs your IRL stream, measuring your setup's draw, USB-C cables and voltages, and the rules for taking power banks on a flight.
   section: help.html
   illustrations: guide
   next: {href: help.html, label: Help}
