@@ -83,12 +83,70 @@ tips.html:
   illustrations: guide
   share_icon: i-list
 
+tips/wifi-off-test.html:
+  title: Test your stream with Wi-Fi off · How to IRL
+  description: "Turn Wi-Fi off in your phone's Settings before a test at home, so the test runs on mobile data. Watch it on a second device."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-network
+
 tips/twitch-test-mode.html:
   title: Test on Twitch without going live · How to IRL
   description: "Add ?bandwidthtest=true after your Twitch stream key: Twitch takes the stream without showing it, and Twitch Inspector shows its bitrate. Take it out before the real stream."
   section: tips.html
   illustrations: guide
   share_icon: i-tick
+
+tips/clap-sync.html:
+  title: Clap once to check your sound is in sync · How to IRL
+  description: "Clap once on camera and watch your second device with headphones on. You should hear the clap when your hands meet."
+  section: tips.html
+  illustrations: guide
+  share_icon: s-silent
+  share_line: Clap once on camera. You should hear the clap when your hands meet.
+
+tips/wave-and-count.html:
+  title: Wave and count to see your delay · How to IRL
+  description: "Wave at the camera and count the seconds until the wave shows up on your second device: roughly your delay to that screen."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-between
+
+tips/wipe-the-lens.html:
+  title: Hazy picture? Wipe the lens · How to IRL
+  description: "A smudge on the lens can make lights glow and blur. Wipe it with a clean lens cloth and look at the same view again."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-phone
+
+tips/watch-the-mic-meter.html:
+  title: Say one line and watch the mic meter · How to IRL
+  description: "Say one normal sentence and watch the mic meter in your app. The bar should move with your words."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-tick
+
+tips/power-bank-idle.html:
+  title: Test your power bank with the camera idle · How to IRL
+  description: "Some power banks shut off when a camera uses very little power. Check that yours keeps powering the camera while it sits idle."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-checklist
+
+tips/plug-in-before-live.html:
+  title: Plug everything in before you go live · How to IRL
+  description: "Some multiport power banks cut power for a moment when a second device is plugged in or unplugged. Plug everything in first."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-checklist
+
+tips/check-the-local-preview.html:
+  title: Frozen on stream? Look at your own preview · How to IRL
+  description: "Viewers see a frozen picture? Look at the preview on the phone you stream from, to see where to look next."
+  section: tips.html
+  illustrations: guide
+  share_icon: s-camera
+  share_line: Look at the preview on the phone you stream from while something moves in front of it.
 
 links.html:
   title: Apps and services · How to IRL

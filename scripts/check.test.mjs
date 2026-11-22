@@ -615,7 +615,7 @@ test('Top navigation: Start, Improve, Fix and Help; Improve goes to its group on
 
 test('Pages in folders work at any depth: links, assets, canonical, share card, edit link and sitemap entry', async()=>{
  const sitemap=await readFile('dist/sitemap.xml','utf8');
- for(const name of [...FIX.map(answerFile),'tips/twitch-test-mode.html']){
+ for(const name of [...FIX.map(answerFile),...config.pages.filter(n=>n.startsWith('tips/'))]){
   const text=docs.get(name),at=addr(name),flat=at.replace('/','-');
   assert.ok(text.includes(`<link rel="canonical" href="https://howtoirl.org/${at}">`)&&text.includes(`<meta property="og:url" content="https://howtoirl.org/${at}">`),name);
   assert.ok(text.includes('<link rel="stylesheet" href="/assets/style.css">')&&text.includes('<link rel="icon" href="/favicon.svg"')&&text.includes('<script src="/assets/site.js"></script>'),name);
@@ -644,7 +644,7 @@ test('/fix: the problems with a link to send each, Improve for what happens ever
  assert.ok(foot.includes('<a href="/fix">Something not working?</a>')&&foot.includes('<a href="/tips">Tips</a>'),'footer links /fix and /tips');
 });
 
-test('/tips lists every tip; the Twitch test tip has its steps, a watch-out, its sources and a Checked date', ()=>{
+test('/tips lists every tip; each tip has its answer, three steps, a check, its scope, its guide, sources and a Checked date', ()=>{
  const tips=docs.get('tips.html');
  const listed=[...tips.matchAll(/<ul class="tip-list">[\s\S]*?<\/ul>/g)].flatMap(m=>[...m[0].matchAll(/<a href="([^"]+)">/g)].map(x=>x[1]));
  assert.deepEqual(listed,config.pages.filter(n=>n.startsWith('tips/')).map(link));
@@ -654,4 +654,15 @@ test('/tips lists every tip; the Twitch test tip has its steps, a watch-out, its
  assert.ok(/<li class="w"><span class="vh">Watch out: <\/span>Take <code>\?bandwidthtest=true<\/code> out again before the real stream/.test(tip));
  assert.ok(/<details class="more fold sources" open><summary>Sources<\/summary><p class="tip-src">Twitch: <a href="https:\/\/dev\.twitch\.tv\/docs\/video-broadcast\/">/.test(tip)&&tip.includes('href="https://inspector.twitch.tv/"'));
  assert.equal((tip.match(/<p class="stamp">Checked <time datetime="2026-11-22">/g)||[]).length,1);
+ for(const name of config.pages.filter(n=>n.startsWith('tips/')&&n!=='tips/twitch-test-mode.html')){
+  const page=docs.get(name),how=page.slice(page.indexOf('<section class="part" id="how"'),page.indexOf('</section>',page.indexOf('<section class="part" id="how"')));
+  assert.ok(/<p class="lede">[^<]+/.test(page),`${name}: a one-line answer`);
+  assert.equal((how.match(/<ol class="checklist">(?:\s*<li>[\s\S]*?<\/li>){3}\s*<\/ol>/g)||[]).length,1,`${name}: three steps`);
+  assert.ok(how.includes('<p><strong>Check:</strong> '),`${name}: the check`);
+  assert.ok(/<ul class="bul">\s*<li/.test(how),`${name}: when it doesn't help`);
+  assert.ok(/<p>More in <a href="\/(?:phone-setup|power|fix\/[a-z-]+)(?:#[a-z-]+)?">/.test(how),`${name}: links the guide it comes from`);
+  assert.ok(/<details class="more fold sources" open><summary>Sources<\/summary><p class="tip-src">[^<]*<a href="https:\/\//.test(how),`${name}: Sources`);
+  assert.equal((how.match(/<p class="stamp">Checked <time datetime="2026-11-22">/g)||[]).length,1,`${name}: Checked`);
+ }
+ assert.ok(/<li>If the picture looks hazy or lights have halos, gently wipe the lens/.test(docs.get('phone-setup.html'))&&docs.get('phone-setup.html').includes('href="https://support.apple.com/en-us/102514"'),'Phone setup: the sourced lens line');
 });
