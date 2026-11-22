@@ -80,7 +80,7 @@ groups:
       - {href: why-bonding.html, icon: i-between, title: "Why more than one network?", text: A second one covers the gaps}
       - {href: something-wrong.html, icon: i-q, title: "Find what broke while you're live", text: Trace the stream step by step}
       - {href: protocols.html, icon: a-chain, title: "RTMP, SRT or SRTLA?", text: Which one fits your connection}
-      - {href: power.html, icon: s-hot, title: Power and flying with batteries, text: "Power banks, cables, flights"}
+      - {href: power.html, icon: s-hot, title: Power and batteries on a plane, text: "Power banks, cables, flights"}
 
 answers:
   - id: more
@@ -123,7 +123,7 @@ answers:
       - {to: ready-made, icon: a-ready, title: "No, I'll buy one", text: "Ready to use, with support."}
     side:
       - else: '<strong>Choose something else when</strong> the stream only drops in crowds: <a href="#second-network">a second network</a> is the smaller step.'
-      - next: '<strong>How long will it run?</strong> <a href="power.html">Power and flying with batteries</a>.'
+      - next: '<strong>How long will it run?</strong> <a href="power.html">Power and batteries on a plane</a>.'
 
   - id: one-phone
     icon: i-phone

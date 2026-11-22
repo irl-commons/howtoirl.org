@@ -105,7 +105,7 @@
         <p>Latency is how long the receiver waits for late and resent pieces. More latency means more delay before your viewers see you, and fewer glitches when the connection stumbles.</p>
         <ul class="bul">
           <li><strong>SRT's own default is 120 ms.</strong> Both ends can set a latency, and the higher of the two is used.</li>
-          <li><strong>The rule of thumb</strong> from Haivision, who made SRT: latency is the round-trip time times a multiplier. On a good network with little loss, about 4 times the round trip. With more loss, more: 8 times at up to 10 % loss. It should also be longer than the longest burst of loss you expect.</li>
+          <li><strong>The general rule</strong> from Haivision, who made SRT: latency is the round-trip time times a multiplier. On a good network with little loss, about 4 times the round trip. With more loss, more: 8 times at up to 10 % loss. It should also be longer than the longest burst of loss you expect.</li>
           <li><strong>On the move,</strong> losses can come in bursts, for example while the phone switches towers. That's likely why phone apps start much higher than the rule gives for a ping: Moblin's default is 3000 ms (3 seconds). BELABOX starts at 2000 ms and recommends 1500 to 2500 ms.</li>
           <li class="w"><span class="vh">Watch out: </span>In an SRT address in OBS, latency is in microseconds, not milliseconds: 2 seconds is <code>latency=2000000</code>. Without it, OBS asks for SRT's 120 ms, and the stream uses the other end's setting if that's higher. Moblin and BELABOX count in milliseconds.</li>
         </ul>

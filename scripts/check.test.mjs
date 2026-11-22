@@ -111,7 +111,7 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the four groups 
   'Phone says live, nobody sees it','Picture frozen','No sound or alerts','Second phone or SIM idle',
   'Glossary — IRL terms explained','Help — Guides and app support',
   'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps',
-  "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power and flying with batteries — Power banks, cables, flights"]);
+  "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power and batteries on a plane — Power banks, cables, flights"]);
  assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
 });
 
