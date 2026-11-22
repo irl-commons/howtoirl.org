@@ -81,7 +81,7 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
                 out.append(f'card "{c["title"]}": no answer #{c["to"]}')
     for a in setup['answers']:
         back = a.get('back')
-        if isinstance(back, dict) and back.get('to') not in ids:
+        if isinstance(back, dict) and not back.get('href') and back.get('to') not in ids:
             out.append(f'#{a["id"]}: back link to #{back.get("to")}, which is no answer')
         elif back is not None and not isinstance(back, dict) and back != 'history':
             out.append(f'#{a["id"]}: back is "{back}" (use history or {{to: <answer id>, label: ...}})')
@@ -92,6 +92,8 @@ def problems(setup: dict, services: list[dict], allowed: dict[str, set]) -> list
         for x in a.get('sources', []):
             if not str(x.get('url', '')).startswith('https://') or not x.get('label'):
                 out.append(f'#{a["id"]}: a source needs a label and an https:// url')
+        if a.get('dir') is not None and not re.fullmatch(r'[a-z0-9-]+', str(a['dir'])):
+            out.append(f'#{a["id"]}: dir "{a["dir"]}" (a folder name: lowercase letters, digits and dashes)')
         if a.get('layout') not in (None, 'steps'):
             out.append(f'#{a["id"]}: layout "{a["layout"]}" (use steps, or leave it out)')
         for b in a.get('blocks', []):
@@ -185,9 +187,19 @@ def card(c: dict) -> str:
 SITE = 'https://howtoirl.org/'
 
 
+# Answers that live in a folder, by id: `dir: fix` puts an answer at fix/<id>.html. Filled by folders().
+DIRS: dict[str, str] = {}
+
+
+def folders(setup: dict) -> None:
+    DIRS.clear()
+    DIRS.update({a['id']: a['dir'] for a in setup['answers'] if a.get('dir')})
+
+
 def page(aid: str) -> str:
-    """Each answer is a page of its own, at the answer's id: the file `<id>.html`, served at `/<id>`."""
-    return f'{aid}.html'
+    """Each answer is a page of its own, at the answer's id: the file `<id>.html`, served at `/<id>`, or
+    `<dir>/<id>.html` when the answer has a `dir`."""
+    return f'{DIRS[aid]}/{aid}.html' if aid in DIRS else f'{aid}.html'
 
 
 def home_html(setup: dict) -> str:
@@ -198,8 +210,10 @@ def home_html(setup: dict) -> str:
         hcls = 'grp live' if g.get('style') == 'symptoms' else 'grp'
         cards = '\n          '.join(card(c) for c in g['cards'])
         anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
+        more = (f'\n        <p class="grp-more"><a href="{g["more"]["href"]}">{esc(g["more"]["label"])}</a></p>'
+                if g.get('more') else '')
         parts.append(f'<h2 class="{hcls}" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
-                     f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>')
+                     f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>{more}')
     return ('<section class="step start" id="start" tabindex="-1" aria-label="Choose your starting point">\n        '
             + '\n        '.join(parts) + '\n      </section>')
 
@@ -207,12 +221,13 @@ def home_html(setup: dict) -> str:
 def back_link(a: dict) -> str:
     """The one way back from an answer, at the top, named after where it goes.
 
-    `back: history` returns to the previous page through site.js and falls back to the cards."""
+    `back: history` returns to the previous page through site.js and falls back to the cards. `back: {href: fix.html,
+    label: ...}` goes to a page that is no answer."""
     back = a.get('back')
     if back == 'history':
         href, label, extra = 'index.html', 'Back', ' data-back="history"'
     elif back:
-        href, label, extra = page(back['to']), back['label'], ''
+        href, label, extra = back.get('href') or page(back['to']), back['label'], ''
     else:
         href, label, extra = 'index.html', 'All starting points', ''
     return f'<p class="go-back"><a href="{href}"{extra}><span aria-hidden="true">←</span>{esc(label)}</a></p>'
@@ -506,7 +521,30 @@ def fill(body: str, setup: dict, services: list[dict]) -> str:
         body = body.replace('<!--setup:start-->', home_html(setup))
     if '<!--setup:answers-->' in body:
         body = body.replace('<!--setup:answers-->', moved_html(setup))
+    if '<!--setup:fix-->' in body:
+        body = body.replace('<!--setup:fix-->', fix_html(setup))
     return body
+
+
+def fix_html(setup: dict) -> str:
+    """The /fix page: every problem answer (`dir: fix`) with its link to send, then Improve's cards for a problem that
+    comes back every time."""
+    rows = []
+    for a in (x for x in setup['answers'] if x.get('dir') == 'fix'):
+        url = SITE + address(page(a['id']))
+        first = re.split(r'(?<=[.!?])\s', plain_text(a['summary']).strip())[0]
+        rows.append(f'<li><a class="fix-t" href="{page(a["id"])}">{esc(a["title"])}</a>'
+                    f'<span class="fix-s">{esc(first)}</span>'
+                    f'<button type="button" class="copy-link" data-copy="{url}" aria-label="Copy link for chat: {esc(a["title"])}" hidden>'
+                    f'Copy link for chat</button></li>')
+    improve = next(g for g in setup['groups'] if g.get('id') == 'improve')
+    cards = '\n          '.join(card(c) for c in improve['cards'])
+    return (f'<ul class="fix-list" aria-label="Problems">\n        ' + '\n        '.join(rows) + '\n      </ul>\n'
+            f'      <section class="fix-band" aria-labelledby="every-time-h">\n'
+            f'        <h2 id="every-time-h">Happens every time?</h2>\n'
+            f'        <p>Then it\'s the setup, not this stream.</p>\n'
+            f'        <ul class="choices" aria-labelledby="every-time-h">\n          {cards}\n        </ul>\n'
+            f'      </section>')
 
 # The site's own pages in Help's Guides tab, in this order, each with the part colour of its topic.
 HELP_PAGES = {'one-phone': 'sender', 'second-network': 'connections', 'hybrid': 'tools', 'better-picture': 'sender',
@@ -546,6 +584,7 @@ def check(pkg: pathlib.Path, path: pathlib.Path = ROOT / 'content/setup.yaml') -
     services = json.loads((pkg / 'data/services.json').read_text())['services']
     schema = json.loads((pkg / 'schema/json/services.schema.json').read_text())
     setup = load_yaml(path)
+    folders(setup)
     return setup, problems(setup, services, allowed_values(schema, services)) + help_problems(setup)
 
 
@@ -560,5 +599,6 @@ def answer_meta(setup: dict) -> list[dict]:
     """What each answer page's head needs (src/components/Head.astro): its own title and description. scripts/share.py
     adds its share image. The rest of the page around it is Home's."""
     return [{'name': page(a['id']), 'title': f'{a["title"]} · How to IRL',
-             'description': plain_text(a['summary']).strip(), 'illustrations': 'home'}
+             'description': plain_text(a['summary']).strip(), 'illustrations': 'home',
+             **({'section': f'{a["dir"]}.html'} if a.get('dir') else {})}
             for a in setup['answers']]

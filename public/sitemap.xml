@@ -13,10 +13,11 @@
   <url><loc>https://howtoirl.org/into-obs</loc></url>
   <url><loc>https://howtoirl.org/build</loc></url>
   <url><loc>https://howtoirl.org/ready-made</loc></url>
-  <url><loc>https://howtoirl.org/live-not-on-platform</loc></url>
-  <url><loc>https://howtoirl.org/picture-frozen</loc></url>
-  <url><loc>https://howtoirl.org/no-sound-or-alerts</loc></url>
-  <url><loc>https://howtoirl.org/second-link-idle</loc></url>
+  <url><loc>https://howtoirl.org/fix</loc></url>
+  <url><loc>https://howtoirl.org/fix/live-not-on-platform</loc></url>
+  <url><loc>https://howtoirl.org/fix/picture-frozen</loc></url>
+  <url><loc>https://howtoirl.org/fix/no-sound-or-alerts</loc></url>
+  <url><loc>https://howtoirl.org/fix/second-link-idle</loc></url>
   <url><loc>https://howtoirl.org/help</loc></url>
   <url><loc>https://howtoirl.org/glossary</loc></url>
   <url><loc>https://howtoirl.org/data-plans</loc></url>
@@ -25,6 +26,8 @@
   <url><loc>https://howtoirl.org/protocols</loc></url>
   <url><loc>https://howtoirl.org/power</loc></url>
   <url><loc>https://howtoirl.org/phone-setup</loc></url>
+  <url><loc>https://howtoirl.org/tips</loc></url>
+  <url><loc>https://howtoirl.org/tips/twitch-test-mode</loc></url>
   <url><loc>https://howtoirl.org/links</loc></url>
   <url><loc>https://howtoirl.org/contact</loc></url>
   <url><loc>https://howtoirl.org/legal-notice</loc></url>

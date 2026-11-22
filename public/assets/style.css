@@ -1798,3 +1798,24 @@ details.nerd > summary::before { content: "+"; font-family: var(--mono); font-we
 details.nerd[open] > summary::before { content: "\2212"; }
 details.nerd[open] { padding-bottom: 12px; }
 details.nerd > p { font-size: 16px; }
+
+/* Home: one link under a group's cards, to the page with all of them. */
+.step.start > .grp-more { margin: 12px 0 0; font-size: var(--t-small); }
+.step.start > .grp-more a { font-weight: 600; }
+
+/* /fix: the problems as rows, each with its link to send; then Improve's cards; then the guide.
+   /tips: the same rows without the button. */
+.fix-list, .tip-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.fix-list li, .tip-list li { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 4px; padding: var(--s2) 0; border-bottom: 1px solid var(--rule); }
+.fix-list .fix-t, .tip-list a { font-weight: 700; font-size: 18px; line-height: 1.3; }
+.fix-list .fix-s, .tip-list span { color: var(--muted); font-size: var(--t-small); line-height: 1.4; }
+.fix-list .copy-link { justify-self: start; margin-top: 8px; }
+@media (min-width: 600px) {
+  .fix-list li { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--s3); align-items: center; }
+  .fix-list .fix-t, .fix-list .fix-s { grid-column: 1; }
+  .fix-list .copy-link { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; }
+}
+.fix-band, .fix-more { margin-top: var(--s5); }
+.fix-band > h2, .fix-more > h2 { font-size: var(--t-h3); line-height: 1.25; margin: 0 0 6px; }
+.fix-band > p { margin: 0 0 var(--s2); color: var(--muted); }
+@media (min-width: 600px) { .fix-band .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
