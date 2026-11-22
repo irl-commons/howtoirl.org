@@ -1819,3 +1819,8 @@ details.nerd > p { font-size: 16px; }
 .fix-band > h2, .fix-more > h2 { font-size: var(--t-h3); line-height: 1.25; margin: 0 0 6px; }
 .fix-band > p { margin: 0 0 var(--s2); color: var(--muted); }
 @media (min-width: 600px) { .fix-band .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Guide figures: the why-bonding drawing set at guide-page size, labels about 18px on a 360 px phone. */
+.guide-page .guide-fig { max-width: 440px; }
+.guide-fig .lb { font-size: 22px; }
+.guide-fig .lb-head { font-weight: 700; }
