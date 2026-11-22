@@ -7,7 +7,7 @@ const {page} = Astro.props;
 const de = page.lang === 'de';
 const en = de ? 'en' : undefined;
 // The page's own item is the current page; a page under an item marks that item.
-// Apps and services and Contact are in the footer, so the bar fits on a phone.
+// Help, the guides, Apps and services and Contact are on Home and in the footer, so the bar fits on a phone.
 const current = href => href === page.name ? 'page' : href === page.section ? 'true' : undefined;
 ---
 <a class="skip" href="#main">{de ? 'Zum Inhalt' : 'Skip to content'}</a>
@@ -31,9 +31,9 @@ const current = href => href === page.name ? 'page' : href === page.section ? 't
       : <Fragment>This site is new and not complete. Something wrong? <a href="contact.html">Let us know</a></Fragment>}</span></span>
     <nav class="site-nav" aria-label="Site" lang={en}>
       <ul>
-        <li><a href="index.html" data-label="Get started" aria-current={current('index.html')}>Get started</a></li>
-        <li><a href="index.html#grp-live-but-something-s-wrong" data-label="Fix">Fix</a></li>
-        <li><a href="help.html#guides" data-label="Guides" aria-current={current('help.html')}>Guides</a></li>
+        <li><a href="index.html" data-label="Start" aria-current={current('index.html')}>Start</a></li>
+        <li><a href="index.html#improve" data-label="Improve">Improve</a></li>
+        <li><a href="index.html#fix" data-label="Fix">Fix</a></li>
         <li><a href="glossary.html" data-label="Glossary" aria-current={current('glossary.html')}>Glossary</a></li>
       </ul>
     </nav>

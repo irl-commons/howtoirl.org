@@ -106,17 +106,17 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
  assert.deepEqual(cards,[
   'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
   'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
-  'Phone says live, nobody sees it — The platform shows you offline','Picture frozen — Viewers see a still picture',
-  "No sound or alerts — The picture is fine, the sound isn't","Second phone or SIM idle — Connected, but the stream doesn't use it",
   'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
   'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
+  'Phone says live, nobody sees it — The platform shows you offline','Picture frozen — Viewers see a still picture',
+  "No sound or alerts — The picture is fine, the sound isn't","Second phone or SIM idle — Connected, but the stream doesn't use it",
   'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
   'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
   'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.',
   "Find what broke while you're live — Follow the stream from the camera to your viewers, and find the part that stopped.",
   'RTMP, SRT or SRTLA? — Which one fits your connection, and how to get it into OBS.',
   'Power and flying with batteries — How long a power bank really lasts, the cables that matter, and taking batteries on a plane.']);
- assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something',"Live, but something's wrong?",'Fix what breaks','Learn more and get help']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more and get help']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
@@ -450,9 +450,9 @@ test('Every answer has its own page, title, description and share image; old hom
  assert.ok(/<a href="second-network.html"><svg class="ill"/.test(home),'home cards link to the answer pages');
 });
 
-test("Live, but something's wrong?: four symptom cards, each with checks, sources and a still-stuck line", ()=>{
+test("Trying to stream, but something's not working?: four symptom cards, each with checks, sources and a still-stuck line", ()=>{
  const home=docs.get('index.html');
- assert.ok(/<h2 class="grp live" id="grp-live-but-something-s-wrong"[^>]*>Live, but something's wrong\?<\/h2>\s*<ul class="choices symptoms"/.test(home));
+ assert.ok(/<h2 class="grp live" id="fix"[^>]*>Trying to stream, but something's not working\?<\/h2>\s*<ul class="choices symptoms"/.test(home));
  for(const id of ['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle']){
   const h=answerHtml(home,id);
   assert.ok(h.includes('<details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://'),id);
@@ -506,4 +506,16 @@ test('Before you go live: a checklist on every answer but the symptom checks, th
   assert.deepEqual(items.map(m=>m[1]),items.map((_,i)=>String(i)),id);
   assert.ok(/<p class="golive-count" hidden><\/p>/.test(box[0])&&/<p class="golive-note" hidden>/.test(box[0]),'count and storage note only with script');
  }
+});
+
+test('Top navigation: Start, Improve, Fix and Glossary; Improve and Fix point at their groups on Home, which point at each other', ()=>{
+ const home=docs.get('index.html');
+ const nav=home.slice(home.indexOf('<nav class="site-nav"'),home.indexOf('</nav>',home.indexOf('<nav class="site-nav"')));
+ assert.deepEqual([...nav.matchAll(/<a href="([^"]+)" data-label="([^"]+)"[^>]*>([^<]+)</g)].map(m=>[m[1],m[2],m[3]]),
+  [['index.html','Start','Start'],['index.html#improve','Improve','Improve'],['index.html#fix','Fix','Fix'],['glossary.html','Glossary','Glossary']]);
+ assert.ok(/<a href="index.html" data-label="Start" aria-current="page">/.test(nav),'Start is the current item on Home');
+ assert.ok(/<h2 class="grp" id="improve"[^>]*>Improve your setup<\/h2>/.test(home));
+ const group=id=>{const i=home.indexOf(`id="${id}"`);return home.slice(i,home.indexOf('<h2',i+1));};
+ assert.ok(/<p class="grp-note">[^<]*<a href="#fix">/.test(group('improve')),'Improve points to the problems');
+ assert.ok(/<p class="grp-note">Happens every time\? <a href="#improve">See Improve your setup<\/a><\/p>/.test(group('fix')),'the problems point to Improve');
 });
