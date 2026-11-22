@@ -34,6 +34,9 @@
 # and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
 # `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
 #
+# A group on Home has a title and cards. `id` sets the heading's id, so links and the top navigation keep
+# working when the title changes; without it the id comes from the title.
+#
 # hold_back keeps a catalogue service out of every block on these pages, with the reason. Use it when
 # the site can't point to a public page for what the catalogue says, and take it out once it can.
 
@@ -47,7 +50,8 @@ groups:
       - {to: hybrid, icon: s-hybrid, title: Desk and away, text: "Switch between desktop and IRL: hybrid streaming"}
       - {to: better-picture, icon: s-camera, title: A better picture, text: "A standalone camera, like a DSLR"}
       - {to: several-cameras, icon: s-multicam, title: Several cameras, text: Mix phones and cameras in one scene}
-  - title: Fix what breaks
+  - title: Improve your setup
+    id: improve
     cards:
       - {to: second-network, icon: s-crowd, title: The signal drops, text: "In crowds, on trains or in weak spots"}
       - {to: more, icon: s-hot, title: The phone gives up, text: "It gets too hot, or the battery runs out"}
