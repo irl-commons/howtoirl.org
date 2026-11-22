@@ -388,10 +388,13 @@ test('Help script: typo-tolerant search and the addresses it understands', ()=>{
  assert.equal(site.countText(39,39),'All 39 guides');assert.equal(site.countText(3,39),'3 of 39 guides');
 });
 
-test('Privacy pages say what "My apps" and Back keep, in English and German', ()=>{
+test('Privacy pages say what "My apps", Back and the checklists keep, in English and German', ()=>{
  assert.ok(plain(docs.get('privacy.html')).includes('So that “Back” on an answer returns to the page you came from, your browser keeps the address of the last page of this site you opened, until you close the tab.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Damit „Back“ auf einer Antwortseite zur vorigen Seite zurückführt'));
  assert.ok(readFileSync('public/assets/site.js','utf8').includes('"howtoirl.last"'));
+ assert.ok(plain(docs.get('privacy.html')).includes('Ticks you set in a “Before you go live” list stay only in your browser on your device; “Clear ticks” removes them.'));
+ assert.ok(plain(docs.get('datenschutz.html')).includes('Haken, die Sie in einer Liste „Before you go live“ setzen, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear ticks“ entfernt sie.'));
+ assert.ok(readFileSync('public/assets/site.js','utf8').includes('"howtoirl.golive.v1"'));
  assert.ok(plain(docs.get('privacy.html')).includes('If you save apps under “My apps” on the Help page, your browser keeps that list only on your device; “Clear” removes it.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Apps, die Sie auf der Hilfeseite unter „My apps“ speichern, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear“ entfernt sie.'));
 });
@@ -466,4 +469,20 @@ test('Checked stamps: a date and Report a mistake, only where the last fact-chec
  }
  // Sections with an open finding stay unstamped until it is fixed.
  for(const id of ['upload','data','maker-data']) assert.ok(!new RegExp(`id="${id}"[^>]*>\\s*<h2(?:(?!</h2>)[\\s\\S])*</h2>\\s*<p class="stamp"`).test(docs.get('data-plans.html')),id);
+});
+
+test('Before you go live: a checklist on every answer but the symptom checks, that ticks without script', ()=>{
+ const symptoms=['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle'];
+ const pages=answerPages();
+ assert.equal(pages.length,16);
+ for(const [name,text] of pages){
+  const id=name.replace(/\.html$/,'');
+  const box=text.match(/<div class="golive" id="[^"]+" role="group" aria-labelledby="[^"]+" data-checklist="([^"]+)">[\s\S]*?<\/ul>[\s\S]*?<\/div>/);
+  if(symptoms.includes(id)){assert.ok(!box,id);continue;}
+  assert.ok(box&&box[1]===id,id);
+  const items=[...box[0].matchAll(/<li><label><input type="checkbox" value="(\d+)" data-nojs-ok> /g)];
+  assert.ok(items.length>=3&&items.length<=7,id);
+  assert.deepEqual(items.map(m=>m[1]),items.map((_,i)=>String(i)),id);
+  assert.ok(/<p class="golive-count" hidden><\/p>/.test(box[0])&&/<p class="golive-note" hidden>/.test(box[0]),'count and storage note only with script');
+ }
 });

@@ -27,7 +27,8 @@ CI on every pull request. Install the Chromium build it expects once with
 check, and, when given, the same target and variants. The run prints every new
 finding; it also fails when an entry no longer matches anything, so remove the
 entry with the fix. `states` adds page states to check, such as home page answers
-that only show when they are the URL fragment.
+that only show when they are the URL fragment. A control marked `data-nojs-ok` is
+complete without script (a checkbox that is only ticked) and is not reported as dead.
 
 ## Page weight
 
