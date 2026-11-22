@@ -600,7 +600,45 @@
     });
   }
 
-  function start() { if (initMoved()) return; initFold(); initCopy(); initBack(); initPlatforms(); initTheme(); initNav(); initBeta(); initWords(); initStandards(); initClear(); initPermalinks(); initCalc(); landTarget(); }
+  // "Before you go live": ticks are kept on this device only, per answer, and counted.
+  var GOLIVE_KEY = "howtoirl.golive.v1";
+  function initChecklists() {
+    var lists = Array.prototype.slice.call(document.querySelectorAll(".golive[data-checklist]"));
+    if (!lists.length) return;
+    var store = storageOrNull();
+    var saved = {};
+    try { saved = JSON.parse((store && store.getItem(GOLIVE_KEY)) || "{}") || {}; } catch (e) { saved = {}; }
+    function save() {
+      if (!store) return;
+      try {
+        if (Object.keys(saved).length) store.setItem(GOLIVE_KEY, JSON.stringify(saved)); else store.removeItem(GOLIVE_KEY);
+      } catch (e) {  }
+    }
+    lists.forEach(function (list) {
+      var id = list.getAttribute("data-checklist");
+      var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+      var count = list.querySelector(".golive-count");
+      var note = list.querySelector(".golive-note");
+      var mine = Array.isArray(saved[id]) ? saved[id] : [];
+      boxes.forEach(function (b) { b.checked = mine.indexOf(b.value) !== -1; });
+      function update(store_) {
+        var on = boxes.filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+        count.textContent = on.length + " of " + boxes.length + " ready";
+        list.classList.toggle("is-done", on.length === boxes.length);
+        if (store_) { if (on.length) saved[id] = on; else delete saved[id]; save(); }
+      }
+      list.addEventListener("change", function () { update(true); });
+      list.querySelector(".golive-clear").addEventListener("click", function () {
+        boxes.forEach(function (b) { b.checked = false; });
+        update(true);
+      });
+      count.hidden = false;
+      if (store) note.hidden = false;
+      update(false);
+    });
+  }
+
+  function start() { if (initMoved()) return; initFold(); initCopy(); initChecklists(); initBack(); initPlatforms(); initTheme(); initNav(); initBeta(); initWords(); initStandards(); initClear(); initPermalinks(); initCalc(); landTarget(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 })();

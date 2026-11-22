@@ -158,6 +158,7 @@ def texts(setup: dict):
             for c in b.get('choose', []):
                 yield c['text']
                 yield from c.get('items', [])
+        yield from a.get('checklist', [])
 
 
 def link_services(text: str, by_id: dict) -> str:
@@ -398,6 +399,22 @@ def stamp_sections(body: str) -> str:
     return re.sub(r'(<section\b[^>]*?) data-checked="([0-9-]+)"([^>]*)>(\s*<h2\b[\s\S]*?</h2>)', one, body)
 
 
+def checklist_html(a: dict, by_id: dict) -> str:
+    """"Before you go live": the answer's own steps as boxes to tick. Ticking works without script; site.js keeps the
+    ticks on this device (localStorage), counts them and offers to clear them."""
+    if not a.get('checklist'):
+        return ''
+    aid = a['id']
+    items = '\n            '.join(f'<li><label><input type="checkbox" value="{i}" data-nojs-ok> {link_services(t, by_id)}</label></li>'
+                                  for i, t in enumerate(a['checklist']))
+    return (f'<div class="golive" id="{aid}-before-you-go-live" role="group" aria-labelledby="{aid}-go-h" data-checklist="{aid}">\n'
+            f'          <h3 id="{aid}-go-h">Before you go live</h3>\n'
+            f'          <p class="golive-count" hidden></p>\n'
+            f'          <ul class="golive-list">\n            {items}\n          </ul>\n'
+            f'          <p class="golive-note" hidden>Your ticks stay on this device. <button type="button" class="golive-clear">Clear ticks</button></p>\n'
+            f'        </div>')
+
+
 def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
     aid = a['id']
     head = (f'<div class="result-head">\n          <svg class="ill big" aria-hidden="true"><use href="#{a["icon"]}"/></svg>\n          <div>\n'
@@ -410,6 +427,8 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
         body = (f'{hint}{a["extra"].strip()}\n'
                 f'        <div class="ask-q">\n          <h3 class="q" id="{aid}-q">{esc(a["ask"])}</h3>{ask}\n'
                 f'          <ul class="choices two" aria-labelledby="{aid}-q">\n            {choices}\n          </ul>\n        </div>')
+        if a.get('checklist'):
+            body += f'\n        <div class="q-check">\n        {checklist_html(a, by_id)}\n        </div>'
         if a.get('side'):
             body += f'\n        <div class="q-side">\n            {side_html(a)}\n        </div>'
         kind = 'question'
@@ -419,7 +438,7 @@ def answer_html(a: dict, services: list[dict], by_id: dict) -> str:
         else:
             blocks = '\n        '.join(block_html(a, b, i == 0, services, by_id) for i, b in enumerate(a['blocks']))
         loose = lambda key: item_list([item(t, by_id) for t in a.get(key, [])], mix=True).replace('class="picks mix"', f'class="picks mix loose {key}"', 1)
-        blocks = '\n        '.join(x for x in (loose('before'), blocks, loose('after'), sources_html(a)) if x)
+        blocks = '\n        '.join(x for x in (loose('before'), blocks, loose('after'), sources_html(a), checklist_html(a, by_id)) if x)
         body = (f'<div class="result-body">\n          <div class="result-main">\n        {blocks}\n          </div>\n'
                 f'          <div class="result-side">\n            {side_html(a)}\n          </div>\n        </div>')
         kind = 'result steps' if a.get('layout') == 'steps' else 'result'

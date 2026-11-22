@@ -66,7 +66,8 @@ function inspect({js,colours}){
  }
  // Without script, a visible control must still do something.
  if(!js)for(const el of document.querySelectorAll('button,input:not([type=hidden]),select,textarea')){
-  if(!visible(el)||el.matches('button[popovertarget],button[commandfor]'))continue;
+  // data-nojs-ok marks a control that is complete without script, such as a checkbox that is only ticked.
+  if(!visible(el)||el.matches('button[popovertarget],button[commandfor],[data-nojs-ok]'))continue;
   if(el.form&&el.form.getAttribute('action'))continue;
   const label=(el.getAttribute('aria-label')||el.textContent||el.placeholder||el.name||'').trim().replace(/\s+/g,' ').slice(0,60);
   out.push({check:'nojs/dead-control',target:describe(el),detail:`visible ${el.tagName.toLowerCase()} "${label}" does nothing without script`});
