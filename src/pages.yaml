@@ -1,0 +1,73 @@
+# What each page in content/ needs around its text: the head, the header and the footer.
+# The answer pages get theirs from content/setup.yaml (answer_meta in scripts/setup.py).
+#
+#   title, description  the browser tab, search results and link previews
+#   lang                en (the default) or de
+#   alternate           the same page in the other language
+#   section             the top navigation item this page belongs under, when it isn't one itself
+#   next                the page the pager at the bottom points to, and its label
+#   illustrations       which drawings the page uses: home, guide or help
+#   stylesheet          a second stylesheet after assets/style.css
+
+index.html:
+  title: How to IRL · Help for IRL streaming
+  description: "For streamers and helpers that stream IRL or hybrid: guides, a glossary and an open list of apps and services."
+  illustrations: home
+
+help.html:
+  title: Help · How to IRL
+  description: Where to get help for the apps in your IRL stream, and guides for them.
+  illustrations: help
+
+glossary.html:
+  title: Glossary · How to IRL
+  description: Words you will meet around IRL streaming, explained in plain language.
+  illustrations: guide
+  next: {href: index.html, label: How to IRL}
+
+data-plans.html:
+  title: Data plans and SIMs · How to IRL
+  description: 'What to look for in a data plan or SIM for an IRL stream: upload speed, how much data a stream uses, the limits behind "unlimited", coverage maps, testing a spot, and roaming abroad.'
+  section: help.html
+  illustrations: guide
+  next: {href: links.html, label: Apps and services}
+
+why-bonding.html:
+  title: Why more than one network? · How to IRL
+  description: Why one modem or phone, even a fast one, isn't enough for an IRL stream, how a second network helps, and what bonding can't fix.
+  section: help.html
+  illustrations: guide
+  next: {href: data-plans.html, label: Data plans and SIMs}
+
+links.html:
+  title: Apps and services · How to IRL
+  description: Phone apps, bonding and receivers, backpacks, cloud production and more for IRL streaming, by what you need and what it runs on.
+  illustrations: guide
+  stylesheet: assets/links-filters.css
+  next: {href: help.html, label: Help}
+
+contact.html:
+  title: Contact · How to IRL
+  description: "How to reach the person behind How to IRL: email, Discord and GitHub."
+
+legal-notice.html:
+  title: Legal notice · How to IRL
+  description: "Legal notice (Impressum) for howtoirl.org: who runs the site and is responsible for it."
+  alternate: impressum.html
+
+impressum.html:
+  title: Impressum · How to IRL
+  description: "Impressum von howtoirl.org: Anbieter und Verantwortlicher."
+  lang: de
+  alternate: legal-notice.html
+
+privacy.html:
+  title: Privacy policy · How to IRL
+  description: "Privacy policy for howtoirl.org: no cookies, no tracking, no access log."
+  alternate: datenschutz.html
+
+datenschutz.html:
+  title: Datenschutzerklärung · How to IRL
+  description: "Datenschutzerklärung von howtoirl.org: keine Cookies, kein Tracking, kein Zugriffsprotokoll."
+  lang: de
+  alternate: privacy.html

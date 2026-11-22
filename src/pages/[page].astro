@@ -1,9 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import shells from '../shells.json';
-import answerShells from '../../.generated/answer-shells.json';
+import {pages} from '../page-meta.mjs';
 import rendered from '../../.generated/content.json';
-export function getStaticPaths() { return [...shells, ...answerShells].filter(s => s.name !== "index.html").map(shell => ({params:{page:shell.name.replace(/\.html$/, '')},props:{shell}})); }
-const {shell} = Astro.props;
+export function getStaticPaths() { return pages.filter(p => p.name !== 'index.html').map(page => ({params: {page: page.name.replace(/\.html$/, '')}, props: {page}})); }
+const {page} = Astro.props;
 ---
-<Layout shell={shell}><Fragment set:html={rendered[shell.name]} /></Layout>
+<Layout page={page}><Fragment set:html={rendered[page.name]} /></Layout>

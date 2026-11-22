@@ -1,0 +1,7 @@
+---
+// The link to the next page in reading order, above the footer.
+const {next} = Astro.props;
+---
+<nav class="pager wrap" aria-label="Next">
+  <a href={next.href}><span class="vh">Next: </span>{next.label} <span class="arrow" aria-hidden="true">⟶</span></a>
+</nav>

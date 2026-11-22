@@ -1,0 +1,31 @@
+---
+// Title, description, canonical address and link preview tags.
+// Answer pages also bring their own share image, 1200 by 630 (scripts/share-images.mjs).
+import site from '../../site.json';
+const {page} = Astro.props;
+const url = `https://${site.domain}/${page.name === 'index.html' ? '' : page.name}`;
+const other = {en: 'de', de: 'en'}[page.lang];
+---
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{page.title}</title>
+<meta name="description" content={page.description}>
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href={url}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={site.name}>
+<meta property="og:title" content={page.shareTitle ?? page.title}>
+<meta property="og:description" content={page.description}>
+<meta property="og:url" content={url}>
+{page.image && <Fragment><meta property="og:image" content={`https://${site.domain}/${page.image}`}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content={page.imageAlt}>
+<meta name="twitter:card" content="summary_large_image"></Fragment>}
+<meta property="og:locale" content={page.lang === 'de' ? 'de_DE' : 'en_GB'}>
+{page.alternate && <Fragment><link rel="alternate" hreflang={page.lang} href={page.name}>
+<link rel="alternate" hreflang={other} href={page.alternate}></Fragment>}
+<link rel="preload" href="assets/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+{page.stylesheet && <link rel="stylesheet" href={page.stylesheet}>}

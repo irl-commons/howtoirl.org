@@ -54,9 +54,8 @@ if missing:
  sys.exit('site.json pages must list every answer page: '+', '.join(missing))
 for name,body in answer_pages.items():
  rendered[name]=finish(body)
-shells=json.loads((ROOT/'src/shells.json').read_text())
 (ROOT/'.generated').mkdir(exist_ok=True)
-(ROOT/'.generated/answer-shells.json').write_text(json.dumps(setup_answers.answer_shells(setup,next(x for x in shells if x['name']=='index.html')),ensure_ascii=False))
+(ROOT/'.generated/answer-pages.json').write_text(json.dumps(setup_answers.answer_meta(setup),ensure_ascii=False))
 # The sitemap lists every page in site.json.
 (ROOT/'public/sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
  +''.join(f'  <url><loc>https://{cfg["domain"]}/{"" if n=="index.html" else n}</loc></url>\n' for n in cfg['pages'])+'</urlset>\n')
