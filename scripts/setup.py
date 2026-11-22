@@ -195,8 +195,9 @@ def home_html(setup: dict) -> str:
         hcls = 'grp live' if g.get('style') == 'symptoms' else 'grp'
         cards = '\n          '.join(card(c) for c in g['cards'])
         anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
+        note = f'\n        <p class="grp-note">{g["note"]}</p>' if g.get('note') else ''
         parts.append(f'<h2 class="{hcls}" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
-                     f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>')
+                     f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>{note}')
     return ('<section class="step start" id="start" tabindex="-1" aria-label="Choose your starting point">\n        '
             + '\n        '.join(parts) + '\n      </section>')
 
