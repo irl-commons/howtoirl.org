@@ -136,6 +136,38 @@
   "datenschutz.html": {
    "html": 16384,
    "total": 228352
+  },
+  "tips/wifi-off-test.html": {
+   "html": 27648,
+   "total": 239616
+  },
+  "tips/clap-sync.html": {
+   "html": 26624,
+   "total": 238592
+  },
+  "tips/wave-and-count.html": {
+   "html": 27648,
+   "total": 238592
+  },
+  "tips/wipe-the-lens.html": {
+   "html": 27648,
+   "total": 239616
+  },
+  "tips/watch-the-mic-meter.html": {
+   "html": 27648,
+   "total": 238592
+  },
+  "tips/power-bank-idle.html": {
+   "html": 27648,
+   "total": 238592
+  },
+  "tips/plug-in-before-live.html": {
+   "html": 27648,
+   "total": 238592
+  },
+  "tips/check-the-local-preview.html": {
+   "html": 27648,
+   "total": 239616
   }
  },
  "assets": {

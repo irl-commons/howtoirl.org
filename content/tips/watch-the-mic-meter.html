@@ -1,0 +1,26 @@
+<div class="wrap page guide-page tip-page">
+  <header class="page-head">
+    <h1>Say one line and watch the mic meter</h1>
+    <p class="lede">Say one normal sentence and watch the mic meter in your app. The bar should move with your words.</p>
+  </header>
+
+  <div class="parts">
+    <section class="part" id="how" aria-labelledby="how-h" data-checked="2026-11-22">
+      <h2 id="how-h">How</h2>
+      <div class="read">
+        <ol class="checklist">
+          <li>Open your app with the scene you'll stream.</li>
+          <li>Make sure the app has picked the mic you want.</li>
+          <li>Say one normal sentence and watch the meter.</li>
+        </ol>
+        <p><strong>Check:</strong> the bar moves with your words, so that mic is picking you up. If it stays flat, check which mic is selected.</p>
+        <ul class="bul">
+          <li>It checks the mic going into your app, not the sound further along.</li>
+          <li class="w"><span class="vh">Watch out: </span>A scene can switch to another mic. In Moblin that's a <a class="gl" href="glossary.html#mic-override">mic override</a>, so check again after you swap mics or scenes.</li>
+        </ul>
+        <p>More in <a href="fix/no-sound-or-alerts.html">No sound or alerts</a>.</p>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">OBS: <a href="https://obsproject.com/kb/audio-mixer-guide">Audio Mixer Guide</a> (Volume Meter: "Visual bars that indicate the volume of the source"). Moblin: <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Stream/Overlay/StreamOverlayRightView.swift#L654-L670">its audio level at the top right</a>, source code.</p></details>
+      </div>
+    </section>
+  </div>
+</div>
