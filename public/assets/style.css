@@ -1412,8 +1412,6 @@ details.sources > .tip-src { display: block; margin-top: 4px; margin-bottom: 8px
   .site-nav li { flex: none; }
   .site-nav a { white-space: nowrap; font-size: 16px; }
 }
-/* Below 360px a narrower gap keeps all four items clear of the fade, so nothing hides behind it. */
-@media (max-width: 359px) { .site-nav ul { gap: 0 16px; } }
 
 /* ---------- Home: three groups of starting points ---------- */
 @supports selector(:has(*)) {
@@ -1421,15 +1419,15 @@ details.sources > .tip-src { display: block; margin-top: 4px; margin-bottom: 8px
   @media screen { .home-page:has(.step:not(#start):target, .step:not(#start) :target) > .page-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; } }
 }
 .step.start { border-top: 0; padding-top: 0; }
-.step.start > .grp { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: var(--s3) 0 10px; }
+.step.start > .grp { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: var(--s5) 0 var(--s2); }
 .step.start > .grp:first-child { margin-top: 0; }
-.start .choices { gap: 8px; }
+.start .choices { gap: 14px; }
 .start .choices a { grid-template-columns: 72px minmax(0, 1fr); column-gap: 12px; padding: 9px 12px; }
 .start .choices .ill { width: 72px; height: 48px; }
 .start .choices strong { font-size: 17px; line-height: 1.25; }
 .start .choices span { font-size: 15px; line-height: 1.35; margin-top: 1px; }
 @media (min-width: 600px) {
-  .start .choices { gap: 16px; }
+  .start .choices { gap: 24px; }
   .start .choices a { grid-template-columns: minmax(0, 1fr); padding: 14px 16px 16px; row-gap: 4px; }
   .start .choices .ill { width: 144px; height: 96px; }
 }
@@ -1437,11 +1435,11 @@ details.sources > .tip-src { display: block; margin-top: 4px; margin-bottom: 8px
   .start .choices:not(.learn), .fits-page .start .choices:not(.learn) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .start .choices .ill { width: 144px; height: 96px; }
 }
-/* Learn more and get help: plain rows, clearly less prominent than the cards. */
+/* Learn more: plain rows, clearly less prominent than the cards. */
 .start .choices.learn { grid-auto-rows: auto; gap: 0; }
 .start .choices.learn li { display: block; }
 .start .choices.learn a { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 0;
-  padding: 8px 2px; background: none; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; }
+  padding: 12px 2px; background: none; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; }
 .start .choices.learn .ill { grid-row: 1 / 3; width: 40px; height: 27px; margin: 0; align-self: center; }
 .start .choices.learn strong { font-size: 16px; font-weight: 700; align-self: end; }
 .start .choices.learn strong::after { content: none; }
@@ -1681,15 +1679,15 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 .myapps .th { flex: none; line-height: 0; }
 .myapps .th img { width: 96px; height: auto; border-radius: 6px; display: block; }
 
-/* Wide screens: the left column holds navigation already on the page. Home: "Learn more and get help" on the start view. */
+/* Wide screens: the left column holds navigation already on the page. Home: "Learn more" on the start view. */
 @media (min-width: 1000px) {
   @supports selector(:has(*)) {
     .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) > .parts, .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) > .parts > .flow, .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .flow > .step.start { display: contents; }
     .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > * { grid-column: 2; }
-    .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > #grp-learn-more-and-get-help { grid-column: 1; grid-row: 2; margin-top: 0; }
+    .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > #learn { grid-column: 1; grid-row: 2; margin-top: 0; }
     .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > .choices.learn { grid-column: 1; grid-row: 3 / span 3; align-self: start; grid-template-columns: minmax(0, 1fr); }
     .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > .choices.learn li:first-child a { border-top: 1px solid var(--rule); }
-    .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > .choices.learn a { padding: 10px 0; grid-template-columns: minmax(0, 1fr); }
+    .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > .choices.learn a { padding: 14px 0; grid-template-columns: minmax(0, 1fr); }
     .home-page:not(:has(.step:not(#start):target, .step:not(#start) :target)) .step.start > .choices.learn .ill { display: none; }
   }
 }
@@ -1735,11 +1733,9 @@ ol.picks.steps .picks.mix, .picks.mix .picks.mix, details.block .picks .picks.mi
 /* "Trying to stream, but something's not working?": four symptom cards, two by two on a phone, text only, so they fit one screen.
    The heading's dot is the tally light of a camera that is on air. */
 .step.start > .grp.live::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--live); vertical-align: 0; }
-.start .choices.symptoms { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 10px; }
+.start .choices.symptoms { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 14px; }
 .start .choices.symptoms li { display: block; grid-row: auto; }
 .start .choices.symptoms a { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; grid-row: auto; padding: 12px 14px 14px; }
 .start .choices.symptoms strong { font-size: 17px; line-height: 1.25; align-self: stretch; }
 .start .choices.symptoms span { font-size: 15px; line-height: 1.35; }
-/* The line under a group that points to the other one: Improve to the problems, and back. */
-.step.start > .grp-note { margin: 10px 0 0; font-size: 15px; color: var(--muted); }
-@media (min-width: 1000px) { .start .choices.symptoms, .fits-page .start .choices.symptoms { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+@media (min-width: 1000px) { .start .choices.symptoms, .fits-page .start .choices.symptoms { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }

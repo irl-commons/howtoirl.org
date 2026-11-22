@@ -94,7 +94,7 @@ assert r.add_permalinks(out) == out
 `],{stdio:'pipe'});
 });
 
-test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups with the agreed card texts', async()=>{
+test('Home: visible h1, no lede, steps bar, SIMs note or pager, the four groups with the agreed card texts', async()=>{
  const text=docs.get('index.html');
  assert.ok(/<header class="page-head">\s*<h1>How to IRL<\/h1>\s*<\/header>/.test(text));
  assert.ok(!text.includes('sims-note')&&!text.includes('How to pick data plans and SIMs')&&!text.includes('class="pager'));
@@ -102,18 +102,16 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
  assert.ok(!text.includes('class="lede"')&&!text.includes('Where does your stream stand today?')&&!text.includes("It doesn't break"));
  const start=text.slice(text.indexOf('id="start"'),text.indexOf('</section>',text.indexOf('id="start"')));
  assert.ok(!start.includes('class="steps"'));
- const cards=[...start.matchAll(/<strong>([^<]+)<\/strong><span>([^<]+)<\/span>/g)].map(m=>`${m[1]} — ${m[2]}`.replaceAll('&#39;',"'").replaceAll('&quot;','"'));
+ const cards=[...start.matchAll(/<strong>([^<]+)<\/strong>(?:<span>([^<]+)<\/span>)?<\/a>/g)].map(m=>(m[2]?`${m[1]} — ${m[2]}`:m[1]).replaceAll('&#39;',"'").replaceAll('&quot;','"'));
  assert.deepEqual(cards,[
-  'Not started yet — Help me get started streaming IRL','Desk and away — Switch between desktop and IRL: hybrid streaming',
-  'A better picture — A standalone camera, like a DSLR','Several cameras — Mix phones and cameras in one scene',
-  'The signal drops — In crowds, on trains or in weak spots','The phone gives up — It gets too hot, or the battery runs out',
-  'My home setup fails — My PC, power or internet at home','No signal at all — I stream outdoors, far from cell towers',
-  'Phone says live, nobody sees it — The platform shows you offline','Picture frozen — Viewers see a still picture',
-  "No sound or alerts — The picture is fine, the sound isn't","Second phone or SIM idle — Connected, but the stream doesn't use it",
-  'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
-  'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
-  'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.']);
- assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more and get help']);
+  'Not started yet — Start with one phone','Desk and away — Hybrid streaming',
+  'A better picture — A DSLR or other camera','Several cameras — Mixed in one scene',
+  'The signal drops — Crowds, trains, weak spots','The phone gives up — Heat or an empty battery',
+  'My home setup fails — PC, power or internet','No signal at all — Far from cell towers',
+  'Phone says live, nobody sees it','Picture frozen','No sound or alerts','Second phone or SIM idle',
+  'Glossary — IRL terms explained','Help — Guides and app support',
+  'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
@@ -454,14 +452,15 @@ test("Trying to stream, but something's not working?: four symptom cards, each w
  }
 });
 
-test('Top navigation: Start, Improve, Fix and Glossary; Improve and Fix point at their groups on Home, which point at each other', ()=>{
+test('Top navigation: Start, Improve, Fix and Help; Improve and Fix go to their groups on Home, with no jump-link lines between them', ()=>{
+ const nav=name=>{const t=docs.get(name);const i=t.indexOf('<nav class="site-nav"');return t.slice(i,t.indexOf('</nav>',i));};
+ assert.deepEqual([...nav('index.html').matchAll(/<a href="([^"]+)" data-label="([^"]+)"[^>]*>([^<]+)</g)].map(m=>[m[1],m[2],m[3]]),
+  [['index.html','Start','Start'],['index.html#improve','Improve','Improve'],['index.html#fix','Fix','Fix'],['help.html','Help','Help']]);
+ assert.ok(/<a href="index.html" data-label="Start" aria-current="page">/.test(nav('index.html')),'Start is the current item on Home');
+ assert.ok(/<a href="help.html" data-label="Help" aria-current="page">/.test(nav('help.html')),'Help is the current item on Help');
+ assert.ok(/<a href="help.html" data-label="Help" aria-current="true">/.test(nav('data-plans.html')),'a page under Help marks Help');
  const home=docs.get('index.html');
- const nav=home.slice(home.indexOf('<nav class="site-nav"'),home.indexOf('</nav>',home.indexOf('<nav class="site-nav"')));
- assert.deepEqual([...nav.matchAll(/<a href="([^"]+)" data-label="([^"]+)"[^>]*>([^<]+)</g)].map(m=>[m[1],m[2],m[3]]),
-  [['index.html','Start','Start'],['index.html#improve','Improve','Improve'],['index.html#fix','Fix','Fix'],['glossary.html','Glossary','Glossary']]);
- assert.ok(/<a href="index.html" data-label="Start" aria-current="page">/.test(nav),'Start is the current item on Home');
- assert.ok(/<h2 class="grp" id="improve"[^>]*>Improve your setup<\/h2>/.test(home));
- const group=id=>{const i=home.indexOf(`id="${id}"`);return home.slice(i,home.indexOf('<h2',i+1));};
- assert.ok(/<p class="grp-note">[^<]*<a href="#fix">/.test(group('improve')),'Improve points to the problems');
- assert.ok(/<p class="grp-note">Happens every time\? <a href="#improve">See Improve your setup<\/a><\/p>/.test(group('fix')),'the problems point to Improve');
+ assert.ok(/<h2 class="grp" id="improve"[^>]*>Improve your setup<\/h2>/.test(home)&&/<h2 class="grp live" id="fix"/.test(home));
+ assert.ok(!home.includes('grp-note')&&!/href="#(?:fix|improve)"/.test(home),'no jump-link lines on Home');
+ assert.ok(/<footer[\s\S]*<a href="glossary.html"/.test(home),'Glossary stays in the footer');
 });
