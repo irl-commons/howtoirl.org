@@ -111,7 +111,7 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the three groups
   'Glossary — Look up IRL terms and what they mean','Help — Find guides and help for the apps and services you use',
   'Data plans and SIMs — Upload speed, how much data you need, and the limits behind "unlimited"',
   'Why more than one network? — One network has short bad moments, even a fast one. A second network covers them.']);
- assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Fix what breaks','Learn more and get help']);
+ assert.deepEqual([...start.matchAll(/<h2 class="grp"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup','Learn more and get help']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{

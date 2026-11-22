@@ -186,7 +186,7 @@ def page(aid: str) -> str:
 def home_html(setup: dict) -> str:
     parts = []
     for i, g in enumerate(setup['groups']):
-        gid = 'grp-' + re.sub('[^a-z0-9]+', '-', g['title'].lower()).strip('-')
+        gid = g.get('id') or 'grp-' + re.sub('[^a-z0-9]+', '-', g['title'].lower()).strip('-')
         cls = 'choices' + (' learn' if g.get('style') == 'learn' else '')
         cards = '\n          '.join(card(c) for c in g['cards'])
         anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
