@@ -1,0 +1,219 @@
+<div class="wrap page plans-page guide-page">
+  <header class="page-head">
+    <h1>How to IRL stream with your phone</h1>
+    <p class="lede">Yes, a phone alone is enough. It has the camera, the mic, the mobile data and the app that sends your stream. A second connection helps when one network keeps dropping, in crowds, on trains or in weak spots. This guide sets up the phone, tests it in private, adds a second connection, and shows you how to prove that each connection can carry your stream on its own.</p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#phone-only">The phone on its own</a></li>
+      <li><a href="#private-test">A private five-minute test</a></li>
+      <li><a href="#second-connection">Add a second connection</a></li>
+      <li><a href="#link-test">Prove each connection works</a></li>
+      <li><a href="#limits">What it can't fix</a></li>
+      <li><a href="#next-steps">Where next</a></li>
+    </ul>
+  </nav>
+
+  <div class="parts">
+    <section class="part" id="phone-only" aria-labelledby="phone-only-h" data-checked="2026-11-22">
+      <h2 id="phone-only-h">The phone on its own</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> install a streaming app, send to your platform or to a hub, and test in private before anyone watches.</p>
+
+        <h3 id="app">The app</h3>
+        <ul class="bul">
+          <li><strong>iPhone and iPad:</strong> Moblin is free and open source. This guide uses it for the examples. A Wi-Fi-only iPad has no mobile data of its own, so the steps with mobile data don't apply to it.</li>
+          <li><strong>Android:</strong> Moblin isn't on Android. Pick an app from <a href="one-phone.html">One phone is enough</a>. IRL Pro, for example, lists SRTLA bonding.</li>
+          <li>Moblink, the Android app with a similar name, isn't a streaming app. It lends a spare phone's connection to your stream: see <a href="#second-connection">below</a>.</li>
+        </ul>
+
+        <h3 id="where-it-sends">Where it sends</h3>
+        <ul class="bul">
+          <li><strong>Straight to the platform with RTMP.</strong> The simplest way, with nothing in between. Fine on a steady connection.</li>
+          <li><strong>With <a href="glossary.html#srt">SRT</a> to a receiver or a <a href="glossary.html#hub">hub</a>.</strong> SRT resends lost pieces of the stream, which helps on a mobile connection. A hub is also where a BRB scene lives, once you set one up, and bonding with SRTLA also goes to a receiver.</li>
+          <li><a href="protocols.html">RTMP, SRT or SRTLA?</a> compares them and shows three working setups.</li>
+        </ul>
+
+        <h3 id="settings">Settings worth a look</h3>
+        <ul class="bul">
+          <li><strong>Data:</strong> an hour at 6 Mbit/s uses about 2.7 GB, plus a little overhead. <a href="data-plans.html#calculator">Work out yours.</a></li>
+          <li><strong><a href="glossary.html#adaptive-bitrate">Adaptive bitrate</a>:</strong> it lowers the bitrate before the stream freezes. In Moblin it's on by default for SRT and SRTLA. <a href="something-wrong.html#lower-bitrate">Why it matters.</a></li>
+          <li><strong><a href="glossary.html#srt-latency">SRT latency</a>:</strong> Moblin starts at 3000 ms. <a href="protocols.html#latency">How to pick it.</a></li>
+          <li class="w"><span class="vh">Watch out: </span>Keep the stream key secret. Anyone who has it can go live on your channel.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/README.md">Moblin README</a> ("A free iOS app for IRL streaming", RTMP, SRT and SRTLA), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/SettingsStream.swift">Moblin's stream settings</a> (adaptive bitrate on by default) and <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/Settings.swift">Moblin's settings</a> (latency 3000 ms), both source code as of 19 November 2026. <a href="https://github.com/eerimoq/moblink/blob/23f68fc0e9ecc2e2eeb09783061813c11ff8f9db/README.md">Moblink README</a> ("Use spare Android phones as extra SRTLA bonding connections"). <a href="https://irlpro.app/">IRL Pro</a> ("SRTLA Bonding over multiple connections"). <a href="https://datatracker.ietf.org/doc/html/draft-sharabayko-srt-01">The SRT protocol draft</a> (lost packets are sent again).</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="private-test" aria-labelledby="private-test-h" data-checked="2026-11-22">
+      <h2 id="private-test-h">A private five-minute test</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> stream where only you can watch, with Wi-Fi off, and look at the result on a second device.</p>
+
+        <h3 id="test-where">Where to send the test</h3>
+        <ul class="bul">
+          <li><strong>With a hub:</strong> send the phone's stream to OBS at home or in the cloud, and watch it arrive in the preview. As long as the hub doesn't stream on, nothing reaches your platform. Who can open the preview depends on the hub.</li>
+          <li><strong>YouTube:</strong> set the live stream to Private before you start, and don't invite anyone. Private means only you and the people you choose. Unlisted works too if you don't mind that anyone with the link can watch it and pass it on. Check the preview in the Live Control Room.</li>
+          <li><strong>Twitch, straight from the phone:</strong> add <code>?bandwidthtest=true</code> to the end of your stream key. Twitch then doesn't show the stream to viewers. In Moblin, edit the stream's full URL (Settings, Streams, your stream, URL): the key is its last part, so the test part goes at the very end.</li>
+          <li><strong>Twitch, through a hub:</strong> the phone sends to your receiver or hub, not to Twitch. Put the test part on the hub's Twitch stream key instead, and watch the picture in the hub's preview.</li>
+          <li>Twitch Inspector, at inspector.twitch.tv, shows what arrives at Twitch, such as the bitrate. It doesn't show you the picture: for picture, sound and delay, use a hub preview or a Private YouTube stream.</li>
+          <li class="w"><span class="vh">Watch out: </span>Take <code>?bandwidthtest=true</code> out again before you go live, or nobody can watch.</li>
+        </ul>
+
+        <h3 id="test-what">What to look at</h3>
+        <ul class="bul">
+          <li>Turn Wi-Fi off in the phone's Settings, so the test uses mobile data like the real stream. The Wi-Fi button in Control Center only disconnects from the current network.</li>
+          <li>The picture moves, and it's sharp enough. Mute the second device while you look, or you'll hear yourself twice.</li>
+          <li>The sound: put headphones on the second device, then clap once. Picture and sound should match.</li>
+          <li>The delay: wave, and count until you see it on the second device.</li>
+          <li>The bitrate in your app. With adaptive bitrate on, it drops when the connection gets weak, so a dip isn't a fault by itself.</li>
+          <li>Walk around the block. A short glitch while you move can happen, <a href="why-bonding.html#handover">for example when the phone switches towers</a>. Long freezes are worth a look.</li>
+        </ul>
+        <p>The platform's own dashboard shows what really arrives: <a href="something-wrong.html#where-to-look">where to look on Twitch, YouTube and Kick</a>.</p>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://support.google.com/youtube/answer/157177?hl=en">YouTube: video privacy settings</a> (Private: "only be seen by you and whomever you choose"; Unlisted: "seen and shared by anyone with the link"), <a href="https://support.google.com/youtube/answer/2853856?hl=en">YouTube: streaming tips</a> ("setting personal live streams to private or unlisted", "check the preview in the Live Control Room"), <a href="https://dev.twitch.tv/docs/video-broadcast/">Twitch: video broadcast</a> ("<code>bandwidthtest=true</code> is an optional query-string parameter that disables live viewing of the stream. It is used to verify bandwidth health on Twitch Inspector"), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Common/Various/CommonUtils.swift">Moblin's RTMP URL and stream-key parsing</a> and <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Streams/Stream/StreamSettingsView.swift">its stream settings</a> (URL), both source code. <a href="https://support.apple.com/en-us/102412">Apple: Wi-Fi in Control Center</a> (disconnects; Settings turns Wi-Fi off).</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="second-connection" aria-labelledby="second-connection-h" data-checked="2026-11-22">
+      <h2 id="second-connection-h">Add a second connection</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> a second connection on a different mobile network, an app that bonds, and a receiver that joins the stream back together.</p>
+
+        <h3 id="what-counts">What counts as a second connection</h3>
+        <ul class="bul">
+          <li><strong>Wi-Fi from a hotspot:</strong> a second phone's hotspot, or a pocket hotspot with a SIM on another network. The phone's own mobile data is one connection, the hotspot's Wi-Fi the other. Moblin uses one mobile and one Wi-Fi connection at the same time.</li>
+          <li><strong>A spare phone that lends its connection:</strong> Moblink on Android, or Moblin on a spare iPhone. The spare phone joins a Wi-Fi network where it can reach your streaming phone, and sends its share of the stream over its own mobile data.</li>
+          <li class="w"><span class="vh">Watch out: </span>A second SIM in the same iPhone isn't a second connection. Apple says an iPhone uses one mobile data network at a time.</li>
+          <li class="w"><span class="vh">Watch out: </span>Two SIMs on the same network help less: <a href="why-bonding.html#same-network">why</a>.</li>
+        </ul>
+
+        <h3 id="moblink-setup">A spare phone with Moblink</h3>
+        <p>Set this up before you go live.</p>
+        <ol class="checklist">
+          <li>In Moblin on your streaming phone, open Settings, then Moblink. Change the password from the default 1234, and turn on Enabled under Streamer.</li>
+          <li>On a spare iPhone with Moblin: Settings, Moblink, the same password, then the first Enabled switch, the one above Streamer. Leave Manual off.</li>
+          <li>On a spare Android phone with Moblink: enter a name and the same password, leave Manual off, and tap Start. Allow Moblink's notifications.</li>
+          <li>Put both phones on a Wi-Fi network where they can reach each other. When iOS asks whether Moblin may find devices on your local network, tap Allow.</li>
+          <li>Keep mobile data on in the spare phone: that's the connection it lends.</li>
+        </ol>
+        <ul class="bul">
+          <li class="w"><span class="vh">Watch out: </span>On a spare Android phone, turn off energy saving for Moblink.</li>
+        </ul>
+
+        <h3 id="needs-srtla">For bonding: SRTLA and a receiver</h3>
+        <ul class="bul">
+          <li>Two connections on the phone don't add up by themselves. Your app has to split the stream over both: that's <a href="glossary.html#bonding">bonding</a>. This guide bonds with SRTLA, the protocol Moblin's bonding status and connection settings below belong to.</li>
+          <li><a href="glossary.html#srtla">SRTLA</a> needs a <a href="receiver.html">receiver</a> on the internet that joins the pieces back into one stream. Some are hosted for you. <a href="why-bonding.html#pieces">How SRTLA splits a stream.</a></li>
+          <li>In Moblin, paste the <code>srtla://</code> address your receiver gives you as the stream URL. An address that starts with <code>srtla://</code> turns bonding on.</li>
+          <li>The receiver has to be reachable over every connection. Check that its incoming feed shows up before you test the connections one by one.</li>
+          <li>If a hotspot from an Android phone connects but carries none of the stream, turn off <a href="glossary.html#big-packets">Big packets</a> in Moblin's SRT(LA) settings and try again. Moblin notes that some Android hotspots don't work with them.</li>
+          <li>Can't join an iPhone's hotspot? If the iPhone that shares has <a href="glossary.html#maximize-compatibility">Maximize Compatibility</a> in its Personal Hotspot settings, turn it on. Apple says it can reduce speed and Wi-Fi security.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/README.md">Moblin README</a> ("one cellular, one WiFi and multiple Ethernet connections simultaneously"), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Moblink/MoblinkSettingsView.swift">Moblin's Moblink settings</a> (the two Enabled switches, Manual, "must have cellular data enabled") and <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/SettingsMoblink.swift">their defaults</a> (password 1234, Manual off), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Info.plist">Moblin looks for Moblink on the local network</a>, <a href="https://github.com/eerimoq/moblink/blob/23f68fc0e9ecc2e2eeb09783061813c11ff8f9db/README.md">Moblink README</a> (energy saving, notifications), <a href="https://github.com/eerimoq/moblink/blob/23f68fc0e9ecc2e2eeb09783061813c11ff8f9db/app/src/main/java/com/eerimoq/moblink/Scanner.kt">Moblink's search for the streamer on the local network</a> and <a href="https://github.com/eerimoq/moblink/blob/23f68fc0e9ecc2e2eeb09783061813c11ff8f9db/app/src/main/java/com/eerimoq/moblink/MainActivity.kt">its screen</a> (Name, Password, Manual, Start; mobile data), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/SettingsStream.swift">Moblin: <code>srtla</code> address means bonding</a>, <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Streams/Stream/Srt/StreamSrtSettingsView.swift">Moblin's SRT(LA) settings</a> ("Sometimes Android hotspots does not work with big packets"), all source code. Apple: <a href="https://support.apple.com/en-us/108898">Using Dual SIM</a> ("Your iPhone can use one cellular data network at a time"), <a href="https://support.apple.com/en-us/102229">local network access</a>, <a href="https://support.apple.com/en-us/119837">If Personal Hotspot is not working</a> (Maximize Compatibility: "internet performance and Wi-Fi security might be reduced"). <a href="https://github.com/BELABOX/srtla/blob/37862da3d0c13b46956efd3f88877053293d97d6/README.md">SRTLA README</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="link-test" aria-labelledby="link-test-h" data-checked="2026-11-22">
+      <h2 id="link-test-h">Prove each connection can carry the stream</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> during a private test, let each connection carry the stream on its own for a minute, and check that fresh video keeps arriving each time.</p>
+        <p>Connected isn't the same as carrying. A phone can show a hotspot as connected while the stream doesn't use it. Switching one connection off only proves that the other one works, so this test does it both ways. The steps are for Moblin with an <code>srtla://</code> address; in another app, look for its statistics per connection.</p>
+
+        <h3 id="test-setup">Before you start</h3>
+        <ul class="bul">
+          <li>Watch on a device whose connection you won't switch off, for example a computer on your home internet.</li>
+          <li>Watch the picture where it ends up: your hub's preview, or a Private YouTube stream. Twitch Inspector shows the bitrate, not the picture.</li>
+          <li>Wave at the camera now and then, or film a clock. Then you can tell fresh video from a frozen picture.</li>
+        </ul>
+
+        <h3 id="see-shares">Step 1: a quick look at each connection's share</h3>
+        <ol class="checklist">
+          <li>While you're live and bonding, Moblin shows a status with a phone-and-signal icon at the top right. On iOS 17 or later, a small pie chart sits beside it once there are shares to show.</li>
+          <li>Tap the statuses at the top right to show them as text. The bonding status then reads like <code>62% Cellular, 38% WiFi</code>.</li>
+          <li>Cellular is the phone's own mobile data. WiFi is any direct Wi-Fi route, such as a hotspot. A spare phone shows up under the name you gave it, and WiFi can show up next to it.</li>
+        </ol>
+        <ul class="bul">
+          <li>Each number is that connection's share of what was sent in the last second, rounded down. The last one in the list gets what's left over. So a small share can show 0 %. Take the numbers as a quick check; steps 2 and 3 are the proof.</li>
+          <li>Uneven shares are normal. SRTLA sends more over the connection that has room for more, and that changes as you move.</li>
+          <li>No bonding status at all? It only shows while you're live and bonding. It can also be switched off: Settings, Display, Status, with "Show all settings" turned on in Settings. "Bonding RTTs" there adds each connection's round-trip time.</li>
+        </ul>
+
+        <h3 id="second-alone">Step 2: the second connection on its own</h3>
+        <ol class="checklist">
+          <li>In Moblin, open Settings, Streams, your stream, SRT(LA), then Connection priorities. SRT(LA) shows when "Show all settings" is on. This works while you're live, without leaving the app.</li>
+          <li>Turn on Enabled, then switch off Cellular. With a spare phone, switch off WiFi too, so only the spare phone carries the stream; it's in the list under its name, and the phone stays on the Wi-Fi it reaches the spare phone over. Moblin sends none of the stream over a switched-off connection, only small keep-alive messages. Leave at least one on: with all of them off, Moblin uses every connection again.</li>
+          <li>Wait until the bonding status lists only WiFi, or the spare phone's name.</li>
+          <li>Watch the second device for a minute. Your waves should keep arriving, after the usual delay.</li>
+          <li>Switch Cellular, and WiFi if you turned it off, back on.</li>
+        </ol>
+        <ul class="bul">
+          <li>You can also switch off mobile data in the iPhone's Settings, under Cellular. That takes you out of Moblin, though. Turn on Background streaming in the stream's settings first: it's off by default. Keep Show PiP on under it, its default: without it, the camera picture can freeze while Moblin is in the background.</li>
+        </ul>
+
+        <h3 id="mobile-alone">Step 3: the phone's own mobile data on its own</h3>
+        <ol class="checklist">
+          <li>On the streaming iPhone, tap the Wi-Fi button in Control Center. It disconnects from the Wi-Fi network right away. With a spare phone, that also cuts the Wi-Fi to it.</li>
+          <li>Moblin stops using a connection when iOS reports its network gone. Wait until the bonding status lists only Cellular: a spare phone can take a few seconds longer to drop out.</li>
+          <li>Watch the second device for a minute. Your waves should keep arriving.</li>
+          <li>Tap the Wi-Fi button again to reconnect. Moblin sets the connection up again, and it reappears in the status once the receiver has accepted it.</li>
+        </ol>
+
+        <h3 id="quiet-link">When a connection goes quiet</h3>
+        <p>A connection can stay connected but stop carrying, for example when a hotspot loses its own signal. Moblin checks every second and starts that connection again after more than 5 seconds without anything from the receiver. BELABOX's sender uses a four-second limit. Both keep trying, and use the connection again once the receiver answers.</p>
+
+        <h3 id="what-viewers-see">What your viewers see in that moment</h3>
+        <ul class="bul">
+          <li>Pieces of the stream that were on their way over the lost connection go missing. The receiver asks for them again, and they come over the connection that's left, if the SRT latency leaves time. So you may see nothing at all, or a short glitch. <a href="why-bonding.html#freeze">More on why.</a></li>
+          <li>If the connection that's left can't carry your bitrate on its own, adaptive bitrate lowers it. The picture gets softer for a while instead of freezing.</li>
+          <li>Your viewers are a few seconds behind you. Keep watching the second device for a while after you switch.</li>
+          <li class="w"><span class="vh">Watch out: </span>A freeze, or BRB in your hub, means the stream didn't arrive in time. Check which connections the bonding status lists, and whether fresh video comes back. If one connection never carried the picture on its own in steps 2 and 3, see <a href="second-link-idle.html">The second connection carries nothing</a>. If each one did, a longer <a href="protocols.html#latency">SRT latency</a> gives resent pieces more time.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">Moblin source code as of 19 November 2026: <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Stream/Overlay/StreamOverlayRightView.swift">the status at the top right</a> (icon, pie chart, tap to show text), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/BondingStatisticsFormatter.swift">the share per connection</a> (rounded down, the rest to the last), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Model/Model.swift">updated every second</a>, <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Media/Srtla/Client/RemoteConnection.swift">connection names</a> (Cellular, WiFi, a spare phone's name), the check every second and the restart ("No packet received in 5 seconds"), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Media/Srtla/Client/SrtlaClient.swift">a connection dropped or set up again when its network goes or comes back, and switched-off connections left out</a>, <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Streams/Stream/Srt/StreamSrtConnectionPriority2View.swift">Connection priorities</a> ("Disabled connections will not be used") with <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Model/ModelMoblink.swift">spare phones added by name</a>, <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Streams/Stream/StreamSettingsView.swift">the stream's settings</a> (SRT(LA) with "Show all settings"; Background streaming: "Live stream and record when the app is in background mode"; Show PiP: "Make built-in and USB cameras not freeze in background mode"), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/SettingsStream.swift">their defaults</a> (Background streaming off, Show PiP on), <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/View/Settings/Display/LocalOverlays/LocalOverlaysStatusSettingsView.swift">the Status settings</a> and <a href="https://github.com/eerimoq/moblin/blob/6f9c3366d46355d2d932309ef7e5310a80462e0e/Moblin/Various/Settings/Settings.swift">their defaults</a> (Bonding on, Bonding RTTs off, statuses as icons). SRTLA: the <a href="https://github.com/BELABOX/srtla/blob/37862da3d0c13b46956efd3f88877053293d97d6/README.md">README</a> ("Traffic is balanced dynamically, depending on the network conditions"; latency gives the time for resends) and the <a href="https://github.com/BELABOX/srtla/blob/37862da3d0c13b46956efd3f88877053293d97d6/srtla_send.c">BELABOX sender</a> (<code>CONN_TIMEOUT 4</code>). Apple: <a href="https://support.apple.com/en-us/109323">Use cellular data</a> (Settings, Cellular, Cellular Data), <a href="https://support.apple.com/en-us/102412">Wi-Fi in Control Center</a> ("your device immediately disconnects"; tap again to reconnect).</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="limits" aria-labelledby="limits-h">
+      <h2 id="limits-h">What a second connection can't fix</h2>
+      <div class="read">
+        <ul class="bul">
+          <li><strong>The picture.</strong> Bonding helps your stream get out. A dark or shaky picture from the camera stays the same. <a href="why-bonding.html#not-camera">More on what bonding carries.</a></li>
+          <li><strong>Data.</strong> Either plan may end up carrying most or all of the stream. Choose each plan as if it carries all of it, and check its hotspot rules: <a href="data-plans.html#use-rules">Data plans and SIMs</a>.</li>
+          <li><strong>Heat and power.</strong> Each phone gets warm and drains its own battery: <a href="why-bonding.html#heat-power">why</a>, and <a href="power.html">Power, and taking power banks on a flight</a>.</li>
+          <li><strong>App versions.</strong> The Moblin steps follow its source code as of 19 November 2026. Menus can move in a later version.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="part" id="go-live" aria-labelledby="go-live-h">
+      <h2 id="go-live-h" class="vh">Before you go live</h2>
+      <div class="read">
+        <div class="golive" id="before-you-go-live" role="group" aria-labelledby="phone-setup-go-h" data-checklist="guide-phone-setup">
+          <h3 id="phone-setup-go-h">Before you go live</h3>
+          <p class="golive-count" hidden></p>
+          <ul class="golive-list">
+            <li><label><input type="checkbox" value="0" data-nojs-ok> Streaming app set up, with your stream address and key.</label></li>
+            <li><label><input type="checkbox" value="1" data-nojs-ok> Private test with Wi-Fi off, watched on a second device: picture, sound, delay.</label></li>
+            <li><label><input type="checkbox" value="2" data-nojs-ok> For bonding: a second connection on another network, and an SRTLA address to your receiver.</label></li>
+            <li><label><input type="checkbox" value="3" data-nojs-ok> Each connection carried fresh video on its own during the private test.</label></li>
+            <li><label><input type="checkbox" value="4" data-nojs-ok> All connections switched back on in Moblin's Connection priorities.</label></li>
+            <li><label><input type="checkbox" value="5" data-nojs-ok> Test mode off: on Twitch, the test part out of the key; on YouTube, the stream set to Public.</label></li>
+          </ul>
+          <p class="golive-note" hidden>Your ticks stay on this device. <button type="button" class="golive-clear">Clear ticks</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="next-steps" aria-labelledby="next-steps-h">
+      <h2 id="next-steps-h">Where next</h2>
+      <div class="read">
+        <ul class="bul">
+          <li><strong><a href="second-network.html">Add a second network</a>:</strong> the options, and apps that bond.</li>
+          <li><strong><a href="receiver.html">A receiver for your bonded stream</a>:</strong> hosted ones, and ones you run yourself.</li>
+          <li><strong><a href="why-bonding.html">Why more than one network?</a></strong> What bonding fixes, and what it can't.</li>
+          <li><strong><a href="something-wrong.html">Find what broke while you're live</a></strong>, when the stream misbehaves.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

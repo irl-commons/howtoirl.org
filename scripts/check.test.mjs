@@ -111,7 +111,8 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the four groups 
   'Phone says live, nobody sees it','Picture frozen','No sound or alerts','Second phone or SIM idle',
   'Glossary — IRL terms explained','Help — Guides and app support',
   'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps',
-  "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power, and taking power banks on a flight — Power banks, cables, flights"]);
+  "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power, and taking power banks on a flight — Power banks, cables, flights",
+  "How to IRL stream with your phone — Set up, then test each connection"]);
  assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
 });
 
@@ -358,7 +359,7 @@ test('Help: Guides list the site\'s own pages first, then every IRL Commons guid
  assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['one-phone.html','second-network.html','hybrid.html','better-picture.html',
   'several-cameras.html','cloud.html','more.html','satellite.html','receiver.html','into-obs.html','build.html','ready-made.html',
   'live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html','data-plans.html','why-bonding.html',
-  'something-wrong.html','protocols.html','power.html']);
+  'something-wrong.html','protocols.html','power.html','phone-setup.html']);
  for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
  const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
  const other=h.slice(h.indexOf('id="g-other"'));
@@ -457,8 +458,9 @@ test("Trying to stream, but something's not working?: four symptom cards, each w
  }
 });
 
-test('Guides G1 to G3: each section with claims ends in its Sources, each has a checklist, Home and Help link them', ()=>{
- const sourced={'something-wrong.html':['chain','drops'],'protocols.html':['pick','caller-listener','setups','latency'],'power.html':['runtime','cables','power-or-not','flying']};
+test('Guide pages: each section with claims ends in its Sources, each has a checklist, Home and Help link them', ()=>{
+ const sourced={'something-wrong.html':['chain','drops'],'protocols.html':['pick','caller-listener','setups','latency'],'power.html':['runtime','cables','power-or-not','flying'],
+  'phone-setup.html':['phone-only','private-test','second-connection','link-test']};
  const home=docs.get('index.html');
  for(const [name,ids] of Object.entries(sourced)){
   const text=docs.get(name);
@@ -479,6 +481,7 @@ test('Checked stamps: a date and Report a mistake, only where the last fact-chec
  const stamped=name=>[...docs.get(name).matchAll(line)].length;
  assert.equal(stamped('data-plans.html'),10);
  assert.equal(stamped('why-bonding.html'),3);
+ assert.equal(stamped('phone-setup.html'),4);
  // The four symptom answers have no date yet.
  const unstamped=['live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html'];
  for(const [name] of answerPages())assert.equal(stamped(name),unstamped.includes(name)?0:1,name);
