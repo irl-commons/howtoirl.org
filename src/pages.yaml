@@ -8,11 +8,15 @@
 #   next                the page the pager at the bottom points to, and its label
 #   illustrations       which drawings the page uses: home, guide or help
 #   stylesheet          a second stylesheet after assets/style.css
+#   share               site: use the site's share card instead of one of its own (scripts/share.py)
+#   share_icon          the drawing on the page's share card, where the page has none of its own
+#   share_line          the line on the share card, where the page's own first sentence is too long
 
 index.html:
   title: How to IRL · Help for IRL streaming
   description: "For streamers and helpers that stream IRL or hybrid: guides, a glossary and an open list of apps and services."
   illustrations: home
+  share_icon: a-pack
 
 help.html:
   title: Help · How to IRL
@@ -73,29 +77,36 @@ links.html:
   illustrations: guide
   stylesheet: assets/links-filters.css
   next: {href: help.html, label: Help}
+  share_icon: i-list
+  share_line: Phone apps, bonding and receivers, backpacks, cloud production and more for IRL streaming.
 
 contact.html:
   title: Contact · How to IRL
   description: "How to reach the person behind How to IRL: email, Discord and GitHub."
+  share: site
 
 legal-notice.html:
   title: Legal notice · How to IRL
   description: "Legal notice (Impressum) for howtoirl.org: who runs the site and is responsible for it."
   alternate: impressum.html
+  share: site
 
 impressum.html:
   title: Impressum · How to IRL
   description: "Impressum von howtoirl.org: Anbieter und Verantwortlicher."
   lang: de
   alternate: legal-notice.html
+  share: site
 
 privacy.html:
   title: Privacy policy · How to IRL
   description: "Privacy policy for howtoirl.org: no cookies, no tracking, no access log."
   alternate: datenschutz.html
+  share: site
 
 datenschutz.html:
   title: Datenschutzerklärung · How to IRL
   description: "Datenschutzerklärung von howtoirl.org: keine Cookies, kein Tracking, kein Zugriffsprotokoll."
   lang: de
   alternate: privacy.html
+  share: site

@@ -5,6 +5,7 @@ sys.path.insert(0,str(ROOT/'shared'))
 import render as r
 sys.path.insert(0,str(ROOT/'scripts'))
 import setup as setup_answers
+import share
 pkg=ROOT/'node_modules/@irl-commons/data'
 data={k:json.loads((pkg/'data'/f'{k}.json').read_text())[k] for k in ['words','services','guides','standards']}
 cfg=json.loads((ROOT/'site.json').read_text())
@@ -56,7 +57,12 @@ if missing:
 for name,body in answer_pages.items():
  rendered[name]=finish(body)
 (ROOT/'.generated').mkdir(exist_ok=True)
-(ROOT/'.generated/answer-pages.json').write_text(json.dumps(setup_answers.answer_meta(setup),ensure_ascii=False))
+answer_meta=setup_answers.answer_meta(setup)
+(ROOT/'.generated/answer-pages.json').write_text(json.dumps(answer_meta,ensure_ascii=False))
+# Every page gets its link preview tags and share image (scripts/share.py, src/components/Head.astro,
+# scripts/share-images.mjs).
+authored=[{'name':n,**m} for n,m in setup_answers.load_yaml(ROOT/'src/pages.yaml').items()]
+(ROOT/'.generated/share.json').write_text(json.dumps(share.manifest(authored+answer_meta,rendered,setup,cfg),ensure_ascii=False,indent=1))
 # The sitemap lists every page in site.json.
 (ROOT/'public/sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
  +''.join(f'  <url><loc>https://{cfg["domain"]}/{"" if n=="index.html" else n}</loc></url>\n' for n in cfg['pages'])+'</urlset>\n')

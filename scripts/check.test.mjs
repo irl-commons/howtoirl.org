@@ -6,6 +6,8 @@ import * as nodeVm from 'node:vm';
 const require_vm=()=>nodeVm;
 import path from 'node:path';
 import {HtmlValidate} from 'html-validate';
+import {createHash} from 'node:crypto';
+import {cardHash,pngSize,readCard} from './share-card.mjs';
 const root=path.resolve('dist');
 const config=JSON.parse(await readFile('site.json','utf8'));
 const docs=new Map(await Promise.all(config.pages.map(async name=>[name,await readFile(path.join(root,name),'utf8')])));
@@ -22,6 +24,43 @@ test('Every page has its canonical URL, metadata, one h1 and unique ids',()=>{
   assert.ok(!text.includes('OpenStreamBox Initiative'),name);
   assert.ok(!text.includes('>Data and standards</a>'),name);
  }
+});
+test('Every page has complete link preview tags and a current 1200x630 share image',async()=>{
+ const share=JSON.parse(await readFile('.generated/share.json','utf8'));
+ const unescape=s=>s.replaceAll('&quot;','"').replaceAll('&#x27;',"'").replaceAll('&#39;',"'").replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&');
+ const seen={'og:title':new Map(),'og:description':new Map()},used=new Set();
+ for(const [name,text] of docs){
+  const one=(attr,key)=>{
+   const found=[...text.matchAll(new RegExp(`<meta ${attr}="${key}" content="([^"]*)">`,'g'))].map(m=>unescape(m[1]));
+   assert.equal(found.length,1,`${name}: one ${key}`);assert.ok(found[0].trim(),`${name}: ${key} is empty`);return found[0];
+  };
+  const url=`https://${config.domain}/${name==='index.html'?'':name}`;
+  const lang=/<html lang="([a-z]+)"/.exec(text)[1];
+  assert.equal(one('property','og:type'),'website',name);
+  assert.equal(one('property','og:site_name'),config.name,name);
+  assert.equal(one('property','og:url'),url,name);
+  assert.equal(one('property','og:locale'),{en:'en_GB',de:'de_DE'}[lang],name);
+  assert.equal(one('property','og:description'),one('name','description'),name);
+  for(const key of ['og:title','og:description']){
+   const value=one('property',key);assert.ok(!seen[key].has(value),`${name} repeats the ${key} of ${seen[key].get(value)}`);seen[key].set(value,name);
+  }
+  assert.equal(one('property','og:image:width'),'1200',name);
+  assert.equal(one('property','og:image:height'),'630',name);
+  assert.equal(one('name','twitter:card'),'summary_large_image',name);
+  assert.equal(one('name','twitter:image:alt'),one('property','og:image:alt'),name);
+  const image=one('property','og:image');
+  assert.equal(one('name','twitter:image'),image,name);
+  const m=new RegExp(`^https://${config.domain.replaceAll('.','\\.')}/(assets/share/[a-z0-9-]+\\.png)\\?v=([0-9a-f]{10}|missing)$`).exec(image);
+  assert.ok(m,`${name}: ${image}`);
+  const [,file,v]=m;used.add(file);
+  assert.equal(share.pages[name],file,name);
+  const png=await readFile(`public/${file}`).catch(()=>assert.fail(`${name}: ${file} is missing; run npm run share-images, then build again`));
+  assert.deepEqual(pngSize(png),[1200,630],file);
+  assert.equal(readCard(png),cardHash(share.cards[file]),`${file} no longer matches its page; run npm run share-images, then build again`);
+  assert.equal(v,createHash('sha256').update(png).digest('hex').slice(0,10),`${name}: the address of ${file} carries an old hash; build again`);
+  assert.ok(png.equals(await readFile(`dist/${file}`)),`dist/${file} is an old copy; build again`);
+ }
+ for(const file of await readdir('public/assets/share'))assert.ok(used.has(`assets/share/${file}`),`public/assets/share/${file} is used by no page`);
 });
 test('Local links and fragments resolve',async()=>{
  for(const [name,text] of docs)for(const match of text.matchAll(/(?:href|src)="([^\"]+)"/g)){
@@ -434,10 +473,7 @@ test('Every answer has its own page, title, description and share image; old hom
   const id=name.replace(/\.html$/,'');
   const title=plain(text.match(/<h1 id="[^"]+">[\s\S]*?<\/h1>/)[0]);
   assert.ok(text.includes(`<title>${title.replaceAll("'",'&#39;')} · How to IRL</title>`)||text.includes(`<title>${title} · How to IRL</title>`),name);
-  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${id}.png">`),name);
-  assert.ok(text.includes('<meta name="twitter:card" content="summary_large_image">'),name);
-  const png=await readFile(`public/assets/share/${id}.png`);
-  assert.deepEqual([png.readUInt32BE(16),png.readUInt32BE(20)],[1200,630],name);
+  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${id}.png?v=`),name);
   assert.ok(text.includes(`<div class="send"><p>Link to send: <a href="${name}">howtoirl.org/<wbr>${name}</a></p><button type="button" class="copy-link" data-copy="https://howtoirl.org/${name}" hidden>Copy link for chat</button></div>`),name);
   assert.ok(!/href="#(?:one-phone|second-network|hybrid|more|receiver|into-obs|build|ready-made|cloud|satellite)"/.test(text),name);
  }

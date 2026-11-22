@@ -555,20 +555,9 @@ if __name__ == '__main__':
     sys.exit(1 if found else 0)
 
 
-def share_image(aid: str) -> str:
-    """The picture a chat app shows for a link to the page: its drawing, title and first line (scripts/share-images.mjs)."""
-    return f'assets/share/{aid}.png'
-
-
-def share_line(a: dict) -> str:
-    """The first sentence of the summary, for the description and the share image."""
-    return re.split(r'(?<=[.!?])\s', plain_text(a['summary']).strip())[0]
-
-
 def answer_meta(setup: dict) -> list[dict]:
-    """What each answer page's head needs (src/components/Head.astro): its own title, description and share image.
-    The rest of the page around it is Home's."""
-    return [{'name': page(a['id']), 'title': f'{a["title"]} · How to IRL', 'shareTitle': a['title'],
-             'description': plain_text(a['summary']).strip(), 'image': share_image(a['id']),
-             'imageAlt': f'{a["title"]}: {share_line(a)}', 'illustrations': 'home'}
+    """What each answer page's head needs (src/components/Head.astro): its own title and description. scripts/share.py
+    adds its share image. The rest of the page around it is Home's."""
+    return [{'name': page(a['id']), 'title': f'{a["title"]} · How to IRL',
+             'description': plain_text(a['summary']).strip(), 'illustrations': 'home'}
             for a in setup['answers']]

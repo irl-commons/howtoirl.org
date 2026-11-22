@@ -1,9 +1,13 @@
 ---
-// Title, description, canonical address and link preview tags.
-// Answer pages also bring their own share image, 1200 by 630 (scripts/share-images.mjs).
+// Title, description, canonical address and link preview tags. Every page has a share image, 1200 by 630:
+// scripts/share.py picks it and hashes it into .generated/share.json, scripts/share-images.mjs draws it.
 import site from '../../site.json';
+import share from '../../.generated/share.json';
 const {page} = Astro.props;
 const url = `https://${site.domain}/${page.name === 'index.html' ? '' : page.name}`;
+const file = share.pages[page.name];
+const image = `https://${site.domain}/${file}?v=${share.images[file].v}`;
+const alt = share.images[file].alt;
 const other = {en: 'de', de: 'en'}[page.lang];
 ---
 <meta charset="utf-8">
@@ -15,15 +19,17 @@ const other = {en: 'de', de: 'en'}[page.lang];
 <link rel="canonical" href={url}>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content={site.name}>
-<meta property="og:title" content={page.shareTitle ?? page.title}>
+<meta property="og:title" content={page.title.replace(` · ${site.name}`, '')}>
 <meta property="og:description" content={page.description}>
 <meta property="og:url" content={url}>
-{page.image && <Fragment><meta property="og:image" content={`https://${site.domain}/${page.image}`}>
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content={page.imageAlt}>
-<meta name="twitter:card" content="summary_large_image"></Fragment>}
 <meta property="og:locale" content={page.lang === 'de' ? 'de_DE' : 'en_GB'}>
+<meta property="og:image" content={image}>
+<meta property="og:image:width" content={String(share.size[0])}>
+<meta property="og:image:height" content={String(share.size[1])}>
+<meta property="og:image:alt" content={alt}>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content={image}>
+<meta name="twitter:image:alt" content={alt}>
 {page.alternate && <Fragment><link rel="alternate" hreflang={page.lang} href={page.name}>
 <link rel="alternate" hreflang={other} href={page.alternate}></Fragment>}
 <link rel="preload" href="assets/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
