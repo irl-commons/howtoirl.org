@@ -46,9 +46,22 @@ selects by that tag, or when a note's service has left its block. A daily job
 every check and opens a pull request.
 
 Each answer is a page of its own, `<answer id>.html`, with the home page's header and footer and its own
-title, description and share image. A new answer needs its page in `site.json` (the build stops
-without it) and a share image: build, then run `npm run share-images` and commit
-`public/assets/share/`. Old links to an answer on the home page (`/#second-network`) still land.
+title and description. A new answer needs its page in `site.json` (the build stops without it).
+Old links to an answer on the home page (`/#second-network`) still land.
+
+## Link previews
+
+`src/components/Head.astro` writes the Open Graph and X card tags of every page from its metadata
+and `.generated/share.json`, which `scripts/share.py` builds. Each page gets a share image of its
+own: its h1, the first sentence of its lede or summary, and its drawing from the home page cards.
+Pages with `share: site` in `src/pages.yaml` (contact and legal pages) share one site card;
+`share_icon` and `share_line` choose the drawing and line where a page has none or its own is
+too long. After adding a page or changing a title or lede, run `npm run build`,
+`npm run share-images` and `npm run check`, then commit `public/assets/share/`. The image
+address carries a hash of the PNG, so chat apps fetch a changed card again. `npm test` fails when
+a page lacks a tag or its image, when an image is not 1200 by 630 pixels or no longer matches
+its page, or when an image is used by no page, and `npm run share-images` stops when text would
+be cut off.
 
 Edit prose in `content/` and each page's title, description, language and pager
 link in `src/pages.yaml`. The head, header with the site navigation, drawings,
