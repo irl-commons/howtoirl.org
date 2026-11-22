@@ -31,7 +31,8 @@ const current = href => href === page.name ? 'page' : href === page.section ? 't
       : <Fragment>This site is new and not complete. Something wrong? <a href="contact.html">Let us know</a></Fragment>}</span></span>
     <nav class="site-nav" aria-label="Site" lang={en}>
       <ul>
-        <li><a href="index.html" data-label="Start" aria-current={current('index.html')}>Start</a></li>
+        <li><a href="index.html" data-label="Get started" aria-current={current('index.html')}>Get started</a></li>
+        <li><a href="index.html#grp-fix-what-breaks" data-label="Fix">Fix</a></li>
         <li><a href="help.html#guides" data-label="Guides" aria-current={current('help.html')}>Guides</a></li>
         <li><a href="glossary.html" data-label="Glossary" aria-current={current('glossary.html')}>Glossary</a></li>
       </ul>
