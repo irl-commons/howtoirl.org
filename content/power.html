@@ -1,0 +1,140 @@
+<div class="wrap page plans-page guide-page">
+  <header class="page-head">
+    <h1>Power, and taking power banks on a flight</h1>
+    <p class="lede">The mAh number on a power bank doesn't tell you how long your stream lasts. Watt-hours and what your setup really draws do. Here's how to work it out, the cables that matter, and the rules for taking power banks on a flight.</p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#runtime">How long it runs</a></li>
+      <li><a href="#cables">Cables and voltages</a></li>
+      <li><a href="#power-or-not">Is it power?</a></li>
+      <li><a href="#flying">Taking power banks on a flight</a></li>
+      <li><a href="#next-steps">Where next</a></li>
+    </ul>
+  </nav>
+
+  <div class="parts">
+    <section class="part" id="runtime" aria-labelledby="runtime-h">
+      <h2 id="runtime-h">How long will it run?</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> hours of streaming = the watt-hours that reach the USB port ÷ the watts your setup draws. Measure the watts on a practice stream.</p>
+        <p>Watts (W) are how fast your setup uses power. Watt-hours (Wh) are how much a battery holds. A 50 Wh battery runs a 10 W setup for about 5 hours.</p>
+
+        <p>A 20,000 mAh bank gives you about 52 to 59 Wh at the USB port, not the 74 Wh on the label.</p>
+        <details class="nerd" id="mah"><summary>Nerd corner: why 20,000 mAh gives less than it says</summary>
+          <p>A power bank's mAh number counts what its cells hold, at the cells' own voltage of about 3.6 to 3.7 V. Your phone charges at 5 V or more. To get watt-hours, multiply volts by amp-hours: 3.7 V × 20 Ah = 74 Wh.</p>
+          <p>Turning the cells' voltage into USB voltage loses some of that as heat. Anker says good banks deliver about 70 to 80 % of what the cells hold. For a 20,000 mAh bank that's about 52 to 59 Wh at the USB port. Counted at 5 V, that's about 10,400 to 11,800 mAh.</p>
+          <figure class="line-fig why-fig">
+            <svg class="line-svg" viewBox="0 0 400 230" role="img" aria-labelledby="bank-t bank-d">
+              <title id="bank-t">A 20,000 mAh power bank: on the label and at the USB port</title>
+              <desc id="bank-d">Two bars. The first, 74 Wh, is what the cells hold. The second is shorter: about 52 Wh solid, with a dashed piece up to 59 Wh. That is what reaches the USB port.</desc>
+              <text class="lb" x="20" y="44">In the cells: 74 Wh</text>
+              <rect class="bar" x="20" y="56" width="340" height="32"/>
+              <text class="lb" x="20" y="140">At the USB port: 52 to 59 Wh</text>
+              <rect class="bar" x="20" y="152" width="239" height="32"/>
+              <rect class="bar-extra" x="259" y="152" width="32" height="32"/>
+              <path class="tw-thin" d="M360 40V200"/>
+            </svg>
+            </figure>
+        </details>
+
+        <h3 id="measure">Measure your own draw</h3>
+        <p>What your setup draws depends on the phone, the camera, the bitrate, the signal and the heat. No table gets it right for yours, so measure it:</p>
+        <ol class="checklist">
+          <li>Put a USB power meter between the power bank and your phone or backpack. It shows volts, amps and watts.</li>
+          <li>Run a practice stream for 20 minutes with your real settings, outside if that's where you stream.</li>
+          <li>Note the watts. Then divide the bank's usable watt-hours by it.</li>
+        </ol>
+        <p>Say the meter shows 8 W, with a 20,000 mAh bank: 52 to 59 Wh ÷ 8 W is about 6½ to 7½ hours. Plan for less: a phone heats up more easily where the signal is weak, and a phone that gets too hot slows or stops charging.</p>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://www.iata.org/contentassets/05e6d8742b0047259bf3a700bc9d42b9/lithium-battery-guidance-document.pdf">IATA lithium battery guidance</a> (Wh = V × Ah), <a href="https://www.anker.com/uk/blogs/power-banks/20000mah-power-bank-how-many-charges">Anker: how many charges from 20,000 mAh</a> (3.6 to 3.7 V, about 74 Wh, 70 to 80 %), <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung on weak signal and heat</a>, <a href="https://support.apple.com/en-us/118431">Apple: if your iPhone gets too hot</a>. The 52 to 59 Wh and the mAh at 5 V are worked out from Anker's numbers. The 8 W is an example, not a measurement.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="cables" aria-labelledby="cables-h">
+      <h2 id="cables-h">Cables, voltages and plugs</h2>
+      <div class="read">
+        <p>With USB Power Delivery (PD), the power bank and the device agree on a voltage before more power flows. Which voltages a bank or charger offers depends on its power: up to 15 W only 5 V, then 9 V, 15 V and 20 V as the power goes up to 100 W. Above 100 W, up to 240 W, newer chargers add 28, 36 and 48 V.</p>
+        <ul class="bul">
+          <li><strong>Cables:</strong> a standard USB-C cable is rated for 3 A. Up to 5 A needs a cable with a chip that says so (an e-marked cable). At 20 V, 3 A is 60 W, so from 60 to 100 W you need a 5 A cable. Above 100 W, at 28 to 48 V, you need a cable rated for 240 W.</li>
+          <li><strong>Low draw:</strong> some power banks switch off when the device draws very little, for example a small board or a camera at rest. Some banks have a low-current mode for this. Anker says its banks need a device to draw at least 30 to 90 mA to keep going.</li>
+          <li><strong>Plugging in:</strong> some multi-port power banks and USB PD chargers cut their output for a moment when another device is plugged in or unplugged, while they share out the power again. Plug everything in before you go live.</li>
+          <li><strong>Cameras:</strong> many cameras can run from outside power through a dummy battery (a DC coupler) in the battery slot. Sony's USB-C coupler needs a USB PD source of 65 W or more and a 5 A cable.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://www.usb.org/sites/default/files/2021-05/USB%20PG%20USB%20PD%203.1%20DevUpdate%20Announcement_FINAL.pdf">USB-IF: USB PD 3.1</a> (5, 9, 15 and 20 V; 28, 36 and 48 V up to 240 W), the <a href="https://www.usb.org/document-library/usb-power-delivery">USB Power Delivery specification</a> (table 3.1, voltages by power), the <a href="https://www.usb.org/sites/default/files/USB%20Type-C%20Spec%20R2.0%20-%20August%202019.pdf">USB Type-C specification</a> (section 2.4, 3 A and 5 A; release 2.1 adds 240 W cables), <a href="https://service.anker.com/article-description/How-Can-I-Charge-Low-Current-Devices-Such-as-Headphones">Anker: charging low-current devices</a>, <a href="https://service.anker.com/article-description/Anker-737-Power-Bank-Special-Issues-Troubleshooting-FAQs">Anker 737 FAQ</a> (question 9), <a href="https://www.sony.jp/ichigan/products/DC-C1/">Sony DC-C1</a> (in Japanese).</p></details>
+        <aside class="soon-card wip-card" aria-labelledby="power-tips-h">
+          <h3 id="power-tips-h">Tips from other streamers</h3>
+          <ul class="bul">
+            <li>Mark the cables that only charge. They carry no data, so a modem or camera on one doesn't show up.</li>
+            <li>Carry a spare of each cable your setup can't run without.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="part" id="power-or-not" aria-labelledby="power-or-not-h">
+      <h2 id="power-or-not-h">Is it power, or something else?</h2>
+      <div class="read">
+        <p>Power trouble and network trouble can look alike. These signs point to power. They come from streamers' experience, not from a measurement on your setup.</p>
+        <ul class="bul">
+          <li><strong>The phone, board or modem restarts</strong> when the stream starts or the bitrate climbs. The bank or the cable may not keep up with the peak. Try another cable first, then another bank.</li>
+          <li><strong>It shows "charging", but the percentage still falls.</strong> The setup probably uses more than the bank delivers at that voltage. A bank and cable that can deliver more may help.</li>
+          <li><strong>Everything stops after a while in the sun.</strong> Phones slow down or pause charging when they get too hot. See <a href="more.html">Keep the phone going</a>.</li>
+          <li><strong>It only happens in crowds or on the move,</strong> with full power: more likely the network. See <a href="something-wrong.html">Find what broke while you're live</a>.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">The signs are tips from streamers. Heat: <a href="https://support.apple.com/en-us/118431">Apple: if your iPhone gets too hot</a> ("Charging … slows or stops").</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="flying" aria-labelledby="flying-h">
+      <h2 id="flying-h">Taking power banks on a flight</h2>
+      <div class="read">
+        <p class="short-answer"><strong>In short:</strong> power banks go in your carry-on, never in checked bags, with the contacts covered. Take at most two, each at 100 Wh or less. Airlines add rules of their own, so read your airline's page on the day you fly.</p>
+        <ul class="bul">
+          <li><strong>Carry-on only.</strong> Spare batteries and power banks never go in checked bags. If your carry-on is taken at the gate or at the plane, take the power banks out and keep them with you.</li>
+          <li><strong>Cover the contacts,</strong> so nothing can short them.</li>
+          <li><strong>Up to 100 Wh each</strong> needs no approval in the US rules. 101 to 160 Wh needs the airline's approval, at most two spares. For power banks that's going away: see below.</li>
+          <li><strong>Find the watt-hours</strong> printed on the bank. If it shows only mAh, multiply by the cell voltage printed next to it: 20,000 mAh at 3.7 V is 74 Wh. Go by the printed watt-hours when there are any: at a higher cell voltage, fewer mAh already make 100 Wh.</li>
+        </ul>
+        <h3 id="new-rules">New rules since 27 March 2026</h3>
+        <p>The international rules (ICAO) now say, though each country adopts them at its own pace: power banks only in the cabin, at most two per person, no charging the power bank on board, and better not to charge your phone from it on board either. Up to 160 Wh is still allowed with the airline's approval. But IATA says its airline rules drop that for power banks from 1 January 2027, and its guidance to airlines already lists them as forbidden. So treat 100 Wh as the limit.</p>
+        <h3 id="airline-rules">Airlines and countries add their own</h3>
+        <ul class="bul">
+          <li><strong>Emirates,</strong> as announced for 1 October 2025: no using a power bank on board at all. You may carry only one, under 100 Wh, with its rating readable, in the seat pocket or a bag under the seat, not in the overhead bin.</li>
+          <li><strong>China,</strong> on domestic flights since 28 June 2025: no power banks without the CCC (3C) mark, with an unclear one, or from a recalled model or batch.</li>
+          <li class="w"><span class="vh">Watch out: </span>These rules change, and other airlines have their own. Read your airline's page on the day you fly.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://www.faa.gov/hazmat/packsafe/lithium-batteries">FAA PackSafe: lithium batteries</a>, the <a href="https://www.icao.int/sites/default/files/publications/DocSeries/9284_2025_2026_add_01_en.pdf">ICAO Technical Instructions, addendum 1</a> (from 27 March 2026), <a href="https://www.iata.org/contentassets/90f8038b0eea42069554b2f4530f49ea/guidance-to-operators---power-banks.pdf">IATA guidance to operators on power banks</a> (pages 1, 4 and 10), <a href="https://www.mediaoffice.ae/en/news/2025/august/08-08/emirates-makes-changes-to-safety-rules-for-customer-usage-of-power-banks-onboard">Emirates</a>, <a href="https://www.caac.gov.cn/English/News/202507/t20250709_227894.html">CAAC</a>. The mAh to Wh sum uses the formula in the <a href="https://www.iata.org/contentassets/05e6d8742b0047259bf3a700bc9d42b9/lithium-battery-guidance-document.pdf">IATA lithium battery guidance</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="part" id="go-live" aria-labelledby="go-live-h">
+      <h2 id="go-live-h" class="vh">Before you go live</h2>
+      <div class="read">
+        <div class="golive" id="before-you-go-live" role="group" aria-labelledby="power-go-h" data-checklist="guide-power">
+          <h3 id="power-go-h">Before you go live</h3>
+          <p class="golive-count" hidden></p>
+          <ul class="golive-list">
+            <li><label><input type="checkbox" value="0" data-nojs-ok> Your setup's watts measured on a practice stream.</label></li>
+            <li><label><input type="checkbox" value="1" data-nojs-ok> The bank's usable watt-hours cover the stream, with some to spare.</label></li>
+            <li><label><input type="checkbox" value="2" data-nojs-ok> Cables rated for the power: an e-marked 5 A cable above 60 W, a 240 W cable above 100 W.</label></li>
+            <li><label><input type="checkbox" value="3" data-nojs-ok> Everything plugged in before you go live.</label></li>
+            <li><label><input type="checkbox" value="4" data-nojs-ok> On a flight: at most two banks, in your carry-on, contacts covered, 100 Wh or less each, the airline's rules read that day.</label></li>
+          </ul>
+          <p class="golive-note" hidden>Your ticks stay on this device. <button type="button" class="golive-clear">Clear ticks</button></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="part" id="next-steps" aria-labelledby="next-steps-h">
+      <h2 id="next-steps-h">Where next</h2>
+      <div class="read">
+        <ul class="bul">
+          <li><strong><a href="more.html">Keep the phone going</a>:</strong> heat, charging and when a backpack makes sense.</li>
+          <li><strong><a href="build.html">Build your own backpack</a></strong> or <a href="ready-made.html">buy a ready-made one</a>.</li>
+          <li><strong><a href="data-plans.html">Data plans and SIMs</a>:</strong> how much data a stream uses.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

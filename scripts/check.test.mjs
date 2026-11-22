@@ -110,7 +110,8 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the four groups 
   'My home setup fails — PC, power or internet','No signal at all — Far from cell towers',
   'Phone says live, nobody sees it','Picture frozen','No sound or alerts','Second phone or SIM idle',
   'Glossary — IRL terms explained','Help — Guides and app support',
-  'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps']);
+  'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps',
+  "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power, and taking power banks on a flight — Power banks, cables, flights"]);
  assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
 });
 
@@ -356,7 +357,8 @@ test('Help: Guides list the site\'s own pages first, then every IRL Commons guid
  const own=h.slice(h.indexOf('id="g-own"'),h.indexOf('id="g-other"'));
  assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['one-phone.html','second-network.html','hybrid.html','better-picture.html',
   'several-cameras.html','cloud.html','more.html','satellite.html','receiver.html','into-obs.html','build.html','ready-made.html',
-  'live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html','data-plans.html','why-bonding.html']);
+  'live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html','data-plans.html','why-bonding.html',
+  'something-wrong.html','protocols.html','power.html']);
  for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
  const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
  const other=h.slice(h.indexOf('id="g-other"'));
@@ -453,6 +455,23 @@ test("Trying to stream, but something's not working?: four symptom cards, each w
   assert.ok(plain(h).includes('Still stuck? Before you ask for help, note your app and its version'),id);
   assert.ok((h.match(/<h2 class="num"/g)||[]).length>=2,id);
  }
+});
+
+test('Guides G1 to G3: each section with claims ends in its Sources, each has a checklist, Home and Help link them', ()=>{
+ const sourced={'something-wrong.html':['chain','drops'],'protocols.html':['pick','caller-listener','setups','latency'],'power.html':['runtime','cables','power-or-not','flying']};
+ const home=docs.get('index.html');
+ for(const [name,ids] of Object.entries(sourced)){
+  const text=docs.get(name);
+  for(const id of ids){
+   const start=text.indexOf(`<section class="part" id="${id}"`);
+   assert.ok(start>0,`${name}#${id}`);
+   const part=text.slice(start,text.indexOf('</section>',start));
+   assert.ok(/<details class="more fold sources" open><summary>Sources<\/summary><p class="tip-src">[^<]*<a href="https:\/\//.test(part),`${name}#${id} has its Sources`);
+  }
+  assert.ok(text.includes(`data-checklist="guide-${name.replace('.html','')}"`),name);
+  assert.ok(home.includes(`href="${name}"`),`Home links ${name}`);
+ }
+ assert.ok(/Tips from other streamers/.test(docs.get('power.html')));
 });
 
 test('Checked stamps: a date and Report a mistake, only where the last fact-check left nothing open', ()=>{
