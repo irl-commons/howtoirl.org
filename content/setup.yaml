@@ -103,7 +103,7 @@ answers:
           <li>A weak signal makes the phone work harder and get warmer, so a stronger network helps with heat too. <span class="tip-src">Source: <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung</a></span></li>
           <li>Lower the resolution, frame rate or <a class="gl" href="glossary.html#bitrate">bitrate</a> in your app. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a></span></li>
           <li class="w"><span class="vh">Watch out: </span>Charging while streaming adds heat, and heat damages the battery for good. If it gets hot while charging, unplug, let it cool, then charge again. <span class="tip-src">Sources: <a href="https://support.apple.com/en-us/118431">Apple</a>, <a href="https://www.apple.com/batteries/maximizing-performance/">Apple batteries</a>, <a href="https://support.google.com/pixelphone/answer/3333708">Google</a>, <a href="https://www.samsung.com/za/support/mobile-devices/how-to-prevent-the-overheating-of-your-galaxy-device/">Samsung</a></span></li>
-          <li>HEVC (H.265) needs less data than H.264 for the same picture, so the phone uploads less. Check first that your receiver and platform accept it: Kick takes only H.264. <span class="tip-src">Sources: <a href="https://support.google.com/youtube/answer/2853702">YouTube</a>, <a href="https://help.kick.com/en/articles/7066931-how-to-stream-on-kick-com">Kick</a></span></li>
+          <li>HEVC (H.265) can give you the same picture at a lower bitrate. Check that your receiver accepts it. From a phone app, choose H.264 for Twitch or Kick. Twitch uses HEVC for its 1440p streams with Enhanced Broadcasting. <span class="tip-src">Sources: <a href="https://support.google.com/youtube/answer/2853702">YouTube</a>, <a href="https://help.kick.com/en/articles/7066931-how-to-stream-on-kick-com">Kick</a>, <a href="https://blog.twitch.tv/en/2026/06/17/introducing-dual-format-and-2k-streaming-on-twitch/">Twitch</a></span></li>
         </ul>
         <aside class="soon-card wip-card" aria-labelledby="cool-wip-h">
           <h3 id="cool-wip-h">Extra cooling</h3>
@@ -126,6 +126,7 @@ answers:
       - next: '<strong>How long will it run?</strong> <a href="power.html">Power, and taking power banks on a flight</a>.'
 
   - id: one-phone
+    checked: 2026-11-21
     icon: i-phone
     title: One phone is enough
     summary: "A phone with a streaming app has everything a stream needs: camera, mic, mobile data and the app that sends it. Start with it, and add parts only when something stops working."
@@ -149,18 +150,27 @@ answers:
         count: [app, apps]
         select: [{class: phone-app}]
         split: [ios, android]
+        notes:
+          moblin: free and open source for iPhone and iPad, with SRTLA and RIST bonding.
+          irl-pro: an Android streaming app with SRTLA bonding. The maker's product page lists a free bonding service and gives no usage limits for it.
       - title: Good to have
         open: true
         before:
           - A power bank, in case your phone runs empty.
           - "! Unplug it when the phone gets hot: charging adds heat."
-          - "A wireless mic. A lot of people add one for their IRL streams: the phone's own mic picks up wind and crowds, and loses your voice at arm's length."
-          - "! Many mic receivers plug into the phone's charging port. Check that yours lets you charge at the same time."
+          - "Try clipping a wireless mic close to your mouth if your voice gets lost in crowd noise. Use a wind cover outdoors."
+          - "! If the mic receiver plugs into your phone's charging port, check that it can pass power through to the phone while you stream."
     side:
       - next: '<strong>Check your data plan.</strong> An hour at 6 Mbit/s uses about 2.7 GB: <a href="data-plans.html">Data plans and SIMs</a>.'
       - else: '<strong>Choose something else when</strong> crowds, long days or heat end your streams: <a href="#second-network">add a second network</a>, or <a href="#more">think about a backpack</a>.'
+    sources:
+      - {label: "Moblin features", url: "https://github.com/eerimoq/moblin#readme"}
+      - {label: "IRL Pro features", url: "https://irlpro.app/"}
+      - {label: "RØDE Wireless Micro guide", url: "https://rode.com/en-us/user-guides/wireless-micro"}
+      - {label: "DJI Mic Mini: charging through the receiver", url: "https://www.dji.com/support/product/mic-mini"}
 
   - id: second-network
+    checked: 2026-11-21
     icon: i-network
     title: Add a second network
     summary: 'Add a second internet connection on a different mobile network, and let your streaming app use both at once. That''s called <a class="gl" href="glossary.html#bonding">bonding</a>. If one network has a bad moment, the other can carry the stream.'
@@ -182,6 +192,8 @@ answers:
           - 'Use an app that bonds: Moblin, IRL Pro, IRL+ Cast, LifeStreamer, IRLwhatever or TVU Go. See <a href="#one-phone">the phone apps</a>.'
         lead: "Or a helper that bonds for your app or adds spare phones:"
         select: [{role: extra-connections, platforms: [android, ios]}]
+        notes:
+          moblink: uses spare Android phones as extra SRTLA or RIST bonding connections. An iPhone running Moblin can do the same.
         after:
           - "! Without bonding, a hotspot isn't combined with the phone's mobile data."
           - '! SRTLA bonding also needs a <a href="#receiver">receiver</a>. Some apps include one; if yours doesn''t, pick a receiver.'
@@ -191,6 +203,9 @@ answers:
     side:
       - else: '<strong>Choose something else when</strong> you need many networks, or a standalone camera on your back: <a href="#more">think about a backpack</a>.'
       - next: '<strong>Why it works:</strong> <a href="why-bonding.html">Why more than one network?</a>'
+    sources:
+      - {label: "Moblink on Google Play", url: "https://play.google.com/store/apps/details?id=com.eerimoq.moblink"}
+      - {label: "Moblink README", url: "https://github.com/eerimoq/moblink"}
 
   - id: build
     checked: 2026-11-21
@@ -222,6 +237,7 @@ answers:
       - next: '<strong>Picking SIMs?</strong> <a href="data-plans.html">Data plans and SIMs</a>.'
 
   - id: ready-made
+    checked: 2026-11-21
     back: {to: more, label: Build or buy}
     icon: a-ready
     title: A ready-made backpack, with support
@@ -234,18 +250,23 @@ answers:
       - title: Who makes them
         count: [maker, makers]
         select: [{id: [liveu-solo, unlimitedirl, yolobox-ultra, teradek-prism-mobile, tvu-one, haivision-pro, dejero-engo]}]
+        notes:
+          liveu-solo: a live video encoder. It can stream over one connection without a subscription. Joining multiple connections (LRT bonding) needs a subscription.
         also:
           - "Many charge a monthly fee for their bonding service on top of the device. Ask what it includes: data, the service, or both."
     side:
       - else: '<strong>Choose something else when</strong> your phone already does what you need but the connection drops: <a href="#second-network">add a second network</a>.'
+    sources:
+      - {label: "LiveU Solo: when you need LRT", url: "https://solohelp.liveu.tv/hc/en-us/articles/17985402380827-Getting-Started-With-Solo-Stream-Tools"}
 
   - id: better-picture
+    checked: 2026-11-21
     icon: s-camera
     title: A standalone camera
     summary: "A mirrorless camera or DSLR gives a cleaner picture in low light, optical zoom and a soft background. An action camera is small, wide and steady. Either hands its picture over HDMI, USB or Wi-Fi to something that streams it: your phone, a backpack, or a box on the camera."
     checklist:
       - "Camera powered for the whole stream: USB-C power or a dummy battery."
-      - "Auto power-off turned off, and a run at home as long as the stream."
+      - "Idle auto power-off turned off, and a test run as long as the stream."
       - "Clean HDMI on, so viewers don't see focus boxes and icons."
       - "Your app or backpack uses the mic you picked."
       - "Picture and sound in sync in a test."
@@ -256,13 +277,13 @@ answers:
         before:
           - "<strong>Power.</strong> The camera has to run for the whole stream. Some run from USB-C power; others need a dummy battery, a battery-shaped adapter on a cable to a power bank."
           - "! A capture adapter draws from the phone, so the phone empties faster."
-          - "! <strong>Heat.</strong> Some cameras get too hot and switch themselves off, sooner in the sun. Run yours at home for as long as you plan to stream, and turn off auto power-off."
+          - "! <strong>Heat.</strong> Some cameras shut down if they get too hot. GoPro recommends shade and airflow. Test yours for as long as you plan to stream. Turn off any idle auto power-off timer."
           - "! <strong>Clean picture.</strong> Look for \"clean HDMI\" in the camera's menu or specs. Without it, viewers see the camera's focus boxes and icons."
           - "<strong>Hands.</strong> Filming, talking and reading chat at once is hard. An action camera, or a phone, on a chest mount keeps your hands free. A bigger camera needs a mount, a gimbal or someone to run it."
           - "<strong>Sound into the camera.</strong> The mic plugs into the camera, and the sound travels with the picture over HDMI, in sync."
           - "! Check that your app or backpack uses the camera's sound. Not all do."
           - "<strong>Sound into the phone or backpack.</strong> A USB mic or audio adapter plugs into the phone or the backpack. Easy to swap mics."
-          - "! The picture arrives later than the sound on this route, so set an audio delay in the app or backpack."
+          - "! Check picture and sound in a test recording. If they are out of sync, delay whichever arrives first, where your app or mixer offers that setting."
       - title: Into your phone
         count: [app, apps]
         select: [{class: phone-app, tags: camera-in}]
@@ -286,8 +307,12 @@ answers:
     side:
       - else: '<strong>Choose something else when</strong> the picture is fine but heat or the battery ends it: <a href="#more">the phone gives up</a>.'
       - next: '<strong>Next:</strong> to show the camera and your phone together, see <a href="#several-cameras">several cameras</a>.'
+    sources:
+      - {label: "GoPro: camera heat, sunlight and airflow", url: "https://community.gopro.com/s/article/HERO11-Black-Camera-Is-Too-Hot?language=en_US"}
+      - {label: "OBS: delay the picture (Render Delay)", url: "https://obsproject.com/kb/render-delay-filter"}
 
   - id: several-cameras
+    checked: 2026-11-21
     icon: s-multicam
     title: Several cameras in one scene
     summary: "Something has to put the pictures together: an app on the phone, OBS on a PC or server, a hub in the cloud, or a box in your backpack."
@@ -318,17 +343,22 @@ answers:
         select: [{class: cloud, tags: multi-camera}]
         notes:
           irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and drop protection.
+          irltoolkit: cloud OBS with overlays and drop protection. The Advanced plan ($179/month) offers more than one input on request.
       - title: In the backpack
         count: [add-on, add-ons]
         pre: When you mix while you're out.
         select: [{class: parts, tags: multi-camera}]
     after:
-      - "! Each phone or camera arrives with its own delay. Line them up where you mix, before you go live."
+      - "! The feeds can arrive at different times. Before going live, compare them where you mix and add delay to the feeds that arrive early."
       - "! Each feed brings its own sound. Take the audio from one and mute the others, or viewers hear echoes."
     side:
       - else: '<strong>Choose something else when</strong> you switch between places instead of showing them together: <a href="#hybrid">Desktop and IRL</a>.'
+    sources:
+      - {label: "IRLToolkit: line up incoming feeds (Syncing Ingests)", url: "https://kb.irltoolkit.com/cloudobs/7-Advanced/sync-ingests"}
+      - {label: "IRLToolkit plans", url: "https://irltoolkit.com/pricing"}
 
   - id: cloud
+    checked: 2026-11-21
     icon: a-cloud
     title: Move the hub to the cloud
     summary: With the hub on a rented server, your away stream keeps running even if the PC, power or internet at home fails. The hub is OBS on that server, or a hosted service.
@@ -341,7 +371,8 @@ answers:
       - title: Cloud hubs
         select: [{class: cloud}, {id: [obs-studio, noalbs-tool]}]
         notes:
-          irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and disconnect protection.
+          irlhosting: cloud OBS servers for IRL streamers, with SRTLA bonding and drop protection.
+          irltoolkit: cloud OBS with overlays and drop protection. The Advanced plan ($179/month) offers more than one input on request.
           obs-studio: " on a server you rent: the OBS you know."
         also:
           - The server or the hosted service costs a monthly fee; OBS itself is free.
@@ -350,8 +381,11 @@ answers:
     side:
       - else: "<strong>Choose something else when</strong> most of your streams are at your desk and your PC is reliable."
       - next: '<strong>Next:</strong> if your hub runs OBS, <a href="#into-obs">get the stream into OBS</a>.'
+    sources:
+      - {label: "IRLToolkit plans", url: "https://irltoolkit.com/pricing"}
 
   - id: hybrid
+    checked: 2026-11-21
     icon: a-hybrid
     title: Desktop and IRL in one stream
     summary: 'To switch between desktop and IRL without ending your stream, send both to a <strong><a class="gl" href="glossary.html#hub">hub</a></strong>: a server or an OBS instance that lets you switch between different sources. Only the hub goes live on Twitch, YouTube or Kick.'
@@ -391,7 +425,7 @@ answers:
         select: [{id: [irlhosting, irltoolkit, obs-studio]}]
         notes:
           irlhosting: '<a class="gl" href="glossary.html#cloud-obs">cloud OBS</a> servers, with SRTLA bonding and <a class="gl" href="glossary.html#drop-protection">drop protection</a>.'
-          irltoolkit: cloud production with overlays and drop protection. Desk plus phone needs the plan with several inputs.
+          irltoolkit: cloud OBS with overlays and drop protection. For desk and phone, request a second input on the Advanced plan ($179/month).
           obs-studio: " on a server you rent: the OBS you know. You can import your scene collection from home."
         after:
           - "! Going live in your app only feeds the hub. Before your first stream, check how your hub goes live on the platform, and whether its input has to be switched on."
@@ -429,8 +463,11 @@ answers:
     side:
       - else: '<strong>Choose something else when</strong> you want desk and phone on screen at the same time: <a href="#several-cameras">several cameras</a>.'
       - next: '<strong>Next:</strong> a phone that bonds sends to a <a href="#receiver">receiver</a> first, and the hub takes the stream from there. Most hosted hubs include one.'
+    sources:
+      - {label: "IRLToolkit plans", url: "https://irltoolkit.com/pricing"}
 
   - id: receiver
+    checked: 2026-11-21
     back: history
     icon: i-receiver
     title: A receiver for your bonded stream
@@ -452,13 +489,18 @@ answers:
         open: true
         pre: Free software, but you look after the server.
         select: [{class: bonding, hosting: self}]
+        notes:
+          irl-srt-server: serves the stream and exposes stats over HTTP. Pair it with an SRTLA receiver to join the bonded links.
         after:
           - "! It needs a server, or a PC at home that your phone or backpack can reach from the internet. At home that means port forwarding, which some internet connections don't allow."
     side:
       - next: '<strong>Next:</strong> <a href="#into-obs">get the stream into OBS</a>.'
       - next: '<strong>Which protocol?</strong> <a href="protocols.html">RTMP, SRT or SRTLA</a>, caller and listener, and SRT latency.'
+    sources:
+      - {label: "irl-srt-server README", url: "https://github.com/irlserver/irl-srt-server"}
 
   - id: into-obs
+    checked: 2026-11-21
     back: history
     icon: a-chain
     title: Into OBS
@@ -468,7 +510,7 @@ answers:
       - "A source made for IRL, which reconnects on its own."
       - "A BRB scene."
       - "Scene switcher set to the receiver's stats URL."
-      - "Only one automatic switcher on this OBS."
+      - "One tool in charge of automatic scene changes for this feed."
       - "Test: cut the feed, see BRB, and see the stream come back."
     blocks:
       - title: In OBS
@@ -478,11 +520,16 @@ answers:
           - A scene switcher like {noalbs-tool} shows your BRB scene when the bitrate drops, and switches back when it recovers.
           - Make a BRB scene, then cut a test feed to check the switch away and back.
           - '! The switcher reads the receiver''s <a class="gl" href="glossary.html#stats-url">stats URL</a>, which isn''t the address OBS plays.'
-          - "! Use one automatic switcher per OBS: two fight over the scenes."
+          - "! Give one tool control of automatic scene changes for this feed."
       - title: Hosted drop protection
         count: [service, services]
         pre: "These switch to BRB for you. Pick one that works with your OBS to keep your scenes, or one that runs the whole show if you don't want OBS."
         select: [{class: cloud}]
+        notes:
+          irltoolkit: cloud OBS with overlays and drop protection. The Advanced plan ($179/month) offers more than one input on request.
+    sources:
+      - {label: "NOALBS README", url: "https://github.com/NOALBS/nginx-obs-automatic-low-bitrate-switching"}
+      - {label: "IRLToolkit plans", url: "https://irltoolkit.com/pricing"}
 
   - id: satellite
     checked: 2026-11-21
@@ -597,7 +644,7 @@ answers:
       - title: Check the connection itself
         before:
           - "Turn off any VPN on the phone that gives the connection. Your receiver has to be reachable over it."
-          - "! With SRTLA, your app stops using a connection when the receiver hasn't answered on it for about 4 seconds."
+          - "! A sender can stop using a link if the receiver stops answering. The BELABOX SRTLA sender waits about 4 to 5 seconds. Other apps can use a different timeout."
           - 'A hotspot from an Android phone: in Moblin, turn off <a class="gl" href="glossary.html#big-packets">Big packets</a> in the stream''s SRT settings. Moblin notes that some Android hotspots don''t work with them.'
           - "A spare phone with Moblink: turn off energy saving on that phone, and allow Moblink's notifications."
     after:

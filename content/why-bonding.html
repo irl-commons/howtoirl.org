@@ -210,7 +210,7 @@
           <li><strong>Room on each link:</strong> for every link, the sender counts the packets that are on their way and not yet confirmed. It also keeps a window, a guess of how many packets that link can carry. Each new packet goes to the link with the most free room in its window.</li>
           <li><strong>Confirmations:</strong> the receiver confirms packets on the link they came in on. A link whose packets keep getting confirmed gets a bigger window.</li>
           <li><strong>Losses:</strong> when the receiver reports a lost packet, the window of the link that carried it shrinks. So a link that gets worse quickly gets fewer packets.</li>
-          <li><strong>A silent link:</strong> if a link sends nothing back for 4 seconds, the sender leaves it out until it answers again.</li>
+          <li><strong>A silent link:</strong> after about 4 to 5 seconds without a reply, the BELABOX sender leaves the link out until it reconnects. An idle link can still answer a small test packet (keepalive).</li>
           <li><strong>Order and resends</strong> are SRT's job. Every packet has a number, so the SRT receiver can put them in order and ask for the missing ones. SRTLA itself doesn't control the bitrate. Your app has to lower it when all links get weak (<a href="glossary.html#adaptive-bitrate">adaptive bitrate</a>).</li>
         </ul>
         <p>This is how the BELABOX SRTLA sender works. Other apps that speak SRTLA may balance their links a little differently.</p>
@@ -260,7 +260,7 @@
       </div>
     </section>
 
-    <section class="part" id="limits" aria-labelledby="limits-h">
+    <section class="part" id="limits" aria-labelledby="limits-h" data-checked="2026-11-21">
       <h2 id="limits-h">The limits</h2>
       <div class="read">
         <div class="why-step">
@@ -330,10 +330,10 @@
           <div class="why-text">
             <h3 id="heat-power">More modems need more power and cooling</h3>
             <p>Every phone or modem uses power and gets warm while it sends, more so with a weak signal. Two phones or four modems drain a battery faster, and in a backpack the heat has to get out. <a href="more.html#cool-h">Tips to keep a phone cool.</a></p>
-            <p>Keep modems and their antennas apart, and watch the USB cables. A fast USB 3 link gives off radio noise that can make a modem next to it hear the tower worse. On my test setup, setting a modem's USB to the slower USB 2 speed made its signal clearer. A bonding link doesn't need more than USB 2.</p>
+            <p>Keep antennas away from USB 3 ports and cables. A USB 3 connection can give off radio noise around 2.4 GHz, which can weaken nearby Wi-Fi and Bluetooth reception.</p>
           </div>
         </div>
-        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">The <a href="https://vbn.aau.dk/ws/files/271964824/ICC2018.pdf">Danish drive test (ICC 2018)</a>, with two phones on the same network; the extra data as in <a href="data-plans.html#overhead">What the extra is</a>; <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">a phone maker on weak signal and heat</a>; <a href="https://www.usb.org/sites/default/files/327216.pdf">Intel's paper on USB 3 radio noise</a> (it measured Wi-Fi and Bluetooth; the effect on a mobile modem is from my own tests: clear on one band, small or none on two others)</p></details>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">The <a href="https://vbn.aau.dk/ws/files/271964824/ICC2018.pdf">Danish drive test (ICC 2018)</a>, with two phones on the same network. The extra data is explained in <a href="data-plans.html#overhead">What the extra is</a>. See also <a href="https://www.samsung.com/in/support/mobile-devices/what-to-do-when-your-samsung-galaxy-device-heats-up-while-in-use/">Samsung on weak signal and heat</a> and <a href="https://www.usb.org/sites/default/files/327216.pdf">Intel on USB 3 noise at 2.4 GHz</a>.</p></details>
       </div>
     </section>
 

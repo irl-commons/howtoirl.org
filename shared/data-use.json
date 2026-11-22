@@ -48,8 +48,8 @@
   "srtla": {
     "ack_bytes": 72,
     "ack_every_packets": 10,
-    "keepalive_kbps": 0.304,
-    "why": "The SRTLA receiver confirms every 10 packets on a link with a 44-byte packet (72 bytes with UDP and IP); a 10-byte keepalive once a second per link, echoed back"
+    "keepalive_kbps": 0.24,
+    "why": "The BELABOX SRTLA receiver confirms every 10 data packets on a link with a 44-byte reply (72 bytes with UDP and IPv4). The idle-link budget is one two-byte keepalive per second, echoed back (30 bytes each way with headers)."
   },
   "mp4": {
     "fixed_kbps": 7,

@@ -124,7 +124,7 @@ test('Answer blocks are collapsible, with the first one open; step-by-step answe
   assert.deepEqual(blocks.map(b=>!!b[1]),open[m[1]]||blocks.map((_,i)=>i===0),m[1]);
  }
  const hybrid=answerHtml(text,'hybrid');
- assert.ok(hybrid.startsWith('<section class="step result steps" id="hybrid"')&&!hybrid.includes('<details'));
+ assert.ok(hybrid.startsWith('<section class="step result steps" id="hybrid"')&&!hybrid.includes('<details class="block"'));
 });
 
 const answerHtml=(_text,id)=>docs.get(`${id}.html`).match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
@@ -159,7 +159,7 @@ test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in a
  const all=plain(text);
  for(const line of ['! Keep the stream key secret. Anyone who has it can go live on your channel.',
   '! On YouTube, switch on live streaming a day early. The first time can take up to 24 hours.',
-  "! Many mic receivers plug into the phone's charging port. Check that yours lets you charge at the same time.",
+  "! If the mic receiver plugs into your phone's charging port, check that it can pass power through to the phone while you stream.",
   'A power bank, in case your phone runs empty. ! Unplug it when the phone gets hot: charging adds heat.',
   '! Coming back: switch to the desktop scene first, then stop the phone app. The other way round, viewers see a frozen picture or BRB.',
   "! Check that your app or backpack uses the camera's sound. Not all do."])
@@ -304,7 +304,7 @@ test('Round 4: titles, summaries, steps, lead lines and side lines of the nine a
  assert.ok(plain(more).includes('Extra cooling Tips from other streamers:')&&!more.includes("I haven't tested")&&!more.includes('Work in progress'));
  assert.equal((more.match(/class="tip-src"/g)||[]).length,5);
  const obs=plain(answerHtml(text,'into-obs'));
- assert.ok(obs.includes('OBS IRL Source or Smooth Media Source (Windows), reconnects on its own.')&&obs.includes('two fight over the scenes')&&!obs.includes('Choose something else'));
+ assert.ok(obs.includes('OBS IRL Source or Smooth Media Source (Windows), reconnects on its own.')&&obs.includes('Give one tool control of automatic scene changes for this feed.')&&!obs.includes('Choose something else'));
 });
 
 test('Site copy says receiver; relay is only another name in the glossary and part of product names', ()=>{
@@ -477,15 +477,15 @@ test('Guides G1 to G3: each section with claims ends in its Sources, each has a 
 test('Checked stamps: a date and Report a mistake, only where the last fact-check left nothing open', ()=>{
  const line=/<p class="stamp">Checked <time datetime="(\d{4}-\d\d-\d\d)">\d{1,2} [A-Z][a-z]+ \d{4}<\/time> · <a href="contact.html">Report a mistake<\/a><\/p>/g;
  const stamped=name=>[...docs.get(name).matchAll(line)].length;
- assert.equal(stamped('data-plans.html'),7);
- assert.equal(stamped('why-bonding.html'),2);
- for(const id of ['more','build','satellite']) assert.equal([...answerHtml(docs.get('index.html'),id).matchAll(line)].length,1,id);
+ assert.equal(stamped('data-plans.html'),10);
+ assert.equal(stamped('why-bonding.html'),3);
+ // The four symptom answers have no date yet.
+ const unstamped=['live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html'];
+ for(const [name] of answerPages())assert.equal(stamped(name),unstamped.includes(name)?0:1,name);
  for(const [name,text] of docs){
   assert.ok(!text.includes('data-checked='),name);
   assert.equal((text.match(/class="stamp"/g)||[]).length,[...text.matchAll(line)].length,name);
  }
- // Sections with an open finding stay unstamped until it is fixed.
- for(const id of ['upload','data','maker-data']) assert.ok(!new RegExp(`id="${id}"[^>]*>\\s*<h2(?:(?!</h2>)[\\s\\S])*</h2>\\s*<p class="stamp"`).test(docs.get('data-plans.html')),id);
 });
 
 test('Before you go live: a checklist on every answer but the symptom checks, that ticks without script', ()=>{
