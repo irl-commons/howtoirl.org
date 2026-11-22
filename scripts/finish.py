@@ -1,4 +1,5 @@
-"""Runs after `astro build`: every built page in dist/ links the addresses pages are served at, without ".html".
+"""Runs after `astro build`: every built page in dist/ links the addresses pages are served at, without ".html", from
+the site root, so a page in a folder (dist/fix/picture-frozen.html) finds its links and assets too.
 
 Content, components and page metadata keep writing `phone-setup.html`; this rewrites the finished HTML once, so links,
 the canonical and og:url, alternate languages and the "Suggest an edit" address all lose their ".html"

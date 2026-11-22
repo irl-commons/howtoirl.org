@@ -29,7 +29,8 @@ def first_sentence(t: str) -> str:
 
 def home_cards(setup: dict) -> dict:
     """The Home page cards by the page they open, for their drawing and line."""
-    return {c['href'] if c.get('href') else f'{c["to"]}.html': c for g in setup['groups'] for c in g['cards']}
+    from setup import page  # scripts/setup.py, which knows the folder each answer page is in
+    return {c['href'] if c.get('href') else page(c['to']): c for g in setup['groups'] for c in g['cards']}
 
 
 def card(name: str, meta: dict, body: str, cards: dict, domain: str) -> dict:
@@ -56,7 +57,8 @@ def site_card(home: dict, domain: str, name: str) -> dict:
 
 
 def image_of(name: str, meta: dict) -> str:
-    return SITE_CARD if meta.get('share') == 'site' else f'assets/share/{name.removesuffix(".html")}.png'
+    # A page in a folder gets a flat file name: fix/picture-frozen.html -> assets/share/fix-picture-frozen.png.
+    return SITE_CARD if meta.get('share') == 'site' else f'assets/share/{name.removesuffix(".html").replace("/", "-")}.png'
 
 
 def version(image: str) -> str:

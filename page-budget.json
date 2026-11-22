@@ -3,127 +3,139 @@
  "pages": {
   "index.html": {
    "html": 33792,
-   "total": 243712
+   "total": 245760
   },
   "one-phone.html": {
    "html": 34816,
-   "total": 244736
+   "total": 246784
   },
   "second-network.html": {
    "html": 32768,
-   "total": 242688
+   "total": 244736
   },
   "hybrid.html": {
    "html": 38912,
-   "total": 248832
+   "total": 249856
   },
   "better-picture.html": {
    "html": 34816,
-   "total": 244736
+   "total": 246784
   },
   "several-cameras.html": {
    "html": 32768,
-   "total": 242688
+   "total": 243712
   },
   "cloud.html": {
    "html": 31744,
-   "total": 240640
+   "total": 242688
   },
   "more.html": {
    "html": 32768,
-   "total": 242688
+   "total": 244736
   },
   "satellite.html": {
    "html": 29696,
-   "total": 239616
+   "total": 241664
   },
   "receiver.html": {
    "html": 31744,
-   "total": 241664
+   "total": 243712
   },
   "into-obs.html": {
    "html": 31744,
-   "total": 241664
+   "total": 243712
   },
   "build.html": {
    "html": 30720,
-   "total": 240640
+   "total": 242688
   },
   "ready-made.html": {
    "html": 30720,
-   "total": 240640
+   "total": 242688
   },
-  "live-not-on-platform.html": {
-   "html": 30720,
-   "total": 240640
-  },
-  "picture-frozen.html": {
+  "fix.html": {
    "html": 29696,
-   "total": 239616
+   "total": 241664
   },
-  "no-sound-or-alerts.html": {
+  "fix/live-not-on-platform.html": {
    "html": 30720,
-   "total": 240640
+   "total": 242688
   },
-  "second-link-idle.html": {
+  "fix/picture-frozen.html": {
    "html": 29696,
-   "total": 239616
+   "total": 241664
+  },
+  "fix/no-sound-or-alerts.html": {
+   "html": 30720,
+   "total": 242688
+  },
+  "fix/second-link-idle.html": {
+   "html": 30720,
+   "total": 241664
   },
   "help.html": {
-   "html": 108544,
-   "total": 331776
+   "html": 107520,
+   "total": 332800
   },
   "glossary.html": {
-   "html": 79872,
-   "total": 289792
+   "html": 80896,
+   "total": 292864
   },
   "data-plans.html": {
    "html": 87040,
-   "total": 296960
+   "total": 299008
   },
   "why-bonding.html": {
-   "html": 67584,
-   "total": 277504
+   "html": 68608,
+   "total": 279552
   },
   "something-wrong.html": {
-   "html": 41984,
-   "total": 251904
+   "html": 43008,
+   "total": 253952
   },
   "protocols.html": {
-   "html": 43008,
-   "total": 252928
+   "html": 44032,
+   "total": 254976
   },
   "power.html": {
    "html": 43008,
-   "total": 252928
+   "total": 254976
   },
   "phone-setup.html": {
-   "html": 60416,
-   "total": 270336
+   "html": 61440,
+   "total": 272384
+  },
+  "tips.html": {
+   "html": 25600,
+   "total": 236544
+  },
+  "tips/twitch-test-mode.html": {
+   "html": 27648,
+   "total": 239616
   },
   "links.html": {
-   "html": 90112,
-   "total": 306176
+   "html": 91136,
+   "total": 308224
   },
   "contact.html": {
-   "html": 9216,
-   "total": 219136
+   "html": 10240,
+   "total": 222208
   },
   "legal-notice.html": {
-   "html": 10240,
-   "total": 220160
+   "html": 11264,
+   "total": 222208
   },
   "impressum.html": {
-   "html": 10240,
-   "total": 220160
+   "html": 11264,
+   "total": 222208
   },
   "privacy.html": {
    "html": 15360,
-   "total": 225280
+   "total": 227328
   },
   "datenschutz.html": {
    "html": 16384,
-   "total": 225280
+   "total": 228352
   }
  },
  "assets": {
@@ -134,6 +146,6 @@
   "assets/fonts/ibm-plex-mono-latin-600-normal.woff2": 18432,
   "assets/links-filters.css": 6144,
   "assets/site.js": 66560,
-  "assets/style.css": 144384
+  "assets/style.css": 145408
  }
 }

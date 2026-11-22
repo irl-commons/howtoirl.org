@@ -1,5 +1,5 @@
 """Render catalogue slots from the pinned upstream package before Astro builds."""
-import json, pathlib, sys, re
+import json, pathlib, sys, re, html
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'shared'))
 import render as r
@@ -29,7 +29,7 @@ def finish(body):
  def cross(match):
   page=match[1]
   return match[0] if page in cfg['pages'] else f'href="https://{other}/{page}'
- body=re.sub(r'href="([a-z0-9-]+\.html)',cross,body)
+ body=re.sub(r'href="((?:[a-z0-9-]+/)*[a-z0-9-]+\.html)',cross,body)
  # Each navigation needs a distinct accessible name. Keep the authored label;
  # only a label that repeats on the page gets "part 2", "part 3" and so on.
  seen={}
@@ -40,16 +40,26 @@ def finish(body):
  body=re.sub(r'<nav[^>]+aria-label="([^"]+)"',landmark,body)
  body=re.sub(r'<nav(?![^>]*aria-label)([^>]*)>',lambda m: '<nav aria-label="Steps '+str(m.start())+'"'+m[1]+'>',body)
  return r.add_permalinks(body)
+# Pages in folders (content/tips/x.html) keep the folder: tips/x.html, served at /tips/x. Links in them are written
+# from the site root, like everywhere else (shared/addresses.py).
+authored_meta=setup_answers.load_yaml(ROOT/'src/pages.yaml')
+def tips_html():
+ tips=[(n,m) for n,m in authored_meta.items() if n.startswith('tips/')]
+ return '<ul class="tip-list">\n      '+'\n      '.join(
+  f'<li><a href="{n}">{html.escape(m["title"].removesuffix(" · How to IRL"))}</a><span>{html.escape(m["description"])}</span></li>'
+  for n,m in tips)+'\n    </ul>'
 rendered={}
-for src in (ROOT/'content').glob('*.html'):
+for src in sorted((ROOT/'content').rglob('*.html')):
  body=src.read_text()
+ if '<!--tips-->' in body:
+  body=body.replace('<!--tips-->',tips_html())
  body=setup_answers.fill(body,setup,data['services'])
  body=r.fill_words(body,glossary_words)
  body=r.fill_standards(body,data['standards'],data['services'],data['words'])
  body=r.fill_services(body,data['services'])
  body=r.fill_calc(body,r.datause.load_model())
  body=setup_answers.stamp_sections(body)
- rendered[src.name]=finish(body)
+ rendered[src.relative_to(ROOT/'content').as_posix()]=finish(body)
 # Each answer is a page of its own, with its own title, description and share image.
 answer_pages=setup_answers.answer_pages(setup,data['services'])
 missing=[n for n in answer_pages if n not in cfg['pages']]
@@ -62,7 +72,7 @@ answer_meta=setup_answers.answer_meta(setup)
 (ROOT/'.generated/answer-pages.json').write_text(json.dumps(answer_meta,ensure_ascii=False))
 # Every page gets its link preview tags and share image (scripts/share.py, src/components/Head.astro,
 # scripts/share-images.mjs).
-authored=[{'name':n,**m} for n,m in setup_answers.load_yaml(ROOT/'src/pages.yaml').items()]
+authored=[{'name':n,**m} for n,m in authored_meta.items()]
 (ROOT/'.generated/share.json').write_text(json.dumps(share.manifest(authored+answer_meta,rendered,setup,cfg),ensure_ascii=False,indent=1))
 # The sitemap lists every page in site.json.
 (ROOT/'public/sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

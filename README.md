@@ -46,16 +46,20 @@ selects by that tag, or when a note's service has left its block. A daily job
 every check and opens a pull request.
 
 Each answer is a page of its own, `<answer id>.html` at `/<answer id>`, with the home page's header and footer and its own
-title and description. A new answer needs its page in `site.json` (the build stops without it).
+title and description. An answer with `dir: fix` is a problem page instead, `fix/<answer id>.html` at
+`/fix/<answer id>`, listed on `/fix`. A new answer needs its page in `site.json` (the build stops without it).
+Tips (`content/tips/<name>.html`, at `/tips/<name>`) are listed on `/tips` from their entries in `src/pages.yaml`.
 Old links to an answer on the home page (`/#second-network`) still land.
 
 ## Addresses
 
 Pages are built as files (`phone-setup.html`) and served without the extension: `https://howtoirl.org/phone-setup`,
 the home page at `/`. An old address ending in `.html`, and `/index`, answers with a permanent redirect (301) to the
-clean one, query kept, so existing links keep working. Content and components may still link `phone-setup.html#step`:
-after `astro build`, `scripts/finish.py` runs `shared/addresses.py` over the finished pages, so every link, canonical
-and edit address for a page of either site is written without `.html`. The sitemap and share cards use the same
+clean one, query kept, so existing links keep working. Content and components may still link `phone-setup.html#step`
+and `assets/style.css`, written as seen from the site root, also on a page in a folder: after `astro build`,
+`scripts/finish.py` runs `shared/addresses.py` over the finished pages, so every link, canonical and edit address for a
+page of either site is written without `.html`, and every link and asset starts at the root (`/phone-setup`,
+`/assets/style.css`), so pages work at any depth. The sitemap and share cards use the same
 addresses, and `npm test` fails if a page links an old address. `npm run serve` serves and redirects the same way as
 the host, and the deploy check fetches each page at its clean address and its redirect from the old one.
 

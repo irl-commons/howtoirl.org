@@ -13,9 +13,13 @@ const config=JSON.parse(await readFile('site.json','utf8'));
 const docs=new Map(await Promise.all(config.pages.map(async name=>[name,await readFile(path.join(root,name),'utf8')])));
 const ids=text=>new Set([...text.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
 const decode=s=>s.replaceAll('&amp;','&');
-// Pages are files x.html served at /x, the home page at /; links use those addresses (shared/addresses.py).
+// Pages are files x.html served at /x, the home page at /; links use those addresses from the site root, so a page in a
+// folder (fix/x.html at /fix/x) works too (shared/addresses.py).
 const addr=name=>name==='index.html'?'':name.replace(/\.html$/,'');
-const link=name=>addr(name)||'./';
+const link=name=>'/'+addr(name);
+// Answers in a folder: the problem answers are at fix/<id>.
+const FIX=['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle'];
+const answerFile=id=>FIX.includes(id)?`fix/${id}.html`:`${id}.html`;
 const fileOf=value=>{const p=value.replace(/^\.?\//,'');return !p?'index.html':/\.[a-z0-9]+$/.test(p)?p:`${p}.html`;};
 test('Every page has its canonical URL, metadata, one h1 and unique ids',()=>{
  for(const [name,text] of docs){
@@ -69,6 +73,8 @@ test('Every page has complete link preview tags and a current 1200x630 share ima
 test('Local links and fragments resolve',async()=>{
  for(const [name,text] of docs)for(const match of text.matchAll(/(?:href|src)="([^\"]+)"/g)){
   const value=decode(match[1]);if(/^(https?:|mailto:|tel:)/.test(value))continue;
+  // From the site root, so the same link works on a page in a folder.
+  assert.ok(/^[\/#?]/.test(value)&&!value.startsWith('//'),`${name}: ${value} is relative; links and assets start at the site root`);
   const [file,hash]=value.split('#');const target=file?fileOf(file):name;
   assert.ok(!target.includes('..'),value);
   assert.ok(!/\.html$/.test(file||''),`${name}: ${value} links an old .html address; link the page without .html`);
@@ -172,7 +178,7 @@ test('Answer blocks are collapsible, with the first one open; step-by-step answe
  assert.ok(hybrid.startsWith('<section class="step result steps" id="hybrid"')&&!hybrid.includes('<details class="block"'));
 });
 
-const answerHtml=(_text,id)=>docs.get(`${id}.html`).match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
+const answerHtml=(_text,id)=>docs.get(answerFile(id)).match(new RegExp(`<section class="step [a-z ]+" id="${id}"[\\s\\S]*?<\\/section>`))[0];
 const answerPages=()=>[...docs].filter(([f,t])=>t.includes('class="wrap page fits-page answer-page"'));
 const allAnswers=()=>answerPages().map(([,t])=>t).join('\n');
 const plain=(html)=>html.replace(/<span class="vh">Watch out: <\/span>/g,'! ').replace(/<a class="permalink"[^>]*>#<\/a>/g,'').replace(/<[^>]+>/g,'').replaceAll('&nbsp;',' ').replaceAll('&#39;',"'").replaceAll('&quot;','"').replaceAll('&amp;','&').replace(/\s+/g,' ').trim();
@@ -188,7 +194,7 @@ test('Desktop and IRL: one opening, five numbered steps, the home/cloud chooser 
  const remote=h.slice(h.indexOf('Switch scenes while you are away'),h.indexOf('During the stream'));
  assert.deepEqual([...remote.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m=>m[1]),['IRL+ Chat','IRLwhatever','Moblin','NOALBS','NOALBS Cloud','OBS Blade','Streamer.bot']);
  assert.ok(!h.includes('SimpleStreamer')&&!h.includes('NoDrop')&&!/two starts/i.test(h));
- for(const w of ['hub','scene','brb','relay','cloud-obs','drop-protection']) assert.ok(h.includes(`class="gl" href="glossary#${w}"`),w);
+ for(const w of ['hub','scene','brb','relay','cloud-obs','drop-protection']) assert.ok(h.includes(`class="gl" href="/glossary#${w}"`),w);
 });
 
 test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in all three answers', ()=>{
@@ -294,15 +300,15 @@ assert 'is tagged scene-control, but no block' in run(lambda s, sv: block(s, 'hy
 test('Answers: exactly one back link at the top that names where it goes, no steps or bottom nav', ()=>{
  const text=allAnswers();
  assert.ok(!/class="(?:steps|step-bar|step-nav|back-to)"/.test(text)&&!text.includes('Back to:'));
- const want={'more':['./','All starting points'],'build':['more','Build or buy'],'ready-made':['more','Build or buy'],
-  'receiver':['./','Back'],'into-obs':['./','Back']};
+ const want={'more':['/','All starting points'],'build':['/more','Build or buy'],'ready-made':['/more','Build or buy'],
+  'receiver':['/','Back'],'into-obs':['/','Back'],...Object.fromEntries(FIX.map(id=>[id,['/fix','All problems']]))};
  const found=[...text.matchAll(/<section class="step (?:result|question)(?: steps)?" id="([^"]+)"[\s\S]*?<\/section>/g)];
  assert.ok(found.length>=10);
  for(const m of found){
   const links=[...m[0].matchAll(/<p class="go-back"><a href="([^"]+)"( data-back="history")?><span aria-hidden="true">←<\/span>([^<]+)<\/a><\/p>/g)];
   assert.equal(links.length,1,m[1]);
   assert.ok(m[0].indexOf('class="go-back"')<m[0].indexOf('class="result-head"'),m[1]);
-  const [href,label]=want[m[1]]||['./','All starting points'];
+  const [href,label]=want[m[1]]||['/','All starting points'];
   assert.deepEqual([links[0][1],links[0][3]],[href,label],m[1]);
   assert.equal(!!links[0][2],label==='Back',m[1]);
   assert.ok(m[0].includes('Link to send')||m[1]==='more',m[1]);
@@ -404,10 +410,10 @@ test('Help: My apps bar is Share link, Share, Saved on this device, Clear; no he
 test('Help: Guides list the site\'s own pages first, then every IRL Commons guide; old addresses still land', ()=>{
  const h=helpMain();
  const own=h.slice(h.indexOf('id="g-own"'),h.indexOf('id="g-other"'));
- assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['one-phone','second-network','hybrid','better-picture',
-  'several-cameras','cloud','more','satellite','receiver','into-obs','build','ready-made',
-  'live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle','data-plans','why-bonding',
-  'something-wrong','protocols','power','phone-setup']);
+ assert.deepEqual([...own.matchAll(/<a class="tt" href="([^"]+)">/g)].map(m=>m[1]),['/one-phone','/second-network','/hybrid','/better-picture',
+  '/several-cameras','/cloud','/more','/satellite','/receiver','/into-obs','/build','/ready-made',
+  '/fix/live-not-on-platform','/fix/picture-frozen','/fix/no-sound-or-alerts','/fix/second-link-idle','/data-plans','/why-bonding',
+  '/something-wrong','/protocols','/power','/phone-setup']);
  for(const m of own.matchAll(/<a class="tt"[^>]*>([^<]+)<\/a><span class="by">([^<]*)</g)) assert.ok(m[2]&&!m[2].toLowerCase().startsWith(m[1].toLowerCase()),m[1]);
  const guides=JSON.parse(readFileSync('node_modules/@irl-commons/data/data/guides.json','utf8')).guides;
  const other=h.slice(h.indexOf('id="g-other"'));
@@ -479,17 +485,17 @@ test('Every answer has its own page, title, description and share image; old hom
  const pages=answerPages();
  assert.equal((docs.get('index.html').match(/<p class="moved" id="[^"]+">/g)||[]).length,pages.length+2,'one moved line per answer and per anchor inside one (hybrid-home, hybrid-cloud)');
  for(const [name,text] of pages){
-  const id=name.replace(/\.html$/,'');
+  const id=name.replace(/\.html$/,''),flat=id.replace('/','-');
   const title=plain(text.match(/<h1 id="[^"]+">[\s\S]*?<\/h1>/)[0]);
   assert.ok(text.includes(`<title>${title.replaceAll("'",'&#39;')} · How to IRL</title>`)||text.includes(`<title>${title} · How to IRL</title>`),name);
-  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${id}.png?v=`),name);
-  assert.ok(text.includes(`<div class="send"><p>Link to send: <a href="${id}">howtoirl.org/<wbr>${id}</a></p><button type="button" class="copy-link" data-copy="https://howtoirl.org/${id}" hidden>Copy link for chat</button></div>`),name);
+  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${flat}.png?v=`),name);
+  assert.ok(text.includes(`<div class="send"><p>Link to send: <a href="/${id}">howtoirl.org/<wbr>${id}</a></p><button type="button" class="copy-link" data-copy="https://howtoirl.org/${id}" hidden>Copy link for chat</button></div>`),name);
   assert.ok(!/href="#(?:one-phone|second-network|hybrid|more|receiver|into-obs|build|ready-made|cloud|satellite)"/.test(text),name);
  }
  const home=docs.get('index.html');
- assert.ok(!home.includes('class="step result')&&home.includes('<p class="moved" id="second-network">This answer has its own page now: <a href="second-network">Add a second network</a></p>'));
- assert.ok(home.includes('<p class="moved" id="hybrid-home">This answer has its own page now: <a href="hybrid#hybrid-home">'));
- assert.ok(/<a href="second-network"><svg class="ill"/.test(home),'home cards link to the answer pages');
+ assert.ok(!home.includes('class="step result')&&home.includes('<p class="moved" id="second-network">This answer has its own page now: <a href="/second-network">Add a second network</a></p>'));
+ assert.ok(home.includes('<p class="moved" id="hybrid-home">This answer has its own page now: <a href="/hybrid#hybrid-home">'));
+ assert.ok(/<a href="\/second-network"><svg class="ill"/.test(home),'home cards link to the answer pages');
 });
 
 test("Trying to stream, but something's not working?: four symptom cards, each with checks, sources and a still-stuck line", ()=>{
@@ -522,13 +528,13 @@ test('Guide pages: each section with claims ends in its Sources, each has a chec
 });
 
 test('Checked stamps: a date and Report a mistake, only where the last fact-check left nothing open', ()=>{
- const line=/<p class="stamp">Checked <time datetime="(\d{4}-\d\d-\d\d)">\d{1,2} [A-Z][a-z]+ \d{4}<\/time> · <a href="contact">Report a mistake<\/a><\/p>/g;
+ const line=/<p class="stamp">Checked <time datetime="(\d{4}-\d\d-\d\d)">\d{1,2} [A-Z][a-z]+ \d{4}<\/time> · <a href="\/contact">Report a mistake<\/a><\/p>/g;
  const stamped=name=>[...docs.get(name).matchAll(line)].length;
  assert.equal(stamped('data-plans.html'),10);
  assert.equal(stamped('why-bonding.html'),3);
  assert.equal(stamped('phone-setup.html'),4);
  // The four symptom answers have no date yet.
- const unstamped=['live-not-on-platform.html','picture-frozen.html','no-sound-or-alerts.html','second-link-idle.html'];
+ const unstamped=FIX.map(answerFile);
  for(const [name] of answerPages())assert.equal(stamped(name),unstamped.includes(name)?0:1,name);
  for(const [name,text] of docs){
   assert.ok(!text.includes('data-checked='),name);
@@ -537,11 +543,11 @@ test('Checked stamps: a date and Report a mistake, only where the last fact-chec
 });
 
 test('Before you go live: a checklist on every answer but the symptom checks, that ticks without script', ()=>{
- const symptoms=['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle'];
+ const symptoms=FIX;
  const pages=answerPages();
  assert.equal(pages.length,16);
  for(const [name,text] of pages){
-  const id=name.replace(/\.html$/,'');
+  const id=name.replace(/\.html$/,'').split('/').pop();
   const box=text.match(/<div class="golive" id="[^"]+" role="group" aria-labelledby="[^"]+" data-checklist="([^"]+)">[\s\S]*?<\/ul>[\s\S]*?<\/div>/);
   if(symptoms.includes(id)){assert.ok(!box,id);continue;}
   assert.ok(box&&box[1]===id,id);
@@ -588,21 +594,64 @@ print(clean_links('<a href="https://example.com/a.html">f</a> <a href="assets/x.
 `]).toString().trim().split('\n');
  assert.deepEqual(out,[
   'https://howtoirl.org/ https://howtoirl.org/help',
-  '<a href="./">a</a> <a href="./#x">b</a> <a href="glossary#srt">c</a> <a href="help?tab=1">d</a>',
+  '<a href="/">a</a> <a href="/#x">b</a> <a href="/glossary#srt">c</a> <a href="/help?tab=1">d</a>',
   '<a href="https://irlcommons.org/standards#shared">e</a> <link rel="canonical" href="https://howtoirl.org/">',
   'changes=On%20https%3A%2F%2Fhowtoirl.org%2Fcloud%3A%20 data-copy="https://howtoirl.org/cloud"',
-  '<a href="https://example.com/a.html">f</a> <a href="assets/x.css">g</a> <a href="https://howtoirl.org/assets/share/a.png">h</a>']);
+  '<a href="https://example.com/a.html">f</a> <a href="/assets/x.css">g</a> <a href="https://howtoirl.org/assets/share/a.png">h</a>']);
 });
 
-test('Top navigation: Start, Improve, Fix and Help; Improve and Fix go to their groups on Home, with no jump-link lines between them', ()=>{
+test('Top navigation: Start, Improve, Fix and Help; Improve goes to its group on Home, Fix to /fix; no jump-link lines between the groups', ()=>{
  const nav=name=>{const t=docs.get(name);const i=t.indexOf('<nav class="site-nav"');return t.slice(i,t.indexOf('</nav>',i));};
  assert.deepEqual([...nav('index.html').matchAll(/<a href="([^"]+)" data-label="([^"]+)"[^>]*>([^<]+)</g)].map(m=>[m[1],m[2],m[3]]),
-  [['./','Start','Start'],['./#improve','Improve','Improve'],['./#fix','Fix','Fix'],['help','Help','Help']]);
- assert.ok(/<a href=".\/" data-label="Start" aria-current="page">/.test(nav('index.html')),'Start is the current item on Home');
- assert.ok(/<a href="help" data-label="Help" aria-current="page">/.test(nav('help.html')),'Help is the current item on Help');
- assert.ok(/<a href="help" data-label="Help" aria-current="true">/.test(nav('data-plans.html')),'a page under Help marks Help');
+  [['/','Start','Start'],['/#improve','Improve','Improve'],['/fix','Fix','Fix'],['/help','Help','Help']]);
+ assert.ok(/<a href="\/" data-label="Start" aria-current="page">/.test(nav('index.html')),'Start is the current item on Home');
+ assert.ok(/<a href="\/help" data-label="Help" aria-current="page">/.test(nav('help.html')),'Help is the current item on Help');
+ assert.ok(/<a href="\/help" data-label="Help" aria-current="true">/.test(nav('data-plans.html')),'a page under Help marks Help');
  const home=docs.get('index.html');
  assert.ok(/<h2 class="grp" id="improve"[^>]*>Improve your setup<\/h2>/.test(home)&&/<h2 class="grp live" id="fix"/.test(home));
  assert.ok(!home.includes('grp-note')&&!/href="#(?:fix|improve)"/.test(home),'no jump-link lines on Home');
- assert.ok(/<footer[\s\S]*<a href="glossary"/.test(home),'Glossary stays in the footer');
+ assert.ok(/<footer[\s\S]*<a href="\/glossary"/.test(home),'Glossary stays in the footer');
+});
+
+test('Pages in folders work at any depth: links, assets, canonical, share card, edit link and sitemap entry', async()=>{
+ const sitemap=await readFile('dist/sitemap.xml','utf8');
+ for(const name of [...FIX.map(answerFile),'tips/twitch-test-mode.html']){
+  const text=docs.get(name),at=addr(name),flat=at.replace('/','-');
+  assert.ok(text.includes(`<link rel="canonical" href="https://howtoirl.org/${at}">`)&&text.includes(`<meta property="og:url" content="https://howtoirl.org/${at}">`),name);
+  assert.ok(text.includes('<link rel="stylesheet" href="/assets/style.css">')&&text.includes('<link rel="icon" href="/favicon.svg"')&&text.includes('<script src="/assets/site.js"></script>'),name);
+  assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${flat}.png?v=`),name);
+  await stat(`dist/assets/share/${flat}.png`);
+  assert.ok(text.includes(`changes=On%20https%3A%2F%2Fhowtoirl.org%2F${at.replace('/','%2F')}%3A%20`),name);
+  assert.ok(sitemap.includes(`<loc>https://howtoirl.org/${at}</loc>`),name);
+  assert.ok(!/\s(?:href|src)="(?!\/|#|\?|https?:|mailto:)/.test(text),`${name}: every link and asset starts at the site root`);
+ }
+ const nav=name=>{const t=docs.get(name);const i=t.indexOf('<nav class="site-nav"');return t.slice(i,t.indexOf('</nav>',i));};
+ assert.ok(nav('fix.html').includes('<a href="/fix" data-label="Fix" aria-current="page">'),'Fix is the current item on /fix');
+ for(const name of FIX.map(answerFile))assert.ok(nav(name).includes('<a href="/fix" data-label="Fix" aria-current="true">'),`${name} marks Fix`);
+});
+
+test('/fix: the problems with a link to send each, Improve for what happens every time, and the guide; Home and the footer link it', ()=>{
+ const fix=docs.get('fix.html');
+ const rows=[...fix.matchAll(/<li><a class="fix-t" href="([^"]+)">[^<]+<\/a><span class="fix-s">[^<]+<\/span><button type="button" class="copy-link" data-copy="([^"]+)" aria-label="Copy link for chat: [^"]+" hidden>Copy link for chat<\/button><\/li>/g)];
+ assert.deepEqual(rows.map(m=>[m[1],m[2]]),FIX.map(id=>[`/fix/${id}`,`https://howtoirl.org/fix/${id}`]));
+ const band=fix.slice(fix.indexOf('<section class="fix-band"'),fix.indexOf('</section>',fix.indexOf('<section class="fix-band"')));
+ assert.ok(/<h2 id="every-time-h">Happens every time\?/.test(band));
+ assert.deepEqual([...band.matchAll(/<li><a href="([^"]+)">/g)].map(m=>m[1]),['/second-network','/more','/cloud','/satellite']);
+ assert.ok(fix.includes('<a href="/something-wrong">Find what broke while you&#39;re live</a>')||fix.includes('<a href="/something-wrong">Find what broke while you\'re live</a>'));
+ const home=docs.get('index.html');
+ assert.ok(!home.includes('class="grp-more"'),'Home: no extra link rows under the groups');
+ const foot=home.slice(home.indexOf('<footer'));
+ assert.ok(foot.includes('<a href="/fix">Something not working?</a>')&&foot.includes('<a href="/tips">Tips</a>'),'footer links /fix and /tips');
+});
+
+test('/tips lists every tip; the Twitch test tip has its steps, a watch-out, its sources and a Checked date', ()=>{
+ const tips=docs.get('tips.html');
+ const listed=[...tips.matchAll(/<ul class="tip-list">[\s\S]*?<\/ul>/g)].flatMap(m=>[...m[0].matchAll(/<a href="([^"]+)">/g)].map(x=>x[1]));
+ assert.deepEqual(listed,config.pages.filter(n=>n.startsWith('tips/')).map(link));
+ const tip=docs.get('tips/twitch-test-mode.html');
+ assert.ok(tip.includes('<code>?bandwidthtest=true</code>'));
+ assert.equal((tip.match(/<ol class="checklist">/g)||[]).length,1);
+ assert.ok(/<li class="w"><span class="vh">Watch out: <\/span>Take <code>\?bandwidthtest=true<\/code> out again before the real stream/.test(tip));
+ assert.ok(/<details class="more fold sources" open><summary>Sources<\/summary><p class="tip-src">Twitch: <a href="https:\/\/dev\.twitch\.tv\/docs\/video-broadcast\/">/.test(tip)&&tip.includes('href="https://inspector.twitch.tv/"'));
+ assert.equal((tip.match(/<p class="stamp">Checked <time datetime="2026-11-22">/g)||[]).length,1);
 });

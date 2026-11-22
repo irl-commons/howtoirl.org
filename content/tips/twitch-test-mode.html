@@ -1,0 +1,23 @@
+<div class="wrap page guide-page tip-page">
+  <header class="page-head">
+    <h1>Test on Twitch without going live</h1>
+    <p class="lede">Add <code>?bandwidthtest=true</code> after your stream key. Twitch takes the stream but nobody can watch it, so you can check it in Twitch Inspector first.</p>
+  </header>
+
+  <div class="parts">
+    <section class="part" id="how" aria-labelledby="how-h" data-checked="2026-11-22">
+      <h2 id="how-h">How</h2>
+      <div class="read">
+        <ol class="checklist">
+          <li>Put <code>?bandwidthtest=true</code> right after the stream key. In an app that takes the whole stream URL in one field, like Moblin, it goes at the very end: <code>rtmp://&lt;server&gt;/app/&lt;stream key&gt;?bandwidthtest=true</code>.</li>
+          <li>Start the stream. Twitch doesn't show it to viewers.</li>
+          <li>Open <a href="https://inspector.twitch.tv/">Twitch Inspector</a>, log in, and check the bitrate and whether the connection stays stable.</li>
+        </ol>
+        <ul class="bul">
+          <li class="w"><span class="vh">Watch out: </span>Take <code>?bandwidthtest=true</code> out again before the real stream, or nobody will see it.</li>
+        </ul>
+        <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">Twitch: <a href="https://dev.twitch.tv/docs/video-broadcast/">Broadcast URLs and stream keys</a> ("an optional query-string parameter that disables live viewing of the stream", and the URL format <code>rtmp://&lt;ingest-server&gt;/app/&lt;stream-key&gt;[?bandwidthtest=true]</code>), <a href="https://inspector.twitch.tv/">Twitch Inspector</a> (bitrate, and stable or unstable). Moblin: <a href="https://github.com/eerimoq/moblin/blob/main/Common/Various/Validate.swift">its RTMP URL check</a>, which refuses a URL without the stream key.</p></details>
+      </div>
+    </section>
+  </div>
+</div>

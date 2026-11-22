@@ -33,13 +33,16 @@
 # `checklist`: "Before you go live", lines to tick that only restate the answer's own steps.
 #
 # Each answer is a page of its own at <id>.html: list it in site.json pages and run npm run share-images.
+# `dir: fix` puts an answer in a folder instead: fix/<id>.html, served at /fix/<id>. The /fix page lists every answer in fix.
 # Links between answers are written as "#<id>" here and point to that page once built.
 # Each answer page has one back link at the top. Without `back` it says "All starting points"
-# and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to.
+# and goes to the cards. `back: {to: <answer id>, label: ...}` names the page it goes to; `back: {href: fix.html,
+# label: ...}` goes to a page that is no answer.
 # `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
 #
 # A group on Home has a title and cards. `id` sets the heading's id, so links and the top navigation keep
-# working when the title changes; without it the id comes from the title.
+# working when the title changes; without it the id comes from the title. `more: {href, label}` is one link under
+# the cards.
 #
 # hold_back keeps a catalogue service out of every block on these pages, with the reason. Use it when
 # the site can't point to a public page for what the catalogue says, and take it out once it can.
@@ -559,6 +562,8 @@ answers:
 
   # "Trying to stream, but something's not working?": the four questions asked most, each a few checks in the order worth trying.
   - id: live-not-on-platform
+    dir: fix
+    back: {href: fix.html, label: All problems}
     icon: a-chain
     title: "Live in the app, but nobody sees it"
     summary: 'Your app may not send to the platform itself. Often it sends to a <a class="gl" href="glossary.html#hub">hub</a> first: a receiver, a cloud OBS or OBS at home. Then the hub goes live on the platform, with its own start.'
@@ -586,6 +591,8 @@ answers:
       - {label: "IRLToolkit: no destination enabled", url: "https://kb.irltoolkit.com/cloudobs/1-Troubleshooting/NoDestEnabled"}
 
   - id: picture-frozen
+    dir: fix
+    back: {href: fix.html, label: All problems}
     icon: s-camera
     title: "The picture froze, but you're still live"
     summary: "Something between the camera and your viewers stopped while the stream kept going. Find out which part: the camera's link to the phone, or the feed into OBS."
@@ -608,6 +615,8 @@ answers:
       - {label: "OBS IRL Source README", url: "https://github.com/irlserver/obs-irl-source"}
 
   - id: no-sound-or-alerts
+    dir: fix
+    back: {href: fix.html, label: All problems}
     icon: s-silent
     title: "No sound, or the alerts are gone"
     summary: 'The picture is fine, so follow the sound from where it starts: the mic, then your app, then OBS. Alerts are web pages inside OBS, and they only play while they are loaded.'
@@ -635,6 +644,8 @@ answers:
       - {label: "OBS: browser source", url: "https://obsproject.com/kb/browser-source"}
 
   - id: second-link-idle
+    dir: fix
+    back: {href: fix.html, label: All problems}
     icon: i-network
     title: "The second connection carries nothing"
     summary: "Connected isn't the same as carrying. Either your app isn't bonding over that connection, or your receiver can't be reached over it."

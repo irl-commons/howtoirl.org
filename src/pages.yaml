@@ -71,6 +71,25 @@ phone-setup.html:
   illustrations: guide
   next: {href: protocols.html, label: "RTMP, SRT or SRTLA?"}
 
+fix.html:
+  title: Something not working? · How to IRL
+  description: "Trying to stream and something isn't working: the problems asked most, each with its checks in order and a link to send to whoever helps you."
+  illustrations: home
+  share_icon: i-q
+
+tips.html:
+  title: Tips · How to IRL
+  description: Short tips for IRL streaming, one thing per page, with their sources.
+  illustrations: guide
+  share_icon: i-list
+
+tips/twitch-test-mode.html:
+  title: Test on Twitch without going live · How to IRL
+  description: "Add ?bandwidthtest=true after your Twitch stream key: Twitch takes the stream without showing it, and Twitch Inspector shows its bitrate. Take it out before the real stream."
+  section: tips.html
+  illustrations: guide
+  share_icon: i-tick
+
 links.html:
   title: Apps and services · How to IRL
   description: Phone apps, bonding and receivers, backpacks, cloud production and more for IRL streaming, by what you need and what it runs on.

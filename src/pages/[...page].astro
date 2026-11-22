@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import {pages} from '../page-meta.mjs';
 import rendered from '../../.generated/content.json';
+// Every page but Home, at its path without ".html"; a page in a folder (fix/picture-frozen.html) keeps the folder.
 export function getStaticPaths() { return pages.filter(p => p.name !== 'index.html').map(page => ({params: {page: page.name.replace(/\.html$/, '')}, props: {page}})); }
 const {page} = Astro.props;
 ---
