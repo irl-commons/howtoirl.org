@@ -60,6 +60,13 @@ power.html:
   illustrations: guide
   next: {href: help.html, label: Help}
 
+phone-setup.html:
+  title: How to IRL stream with your phone · How to IRL
+  description: "Stream IRL with just your phone: the app, a private test before you go public, adding a second connection with bonding, and a test that proves the second connection carries your stream."
+  section: help.html
+  illustrations: guide
+  next: {href: protocols.html, label: "RTMP, SRT or SRTLA?"}
+
 links.html:
   title: Apps and services · How to IRL
   description: Phone apps, bonding and receivers, backpacks, cloud production and more for IRL streaming, by what you need and what it runs on.

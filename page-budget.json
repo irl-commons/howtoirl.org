@@ -3,123 +3,127 @@
  "pages": {
   "index.html": {
    "html": 33792,
-   "total": 241664
+   "total": 243712
   },
   "one-phone.html": {
-   "html": 33792,
-   "total": 241664
+   "html": 34816,
+   "total": 244736
   },
   "second-network.html": {
-   "html": 31744,
-   "total": 240640
+   "html": 32768,
+   "total": 242688
   },
   "hybrid.html": {
-   "html": 37888,
-   "total": 246784
+   "html": 38912,
+   "total": 248832
   },
   "better-picture.html": {
    "html": 34816,
-   "total": 242688
+   "total": 244736
   },
   "several-cameras.html": {
-   "html": 31744,
-   "total": 240640
+   "html": 32768,
+   "total": 242688
   },
   "cloud.html": {
-   "html": 30720,
-   "total": 239616
+   "html": 31744,
+   "total": 240640
   },
   "more.html": {
    "html": 32768,
-   "total": 240640
+   "total": 242688
   },
   "satellite.html": {
    "html": 29696,
-   "total": 238592
+   "total": 239616
   },
   "receiver.html": {
    "html": 31744,
-   "total": 239616
+   "total": 241664
   },
   "into-obs.html": {
    "html": 31744,
-   "total": 239616
+   "total": 241664
   },
   "build.html": {
    "html": 30720,
-   "total": 238592
+   "total": 240640
   },
   "ready-made.html": {
-   "html": 29696,
-   "total": 238592
+   "html": 30720,
+   "total": 240640
   },
   "live-not-on-platform.html": {
    "html": 30720,
-   "total": 238592
+   "total": 240640
   },
   "picture-frozen.html": {
    "html": 29696,
-   "total": 237568
+   "total": 239616
   },
   "no-sound-or-alerts.html": {
    "html": 30720,
-   "total": 238592
+   "total": 240640
   },
   "second-link-idle.html": {
    "html": 29696,
-   "total": 238592
+   "total": 239616
   },
   "help.html": {
-   "html": 107520,
-   "total": 329728
+   "html": 108544,
+   "total": 331776
   },
   "glossary.html": {
    "html": 79872,
-   "total": 287744
+   "total": 289792
   },
   "data-plans.html": {
-   "html": 84992,
-   "total": 293888
+   "html": 87040,
+   "total": 296960
   },
   "why-bonding.html": {
    "html": 67584,
-   "total": 276480
+   "total": 277504
   },
   "something-wrong.html": {
    "html": 41984,
-   "total": 250880
+   "total": 251904
   },
   "protocols.html": {
    "html": 43008,
-   "total": 251904
+   "total": 252928
   },
   "power.html": {
    "html": 43008,
-   "total": 250880
+   "total": 252928
+  },
+  "phone-setup.html": {
+   "html": 60416,
+   "total": 270336
   },
   "links.html": {
    "html": 90112,
-   "total": 304128
+   "total": 306176
   },
   "contact.html": {
    "html": 9216,
-   "total": 218112
+   "total": 219136
   },
   "legal-notice.html": {
    "html": 10240,
-   "total": 219136
+   "total": 220160
   },
   "impressum.html": {
    "html": 10240,
-   "total": 219136
+   "total": 220160
   },
   "privacy.html": {
    "html": 15360,
-   "total": 223232
+   "total": 225280
   },
   "datenschutz.html": {
-   "html": 15360,
-   "total": 224256
+   "html": 16384,
+   "total": 225280
   }
  },
  "assets": {
@@ -130,6 +134,6 @@
   "assets/fonts/ibm-plex-mono-latin-600-normal.woff2": 18432,
   "assets/links-filters.css": 6144,
   "assets/site.js": 66560,
-  "assets/style.css": 143360
+  "assets/style.css": 144384
  }
 }

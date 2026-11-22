@@ -512,7 +512,7 @@ HELP_PAGES = {'one-phone': 'sender', 'second-network': 'connections', 'hybrid': 
               'several-cameras': 'tools', 'cloud': 'receiver', 'more': 'sender', 'satellite': 'connections', 'receiver': 'receiver',
               'into-obs': 'tools', 'build': 'sender', 'ready-made': 'sender', 'live-not-on-platform': 'tools', 'picture-frozen': 'sender',
               'no-sound-or-alerts': 'tools', 'second-link-idle': 'connections', 'data-plans.html': 'connections', 'why-bonding.html': 'connections',
-              'something-wrong.html': 'tools', 'protocols.html': 'receiver', 'power.html': 'sender'}
+              'something-wrong.html': 'tools', 'protocols.html': 'receiver', 'power.html': 'sender', 'phone-setup.html': 'connections'}
 HELP_SKIP = {'a', 'in', 'one', 'the', 'and', 'to', 'your'}
 
 

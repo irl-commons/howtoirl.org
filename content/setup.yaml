@@ -81,6 +81,7 @@ groups:
       - {href: something-wrong.html, icon: i-q, title: "Find what broke while you're live", text: Trace the stream step by step}
       - {href: protocols.html, icon: a-chain, title: "RTMP, SRT or SRTLA?", text: Which one fits your connection}
       - {href: power.html, icon: s-hot, title: "Power, and taking power banks on a flight", text: "Power banks, cables, flights"}
+      - {href: phone-setup.html, icon: i-phone, title: How to IRL stream with your phone, text: "Set up, then test each connection"}
 
 answers:
   - id: more
@@ -163,6 +164,7 @@ answers:
     side:
       - next: '<strong>Check your data plan.</strong> An hour at 6 Mbit/s uses about 2.7 GB: <a href="data-plans.html">Data plans and SIMs</a>.'
       - else: '<strong>Choose something else when</strong> crowds, long days or heat end your streams: <a href="#second-network">add a second network</a>, or <a href="#more">think about a backpack</a>.'
+      - next: '<strong>Step by step:</strong> <a href="phone-setup.html">How to IRL stream with your phone</a>, with a private test before you go public.'
     sources:
       - {label: "Moblin features", url: "https://github.com/eerimoq/moblin#readme"}
       - {label: "IRL Pro features", url: "https://irlpro.app/"}
@@ -203,6 +205,7 @@ answers:
     side:
       - else: '<strong>Choose something else when</strong> you need many networks, or a standalone camera on your back: <a href="#more">think about a backpack</a>.'
       - next: '<strong>Why it works:</strong> <a href="why-bonding.html">Why more than one network?</a>'
+      - next: '<strong>Prove it works:</strong> <a href="phone-setup.html#link-test">switch one connection off during a test</a>.'
     sources:
       - {label: "Moblink on Google Play", url: "https://play.google.com/store/apps/details?id=com.eerimoq.moblink"}
       - {label: "Moblink README", url: "https://github.com/eerimoq/moblink"}
@@ -641,6 +644,7 @@ answers:
         before:
           - 'Bonding has to be on in your app, and the app should list every connection. A hotspot on its own adds a network, not bonding: see <a href="#second-network">Add a second network</a>.'
           - "During a test stream, look at each connection's traffic. Zero on one means it isn't helping yet."
+          - 'Where Moblin shows each connection''s share: <a href="phone-setup.html#see-shares">How to IRL stream with your phone</a>.'
       - title: Check the connection itself
         before:
           - "Turn off any VPN on the phone that gives the connection. Your receiver has to be reachable over it."
