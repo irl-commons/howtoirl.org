@@ -7,6 +7,7 @@ import html, json, re, subprocess, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'shared'))
 import render as r
+from addresses import address
 
 KEYS = ('id', 'class', 'kind', 'role', 'hosting', 'part', 'platforms', 'tags')
 LIST_FIELDS = {'part', 'platforms', 'tags'}
@@ -185,7 +186,7 @@ SITE = 'https://howtoirl.org/'
 
 
 def page(aid: str) -> str:
-    """Each answer is a page of its own, at the answer's id."""
+    """Each answer is a page of its own, at the answer's id: the file `<id>.html`, served at `/<id>`."""
     return f'{aid}.html'
 
 
@@ -368,8 +369,8 @@ def side_html(a: dict) -> str:
     for item in a.get('side', []):
         (k, v), = item.items()
         out.append(SIMS if k == 'sims' else f'<p class="{k}">{v}</p>')
-    url = SITE + page(a['id'])
-    out.append(f'<div class="send"><p>Link to send: <a href="{page(a["id"])}">howtoirl.org/<wbr>{page(a["id"])}</a></p>'
+    url = SITE + address(page(a['id']))
+    out.append(f'<div class="send"><p>Link to send: <a href="{page(a["id"])}">howtoirl.org/<wbr>{address(page(a["id"]))}</a></p>'
                f'<button type="button" class="copy-link" data-copy="{url}" hidden>Copy link for chat</button></div>')
     return '\n            '.join(out)
 

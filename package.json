@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "python3 scripts/prepare.py && astro build",
+    "build": "python3 scripts/prepare.py && astro build && python3 scripts/finish.py",
     "test": "node --test scripts/check.test.mjs scripts/banned-phrases.test.mjs scripts/budget.test.mjs",
     "check": "npm run build && npm test",
     "check:browser": "node --test scripts/browser.test.mjs",
