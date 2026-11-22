@@ -502,9 +502,6 @@ if __name__ == '__main__':
     sys.exit(1 if found else 0)
 
 
-SHARE_SIZE = (1200, 630)
-
-
 def share_image(aid: str) -> str:
     """The picture a chat app shows for a link to the page: its drawing, title and first line (scripts/share-images.mjs)."""
     return f'assets/share/{aid}.png'
@@ -515,31 +512,10 @@ def share_line(a: dict) -> str:
     return re.split(r'(?<=[.!?])\s', plain_text(a['summary']).strip())[0]
 
 
-def answer_shells(setup: dict, home: dict) -> list[dict]:
-    """A shell per answer page, from the home page's: its own title, description, address and share image."""
-    out = []
-    for a in setup['answers']:
-        name = page(a['id'])
-        title = f'{a["title"]} · How to IRL'
-        desc = plain_text(a['summary']).strip()
-        url = SITE + name
-        image = SITE + share_image(a['id'])
-        q = lambda t: html.escape(t, quote=True)
-        head = home['head']
-        for pattern, value in [(r'<title>[^<]*</title>', f'<title>{esc(title)}</title>'),
-                               (r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{q(desc)}">'),
-                               (r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{url}">'),
-                               (r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{q(a["title"])}">'),
-                               (r'<meta property="og:description" content="[^"]*">', f'<meta property="og:description" content="{q(desc)}">'),
-                               (r'<meta property="og:url" content="[^"]*">', f'<meta property="og:url" content="{url}">\n'
-                                f'<meta property="og:image" content="{image}">\n'
-                                f'<meta property="og:image:width" content="{SHARE_SIZE[0]}">\n'
-                                f'<meta property="og:image:height" content="{SHARE_SIZE[1]}">\n'
-                                f'<meta property="og:image:alt" content="{q(a["title"] + ": " + share_line(a))}">\n'
-                                f'<meta name="twitter:card" content="summary_large_image">')]:
-            head, n = re.subn(pattern, lambda _m, v=value: v, head)
-            assert n == 1, (name, pattern)
-        after = home['after'].replace('howtoirl.org%2F%3A%20', f'howtoirl.org%2F{name}%3A%20')
-        out.append({'name': name, 'meta': {**home['meta'], 'title': title, 'description': desc, 'nav': 'answer'},
-                    'head': head, 'before': home['before'], 'after': after})
-    return out
+def answer_meta(setup: dict) -> list[dict]:
+    """What each answer page's head needs (src/components/Head.astro): its own title, description and share image.
+    The rest of the page around it is Home's."""
+    return [{'name': page(a['id']), 'title': f'{a["title"]} · How to IRL', 'shareTitle': a['title'],
+             'description': plain_text(a['summary']).strip(), 'image': share_image(a['id']),
+             'imageAlt': f'{a["title"]}: {share_line(a)}', 'illustrations': 'home'}
+            for a in setup['answers']]

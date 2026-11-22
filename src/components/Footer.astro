@@ -1,4 +1,67 @@
 ---
-const {html} = Astro.props;
+// About and contact, the IRL Commons sites, links to every page, and the legal lines.
+// German pages translate the about and legal lines and keep the English page list.
+import site from '../../site.json';
+const {page} = Astro.props;
+const de = page.lang === 'de';
+const en = de ? 'en' : undefined;
+const url = `https://${site.domain}/${page.name === 'index.html' ? '' : page.name}`;
+const edit = 'https://github.com/irl-commons/irl-commons/issues/new?template=edit-entry.yml&changes=' + encodeURIComponent(`On ${url}: `);
+// Home has no current mark in the footer; every other page marks its own link.
+const current = href => href === page.name && href !== 'index.html' ? 'page' : undefined;
 ---
-<Fragment set:html={html} />
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-about">
+      <a class="brand" href="index.html"><svg aria-hidden="true"><use href="#mark"/></svg>How to IRL</a>
+      <p>{de ? 'Kontakt' : 'Contact'}: <a href="mailto:hello@howtoirl.org">hello@howtoirl.org</a> {de ? 'oder' : 'or'} <a href="https://discord.gg/KChVwU6fjk">Discord</a></p>
+      <p class="foot-commons" lang={en}>Data from <a href="https://irlcommons.org/">IRL Commons</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a class="edit" href={edit} title="Suggest an edit to this page"><svg aria-hidden="true"><use href="#i-edit"/></svg><span class="vh">Suggest an edit to this page</span></a></p>
+      <div class="foot-sites" lang={en}>
+        <p>How to IRL is part of IRL Commons.</p>
+        <ul>
+          <li><a href="https://howtoirl.org/">How to IRL</a>: help for streamers and their helpers</li>
+          <li><a href="https://irlcommons.org/">IRL Commons</a>: open standards and open data</li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-nav" aria-label={de ? 'Alle Seiten' : 'All pages'} lang={en}>
+      <div class="foot-group">
+        <h2 class="foot-h">Guides</h2>
+        <ul>
+          <li><a href="help.html" aria-current={current('help.html')}>Help</a></li>
+          <li><a href="data-plans.html" aria-current={current('data-plans.html')}>Data plans and SIMs</a></li>
+          <li><a href="why-bonding.html" aria-current={current('why-bonding.html')}>Why more than one network?</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2 class="foot-h">Look it up</h2>
+        <ul>
+          <li><a href="glossary.html" aria-current={current('glossary.html')}>Glossary</a></li>
+          <li><a href="links.html" aria-current={current('links.html')}>Apps and services</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2 class="foot-h">This site</h2>
+        <ul>
+          <li><a href="index.html" aria-current={current('index.html')}>Home</a></li>
+          <li><a href="contact.html" aria-current={current('contact.html')}>Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2 class="foot-h">Legal</h2>
+        <ul>
+          <li><a href="legal-notice.html" aria-current={current('legal-notice.html')}>Legal notice</a></li>
+          <li><a href="impressum.html" lang="de" hreflang="de" aria-current={current('impressum.html')}>Impressum</a></li>
+          <li><a href="privacy.html" aria-current={current('privacy.html')}>Privacy policy</a></li>
+          <li><a href="datenschutz.html" lang="de" hreflang="de" aria-current={current('datenschutz.html')}>Datenschutz</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="foot-legal">
+      <p>{de ? 'Aktualisiert 15. November 2026.' : 'Updated 15 November 2026.'}</p>
+    </div>
+    <p class="foot-credits">{de
+      ? 'Nicht mit BELABOX, CeraLive, Moblin, Moblink, OBS Studio oder anderen hier genannten Projekten, Apps oder Firmen verbunden. Die Namen gehören ihren Inhabern.'
+      : 'Not affiliated with BELABOX, CeraLive, Moblin, Moblink, OBS Studio or any other project, app or company named here. Names belong to their owners.'}</p>
+  </div>
+</footer>
