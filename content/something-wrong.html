@@ -70,11 +70,51 @@
 
         <h3 id="show-something">Show your viewers something while it's down</h3>
         <p>A <a href="glossary.html#brb">BRB scene</a> doesn't stop a drop. It shows your viewers something better than a frozen picture until the feed comes back. A scene switcher does this for you. NOALBS, for example, reads your receiver's bitrate every second. It switches to a LOW scene when the bitrate falls to a limit you set, to BRB when the feed is gone, and back to LIVE when it recovers.</p>
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 260" role="img" aria-labelledby="sw-t sw-d">
+            <title id="sw-t">A scene switcher follows the bitrate</title>
+            <desc id="sw-d">The bitrate at the receiver over time, with a line for the limit you set. While the bitrate is above the limit, the switcher shows LIVE. When it falls under the limit, it switches to LOW. When the feed is gone, to BRB. When the bitrate comes back, to LIVE again.</desc>
+            <path class="tw-ground" d="M150 50V230M230 50V230M300 50V230"/>
+            <text class="lb lb-head mid" x="85" y="36">LIVE</text>
+            <text class="lb lb-head mid" x="190" y="36">LOW</text>
+            <text class="lb lb-head mid" x="265" y="36">BRB</text>
+            <text class="lb lb-head mid" x="340" y="36">LIVE</text>
+            <path class="tw-edge" d="M20 150H380"/>
+            <text class="lb" x="20" y="182">Your limit</text>
+            <text class="lb acc-text" x="20" y="74">Bitrate</text>
+            <path class="tw-down acc" d="M20 92L52 84L84 98L116 90L140 104L156 176L176 184L196 172L218 190L228 214"/>
+            <path class="tw-down acc" d="M304 214L316 104L338 92L360 98L380 90"/>
+            <path class="tw-ground" d="M20 230H380"/>
+          </svg>
+        </figure>
         <p>On Twitch, <a href="glossary.html#disconnect-protection">Disconnect Protection</a> covers a drop between Twitch and whatever sends it your stream: your hub, or your app if it streams straight to Twitch. You switch it on yourself in Stream Settings, with "Temporary Backup Image" on too. If your connection to Twitch drops, viewers see a placeholder for up to 90 seconds, and the recording stays in one piece. If you don't reconnect in that time, the stream ends as normal.</p>
         <ul class="bul">
           <li class="w"><span class="vh">Watch out: </span>If your phone streams straight to the platform, viewers see no BRB scene while its connection is down, whatever the phone shows. At most they see the platform's own placeholder, if it has one. A BRB scene needs a hub between your app and the platform.</li>
           <li class="w"><span class="vh">Watch out: </span>After a dropout, OBS's own media source can leave the sound glitchy and out of sync until you restart the source. NOALBS's <code>!fix</code> chat command restarts it. A source made for IRL such as OBS IRL Source tries to reconnect every 2 seconds, where the media source waits 10. Its makers say the sound survives a bad connection.</li>
         </ul>
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 300" role="img" aria-labelledby="brb-t brb-d">
+            <title id="brb-t">BRB needs a hub</title>
+            <desc id="brb-d">Two setups while the phone's connection is down. Phone straight to the platform: nothing arrives, and viewers see at most the platform's own placeholder. Phone to a hub, then the platform: the hub keeps streaming to the platform and shows the BRB scene.</desc>
+            <text class="lb lb-head" x="16" y="30">Straight to the platform</text>
+            <rect class="tw-line" x="20" y="50" width="30" height="54" rx="5"/>
+            <path class="tw-up" d="M58 77H254"/>
+            <text class="lb mid" x="156" y="66">Down</text>
+            <rect class="tw-line" x="262" y="48" width="122" height="58" rx="4"/>
+            <text class="lb mid" x="323" y="84">Platform</text>
+            <text class="lb" x="384" y="136" text-anchor="end">At most a placeholder</text>
+            <text class="lb lb-head" x="16" y="186">Through a hub</text>
+            <rect class="tw-line" x="20" y="206" width="30" height="54" rx="5"/>
+            <path class="tw-up" d="M58 233H128"/>
+            <text class="lb mid" x="93" y="222">Down</text>
+            <rect class="tw-line" x="136" y="204" width="86" height="58" rx="4"/>
+            <text class="lb mid acc-text" x="179" y="240">BRB</text>
+            <text class="lb mid" x="179" y="292">Hub</text>
+            <path class="tw-down acc" d="M228 233H256"/>
+            <rect class="tw-line" x="262" y="204" width="122" height="58" rx="4"/>
+            <text class="lb mid" x="323" y="240">Platform</text>
+          </svg>
+        </figure>
         <details class="more fold sources" open><summary>Sources</summary><p class="tip-src">Adaptive bitrate: <a href="https://github.com/eerimoq/moblin">Moblin README</a>, <a href="https://belabox.net/">BELABOX</a> ("dynamic bitrate control"), <a href="https://docs.vdo.ninja/guides/irl-streaming-stability">VDO.Ninja: IRL streaming stability</a>. A silent connection: the <a href="https://github.com/BELABOX/srtla/blob/main/srtla_send.c">BELABOX SRTLA sender</a> (<code>CONN_TIMEOUT 4</code>) and <a href="https://github.com/eerimoq/moblin/blob/main/Moblin/Media/Srtla/Client/RemoteConnection.swift">Moblin's SRTLA client</a> ("No packet received in 5 seconds"), both source code. Scene switching: <a href="https://docs.noalbs.com/guides/switching/">NOALBS: switching</a>. Twitch: <a href="https://help.twitch.tv/s/article/Disconnect-Protection?language=en_US">Disconnect Protection</a>. OBS: <a href="https://belabox.net/obs-audio-glitching.html">BELABOX on audio glitches in OBS</a>, <a href="https://github.com/irlserver/obs-irl-source">OBS IRL Source README</a>.</p></details>
       </div>
     </section>
