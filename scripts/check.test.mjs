@@ -94,6 +94,14 @@ test('Strict CSP: one first-party script, no inline executable code or third-par
  assert.equal(scripts.size,1);
  assert.ok((await readFile('public/_headers','utf8')).includes("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"));
 });
+test('The app platform filters load after the site stylesheet and only on Apps and services',()=>{
+ for(const [name,text] of docs){
+  const styles=[...text.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match=>match[1]);
+  assert.match(styles[0],/^\/assets\/site\.[\w-]{8}\.css$/);
+  if(name==='links.html')assert.match(styles[1],/^\/assets\/links-filters\.[\w-]{8}\.css$/);
+  assert.equal(styles.length,name==='links.html'?2:1,name);
+ }
+});
 test('Data entries offer text-field-only edit forms',()=>{
  for(const [name,text] of docs){
   if(['glossary.html','help.html','links.html','standards.html'].includes(name))assert.ok(text.includes('Suggest an edit'),name);
@@ -217,7 +225,7 @@ test('Watch-out marks: a visually hidden "Watch out:" on every marked line, in a
   assert.ok(all.includes(line),line);
  assert.ok(!all.includes('Every backpack and encoder'));
  for(const [f,t] of docs) assert.ok(!t.includes('class="legend"')&&!/= what to do|= watch out/.test(t),f);
- assert.ok(/\.picks\.mix li\.w::before[^{]*\{[^}]*var\(--caution\)/.test(readFileSync('public/assets/style.css','utf8')));
+ assert.ok(/\.picks\.mix li\.w::before[^{]*\{[^}]*var\(--caution\)/.test(readFileSync('src/styles/site.css','utf8')));
 });
 
 test('One phone: first stream steps, an iPhone/Android switch that works without script, and the data line', ()=>{
@@ -325,7 +333,7 @@ test('Numbered steps keep their numbers; watch-outs sit under a step without one
  const nested=steps[0].match(/<ul class="picks mix">([\s\S]*?)<\/ul>/)[1];
  assert.deepEqual([...nested.matchAll(/<li class="w"><span class="vh">Watch out: <\/span>([^.]+)/g)].map(m=>m[1]),['Keep the stream key secret','On YouTube, switch on live streaming a day early']);
  assert.ok(!/<ol class="picks mix/.test(allAnswers()),'an ordered list never drops its numbers');
- const css=readFileSync('public/assets/style.css','utf8');
+ const css=readFileSync('src/styles/site.css','utf8');
  assert.ok(/ol\.picks\.steps[^{]*\{[^}]*list-style: decimal/.test(css));
 });
 
@@ -403,7 +411,7 @@ test('Help: My apps bar is Share link, Share, Saved on this device, Clear; no he
  const bar=plain(h.match(/<div class="mine-bar">[\s\S]*?<\/div><\/section>/)[0].replace(/<input[^>]*>/g,'').replace(/<\/(?:button|span)>/g,' '));
  assert.equal(bar,'Share link Share Saved on this device Clear');
  assert.ok(!/helper/i.test(plain(h.replace(/<[^>]+>/g,' '))));
- const css=readFileSync('public/assets/style.css','utf8');
+ const css=readFileSync('src/styles/site.css','utf8');
  assert.ok(/\.myapps \.mine-bar > \.share-wrap > #share, \.myapps \.mine-bar > #nshare \{[^}]*height: 36px;[^}]*line-height: 1;/.test(css),'Share link and Share have one height');
 });
 
@@ -575,7 +583,8 @@ test('Pages answer at addresses without .html; old .html addresses answer 301 to
    assert.equal(old.status,301,name);assert.equal(old.headers.get('location'),`/${addr(name)}?a=1&b=2`,name);
   }
   assert.equal((await get('/index')).headers.get('location'),'/');
-  for(const p of ['/assets/style.css','/sitemap.xml','/robots.txt'])assert.equal((await get(p)).status,200,p);
+  const stylesheet=docs.get('index.html').match(/<link rel="stylesheet" href="([^"]+)"/)[1];
+  for(const p of [stylesheet,'/sitemap.xml','/robots.txt'])assert.equal((await get(p)).status,200,p);
   assert.equal((await get('/no-such-page')).status,404);
   assert.equal((await get('/phone-setup/')).status,404);
  }finally{await server.close();}
@@ -618,7 +627,7 @@ test('Pages in folders work at any depth: links, assets, canonical, share card, 
  for(const name of [...FIX.map(answerFile),...config.pages.filter(n=>n.startsWith('tips/'))]){
   const text=docs.get(name),at=addr(name),flat=at.replace('/','-');
   assert.ok(text.includes(`<link rel="canonical" href="https://howtoirl.org/${at}">`)&&text.includes(`<meta property="og:url" content="https://howtoirl.org/${at}">`),name);
-  assert.ok(text.includes('<link rel="stylesheet" href="/assets/style.css">')&&text.includes('<link rel="icon" href="/favicon.svg"')&&text.includes('<script src="/assets/site.js"></script>'),name);
+  assert.ok(/<link rel="stylesheet" href="\/assets\/site\.[\w-]{8}\.css">/.test(text)&&text.includes('<link rel="icon" href="/favicon.svg"')&&text.includes('<script src="/assets/site.js"></script>'),name);
   assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${flat}.png?v=`),name);
   await stat(`dist/assets/share/${flat}.png`);
   assert.ok(text.includes(`changes=On%20https%3A%2F%2Fhowtoirl.org%2F${at.replace('/','%2F')}%3A%20`),name);

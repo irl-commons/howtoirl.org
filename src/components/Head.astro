@@ -2,6 +2,8 @@
 // Title, description, canonical address and link preview tags. Every page has a share image, 1200 by 630:
 // scripts/share.py picks it and hashes it into .generated/share.json, scripts/share-images.mjs draws it.
 import site from '../../site.json';
+import siteStyles from '../styles/site.css?url';
+import linksStyles from '../../.generated/links-filters.css?url';
 import share from '../../.generated/share.json';
 const {page} = Astro.props;
 const url = `https://${site.domain}/${page.name === 'index.html' ? '' : page.name}`;
@@ -33,5 +35,5 @@ const other = {en: 'de', de: 'en'}[page.lang];
 {page.alternate && <Fragment><link rel="alternate" hreflang={page.lang} href={page.name}>
 <link rel="alternate" hreflang={other} href={page.alternate}></Fragment>}
 <link rel="preload" href="assets/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css">
-{page.stylesheet && <link rel="stylesheet" href={page.stylesheet}>}
+<link rel="stylesheet" href={siteStyles}>
+{page.stylesheet && <link rel="stylesheet" href={linksStyles}>}
