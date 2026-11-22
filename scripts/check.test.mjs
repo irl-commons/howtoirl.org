@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir,stat} from 'node:fs/promises';
 import {readFileSync} from 'node:fs';
-import * as nodeVm from 'node:vm';
-const require_vm=()=>nodeVm;
+import {movedUrl,pickPlatform} from '../src/scripts/addresses.ts';
+import {countText,fuzzy,guidesHash,parseHash} from '../src/scripts/help-query.ts';
 import path from 'node:path';
 import {HtmlValidate} from 'html-validate';
 import {createHash} from 'node:crypto';
@@ -86,7 +86,11 @@ test('Strict CSP: one first-party script, no inline executable code or third-par
  const scripts=new Set();
  for(const [name,text] of docs){
   assert.ok(!/<style\b|\sstyle=|\son\w+=/i.test(text),name);
-  for(const m of text.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)){
+  const pageScripts=[...text.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
+  assert.equal(pageScripts.length,1,name);
+  for(const m of pageScripts){
+   assert.match(m[1],/\btype="module"/);
+   assert.match(m[1],/\bblocking="render"/);
    assert.equal(m[2].trim(),'');const src=/src="([^"]+)"/.exec(m[1]);assert.ok(src);assert.ok(src[1].startsWith('/assets/'));scripts.add(src[1]);
   }
   assert.ok(!/<(?:img|script|iframe|video|audio)[^>]+src="(?:https?:|\/\/)|<link[^>]+href="(?:https?:|\/\/)(?![^>]*rel="canonical")/i.test(text.replace(/<link rel="(?:canonical|alternate)"[^>]*>/g,'')),name);
@@ -249,18 +253,14 @@ test('A standalone camera: the camera checklist, the Moblin note and the side li
  assert.ok(!/into the hub|through the receiver/i.test(t));
 });
 
-test('The platform switch starts on the visitor\'s own phone', async()=>{
- const vm=await import('node:vm');
- // site.js holds two script parts, and each hands its helpers to module.exports.
- const site={};
- vm.runInNewContext(readFileSync('public/assets/site.js','utf8'),{module:{get exports(){return site;},set exports(v){Object.assign(site,v);}}});
- assert.equal(site.pickPlatform('Mozilla/5.0 (Linux; Android 14; Pixel 8)',['ios','android']),'android');
- assert.equal(site.pickPlatform('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',['ios','android']),'ios');
- assert.equal(site.pickPlatform('Mozilla/5.0 (Windows NT 10.0)',['ios','android']),'ios');
+test('The platform switch starts on the visitor\'s own phone',()=>{
+ assert.equal(pickPlatform('Mozilla/5.0 (Linux; Android 14; Pixel 8)',['ios','android']),'android');
+ assert.equal(pickPlatform('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',['ios','android']),'ios');
+ assert.equal(pickPlatform('Mozilla/5.0 (Windows NT 10.0)',['ios','android']),'ios');
  // A moved page forwards to the clean address of the page it names.
- assert.equal(site.movedUrl('index.html','#second-network'),'./#second-network');
- assert.equal(site.movedUrl('glossary.html',''),'glossary');
- assert.equal(site.movedUrl('https://evil.example/',''),null);
+ assert.equal(movedUrl('index.html','#second-network'),'./#second-network');
+ assert.equal(movedUrl('glossary.html',''),'glossary');
+ assert.equal(movedUrl('https://evil.example/',''),null);
 });
 
 test('setup.yaml checks catch unknown values, untagged homes, stale notes and bad hold_back entries', async()=>{
@@ -432,32 +432,28 @@ test('Help: Guides list the site\'s own pages first, then every IRL Commons guid
 });
 
 test('Help script: typo-tolerant search and the addresses it understands', ()=>{
- const vm=require_vm();
- const site={};
- vm.runInNewContext(readFileSync('public/assets/site.js','utf8'),{module:{get exports(){return site;},set exports(v){Object.assign(site,v);}}});
- const hit=(q,s)=>site.fuzzy(q,s)>0;
+ const hit=(q,s)=>fuzzy(q,s)>0;
  for(const [q,s] of [['irlpro','IRL Pro irl-pro'],['streamerbot','Streamer.bot streamer-bot'],['moblni','Moblin moblin'],['mobln','Moblin moblin'],['obs studo','OBS Studio obs-studio'],['BELABOX','BELABOX belabox']]) assert.ok(hit(q,s),q);
  for(const [q,s] of [['zzzz','Moblin moblin'],['speedify','OBS Studio obs-studio']]) assert.ok(!hit(q,s),q);
- const P=h=>JSON.parse(JSON.stringify(site.parseHash(h)));
- assert.deepEqual(P('#stack=moblin,irl-pro'),{tab:'help',stack:['moblin','irl-pro'],f:null,open:'',row:''});
- assert.deepEqual(P('#ask-moblin'),{tab:'help',stack:null,f:null,open:'moblin',row:''});
- assert.equal(P('#guides-obs').f.st,'tools');assert.equal(P('#guides-camera').f.st,'sender');assert.equal(P('#guides-platform').f.st,'receiver');
- assert.equal(P('#for-moblin').f.app,'moblin');assert.equal(P('#kind-video').f.k,'video');
- assert.deepEqual(P('#guides?part=obs&kind=video&for=moblin&q=set%20up').f,{src:'',st:'tools',k:'video',app:'moblin',q:'set up'});
- assert.equal(P('#where-to-ask').tab,'help');assert.equal(P('#dimadesu-three-android-apps').row,'dimadesu-three-android-apps');
- assert.equal(site.guidesHash({src:'',st:'',k:'',app:'moblin',q:''}),'#for-moblin');
- assert.equal(site.guidesHash({src:'own',st:'',k:'',app:'',q:''}),'#guides?from=own');
- assert.equal(site.guidesHash({src:'',st:'tools',k:'video',app:'',q:'obs'}),'#guides?part=tools&kind=video&q=obs');
- assert.equal(site.countText(39,39),'All 39 guides');assert.equal(site.countText(3,39),'3 of 39 guides');
+ assert.deepEqual(parseHash('#stack=moblin,irl-pro'),{tab:'help',stack:['moblin','irl-pro'],f:null,open:'',row:''});
+ assert.deepEqual(parseHash('#ask-moblin'),{tab:'help',stack:null,f:null,open:'moblin',row:''});
+ assert.equal(parseHash('#guides-obs').f.st,'tools');assert.equal(parseHash('#guides-camera').f.st,'sender');assert.equal(parseHash('#guides-platform').f.st,'receiver');
+ assert.equal(parseHash('#for-moblin').f.app,'moblin');assert.equal(parseHash('#kind-video').f.k,'video');
+ assert.deepEqual(parseHash('#guides?part=obs&kind=video&for=moblin&q=set%20up').f,{src:'',st:'tools',k:'video',app:'moblin',q:'set up'});
+ assert.equal(parseHash('#where-to-ask').tab,'help');assert.equal(parseHash('#dimadesu-three-android-apps').row,'dimadesu-three-android-apps');
+ assert.equal(guidesHash({src:'',st:'',k:'',app:'moblin',q:''}),'#for-moblin');
+ assert.equal(guidesHash({src:'own',st:'',k:'',app:'',q:''}),'#guides?from=own');
+ assert.equal(guidesHash({src:'',st:'tools',k:'video',app:'',q:'obs'}),'#guides?part=tools&kind=video&q=obs');
+ assert.equal(countText(39,39),'All 39 guides');assert.equal(countText(3,39),'3 of 39 guides');
 });
 
 test('Privacy pages say what "My apps", Back and the checklists keep, in English and German', ()=>{
  assert.ok(plain(docs.get('privacy.html')).includes('So that “Back” on an answer returns to the page you came from, your browser keeps the address of the last page of this site you opened, until you close the tab.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Damit „Back“ auf einer Antwortseite zur vorigen Seite zurückführt'));
- assert.ok(readFileSync('public/assets/site.js','utf8').includes('"howtoirl.last"'));
+ assert.ok(readFileSync('src/scripts/answers.ts','utf8').includes('"howtoirl.last"'));
  assert.ok(plain(docs.get('privacy.html')).includes('Ticks you set in a “Before you go live” list stay only in your browser on your device; “Clear ticks” removes them.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Haken, die Sie in einer Liste „Before you go live“ setzen, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear ticks“ entfernt sie.'));
- assert.ok(readFileSync('public/assets/site.js','utf8').includes('"howtoirl.golive.v1"'));
+ assert.ok(readFileSync('src/scripts/answers.ts','utf8').includes('"howtoirl.golive.v1"'));
  assert.ok(plain(docs.get('privacy.html')).includes('If you save apps under “My apps” on the Help page, your browser keeps that list only on your device; “Clear” removes it.'));
  assert.ok(plain(docs.get('datenschutz.html')).includes('Apps, die Sie auf der Hilfeseite unter „My apps“ speichern, bleiben nur in Ihrem Browser auf Ihrem Gerät; „Clear“ entfernt sie.'));
 });
@@ -627,7 +623,7 @@ test('Pages in folders work at any depth: links, assets, canonical, share card, 
  for(const name of [...FIX.map(answerFile),...config.pages.filter(n=>n.startsWith('tips/'))]){
   const text=docs.get(name),at=addr(name),flat=at.replace('/','-');
   assert.ok(text.includes(`<link rel="canonical" href="https://howtoirl.org/${at}">`)&&text.includes(`<meta property="og:url" content="https://howtoirl.org/${at}">`),name);
-  assert.ok(/<link rel="stylesheet" href="\/assets\/site\.[\w-]{8}\.css">/.test(text)&&text.includes('<link rel="icon" href="/favicon.svg"')&&text.includes('<script src="/assets/site.js"></script>'),name);
+  assert.ok(/<link rel="stylesheet" href="\/assets\/site\.[\w-]{8}\.css">/.test(text)&&text.includes('<link rel="icon" href="/favicon.svg"')&&/<script[^>]*\bsrc="\/assets\/[^"]+\.js"><\/script>/.test(text),name);
   assert.ok(text.includes(`<meta property="og:image" content="https://howtoirl.org/assets/share/${flat}.png?v=`),name);
   await stat(`dist/assets/share/${flat}.png`);
   assert.ok(text.includes(`changes=On%20https%3A%2F%2Fhowtoirl.org%2F${at.replace('/','%2F')}%3A%20`),name);
