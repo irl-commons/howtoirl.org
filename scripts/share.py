@@ -8,6 +8,9 @@ scripts/share-images.mjs renders its cards into public/assets/share/. The image 
 changed card gets a new address and chat apps fetch it again instead of showing their cached copy."""
 import hashlib, html, pathlib, re, sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'shared'))
+from addresses import address  # noqa: E402
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SIZE = (1200, 630)
 SITE_CARD = 'assets/share/site.png'
@@ -42,7 +45,7 @@ def card(name: str, meta: dict, body: str, cards: dict, domain: str) -> dict:
                                        or first_sentence(meta['description']))
     drawn = re.search(r'^<div class="result-head">\s*<svg class="ill[^"]*"[^>]*><use href="#([a-z0-9-]+)"', head)
     icon = meta.get('share_icon') or (drawn[1] if drawn else home.get('icon', ''))
-    url = f'{domain}/' + ('' if name == 'index.html' else name)
+    url = f'{domain}/' + address(name)
     return {'kind': 'page', 'page': name, 'title': plain(h1[1]), 'line': line, 'icon': icon, 'url': url}
 
 

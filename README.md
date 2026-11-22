@@ -45,9 +45,19 @@ selects by that tag, or when a note's service has left its block. A daily job
 (`.github/workflows/data-bump.yml`) pins the newest stable npm release of IRL Commons, runs
 every check and opens a pull request.
 
-Each answer is a page of its own, `<answer id>.html`, with the home page's header and footer and its own
+Each answer is a page of its own, `<answer id>.html` at `/<answer id>`, with the home page's header and footer and its own
 title and description. A new answer needs its page in `site.json` (the build stops without it).
 Old links to an answer on the home page (`/#second-network`) still land.
+
+## Addresses
+
+Pages are built as files (`phone-setup.html`) and served without the extension: `https://howtoirl.org/phone-setup`,
+the home page at `/`. An old address ending in `.html`, and `/index`, answers with a permanent redirect (301) to the
+clean one, query kept, so existing links keep working. Content and components may still link `phone-setup.html#step`:
+after `astro build`, `scripts/finish.py` runs `shared/addresses.py` over the finished pages, so every link, canonical
+and edit address for a page of either site is written without `.html`. The sitemap and share cards use the same
+addresses, and `npm test` fails if a page links an old address. `npm run serve` serves and redirects the same way as
+the host, and the deploy check fetches each page at its clean address and its redirect from the old one.
 
 ## Link previews
 
@@ -78,7 +88,7 @@ to that list when the page change is ready. The build rejects missing ids.
 
 `shared/` is the same versioned folder in both site repositories: rendering
 functions, calculator formula, thumbnail attribution and the data-use model.
-Shared version: 1.2.10. Changes should be copied to the sibling site in the same
+Shared version: 1.2.11. Changes should be copied to the sibling site in the same
 review. Vendoring this small folder keeps either repository independently
 buildable without a third package release. Styles and self-hosted fonts are
 identical; one first-party script adds theme choice, search, the calculator and

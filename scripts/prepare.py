@@ -3,6 +3,7 @@ import json, pathlib, sys, re
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'shared'))
 import render as r
+from addresses import address
 sys.path.insert(0,str(ROOT/'scripts'))
 import setup as setup_answers
 import share
@@ -65,7 +66,7 @@ authored=[{'name':n,**m} for n,m in setup_answers.load_yaml(ROOT/'src/pages.yaml
 (ROOT/'.generated/share.json').write_text(json.dumps(share.manifest(authored+answer_meta,rendered,setup,cfg),ensure_ascii=False,indent=1))
 # The sitemap lists every page in site.json.
 (ROOT/'public/sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
- +''.join(f'  <url><loc>https://{cfg["domain"]}/{"" if n=="index.html" else n}</loc></url>\n' for n in cfg['pages'])+'</urlset>\n')
+ +''.join(f'  <url><loc>https://{cfg["domain"]}/{address(n)}</loc></url>\n' for n in cfg['pages'])+'</urlset>\n')
 (ROOT/'.generated').mkdir(exist_ok=True)
 (ROOT/'.generated/content.json').write_text(json.dumps(rendered,ensure_ascii=False))
 if 'links.html' in json.loads((ROOT/'site.json').read_text())['pages']:
