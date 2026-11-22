@@ -39,7 +39,7 @@
 # `back: history` says "Back" and returns to the answer the visitor came from, or to the cards.
 #
 # A group on Home has a title and cards. `id` sets the heading's id, so links and the top navigation keep
-# working when the title changes; without it the id comes from the title. `note` is one line under the cards.
+# working when the title changes; without it the id comes from the title.
 #
 # hold_back keeps a catalogue service out of every block on these pages, with the reason. Use it when
 # the site can't point to a public page for what the catalogue says, and take it out once it can.
@@ -50,38 +50,37 @@ hold_back:
 groups:
   - title: Start or add something
     cards:
-      - {to: one-phone, icon: s-new, title: Not started yet, text: Help me get started streaming IRL}
-      - {to: hybrid, icon: s-hybrid, title: Desk and away, text: "Switch between desktop and IRL: hybrid streaming"}
-      - {to: better-picture, icon: s-camera, title: A better picture, text: "A standalone camera, like a DSLR"}
-      - {to: several-cameras, icon: s-multicam, title: Several cameras, text: Mix phones and cameras in one scene}
+      - {to: one-phone, icon: s-new, title: Not started yet, text: Start with one phone}
+      - {to: hybrid, icon: s-hybrid, title: Desk and away, text: Hybrid streaming}
+      - {to: better-picture, icon: s-camera, title: A better picture, text: A DSLR or other camera}
+      - {to: several-cameras, icon: s-multicam, title: Several cameras, text: Mixed in one scene}
   - title: Improve your setup
     id: improve
-    note: 'Trying to stream and something isn''t working? <a href="#fix">See what to check first</a>'
     cards:
-      - {to: second-network, icon: s-crowd, title: The signal drops, text: "In crowds, on trains or in weak spots"}
-      - {to: more, icon: s-hot, title: The phone gives up, text: "It gets too hot, or the battery runs out"}
-      - {to: cloud, icon: s-home, title: My home setup fails, text: "My PC, power or internet at home"}
-      - {to: satellite, icon: s-far, title: No signal at all, text: "I stream outdoors, far from cell towers"}
+      - {to: second-network, icon: s-crowd, title: The signal drops, text: "Crowds, trains, weak spots"}
+      - {to: more, icon: s-hot, title: The phone gives up, text: Heat or an empty battery}
+      - {to: cloud, icon: s-home, title: My home setup fails, text: "PC, power or internet"}
+      - {to: satellite, icon: s-far, title: No signal at all, text: Far from cell towers}
   - title: "Trying to stream, but something's not working?"
     id: fix
     style: symptoms
-    note: 'Happens every time? <a href="#improve">See Improve your setup</a>'
     cards:
-      - {to: live-not-on-platform, title: "Phone says live, nobody sees it", text: The platform shows you offline}
-      - {to: picture-frozen, title: Picture frozen, text: "Viewers see a still picture"}
-      - {to: no-sound-or-alerts, title: No sound or alerts, text: "The picture is fine, the sound isn't"}
-      - {to: second-link-idle, title: Second phone or SIM idle, text: "Connected, but the stream doesn't use it"}
-  - title: Learn more and get help
+      - {to: live-not-on-platform, title: "Phone says live, nobody sees it"}
+      - {to: picture-frozen, title: Picture frozen}
+      - {to: no-sound-or-alerts, title: No sound or alerts}
+      - {to: second-link-idle, title: Second phone or SIM idle}
+  - title: Learn more
+    id: learn
     style: learn
     anchor: sims  # old links to the removed "How to pick data plans and SIMs" note land here
     cards:
-      - {href: glossary.html, icon: i-book, title: Glossary, text: Look up IRL terms and what they mean}
-      - {href: help.html, icon: i-help, title: Help, text: Find guides and help for the apps and services you use}
-      - {href: data-plans.html, icon: i-network, title: Data plans and SIMs, text: 'Upload speed, how much data you need, and the limits behind "unlimited"'}
-      - {href: why-bonding.html, icon: i-between, title: "Why more than one network?", text: "One network has short bad moments, even a fast one. A second network covers them."}
-      - {href: something-wrong.html, icon: i-q, title: "Find what broke while you're live", text: "Follow the stream from the camera to your viewers, and find the part that stopped."}
-      - {href: protocols.html, icon: a-chain, title: "RTMP, SRT or SRTLA?", text: "Which one fits your connection, and how to get it into OBS."}
-      - {href: power.html, icon: s-hot, title: Power and flying with batteries, text: "How long a power bank really lasts, the cables that matter, and taking batteries on a plane."}
+      - {href: glossary.html, icon: i-book, title: Glossary, text: IRL terms explained}
+      - {href: help.html, icon: i-help, title: Help, text: Guides and app support}
+      - {href: data-plans.html, icon: i-network, title: Data plans and SIMs, text: Upload speed and data use}
+      - {href: why-bonding.html, icon: i-between, title: "Why more than one network?", text: A second one covers the gaps}
+      - {href: something-wrong.html, icon: i-q, title: "Find what broke while you're live", text: Trace the stream step by step}
+      - {href: protocols.html, icon: a-chain, title: "RTMP, SRT or SRTLA?", text: Which one fits your connection}
+      - {href: power.html, icon: s-hot, title: Power and flying with batteries, text: "Power banks, cables, flights"}
 
 answers:
   - id: more
