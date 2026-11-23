@@ -35,6 +35,26 @@
         <p><a href="glossary.html#srt">SRT</a> sends over UDP and handles losses itself. The receiver keeps a short buffer, the <a href="glossary.html#srt-latency">latency</a>. When a piece goes missing, the receiver asks for it again, and the resend has until the buffer runs out to arrive. In live mode, a piece that's still missing by then is dropped, so the rest of the stream doesn't wait for it.</p>
         <p>SRT needs something on the other end that takes SRT: OBS, a receiver or a cloud hub. The ingest pages of Twitch, YouTube and Kick don't list SRT, so a hub sits in between and streams on with RTMP.</p>
 
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 330" role="img" aria-labelledby="loss-t loss-d">
+            <title id="loss-t">When piece 3 goes missing</title>
+            <desc id="loss-d">Six numbered pieces of a stream as they come out at the receiving end, over time. With RTMP, pieces 1 and 2 come out, then everything waits until piece 3 is sent again, and 3 to 6 come out late. With SRT, a resent piece 3 that arrives in time comes out in its place, and the stream stays on time. If it's still missing when the latency runs out, SRT drops it and 4, 5 and 6 come out on time.</desc>
+            <text class="lb lb-head" x="16" y="30">RTMP</text>
+            <g class="pc-piece"><rect x="20" y="46" width="30" height="30" rx="4"/><rect x="60" y="46" width="30" height="30" rx="4"/><rect x="246" y="46" width="30" height="30" rx="4"/><rect x="280" y="46" width="30" height="30" rx="4"/><rect x="314" y="46" width="30" height="30" rx="4"/><rect x="348" y="46" width="30" height="30" rx="4"/></g>
+            <text class="lb mid" x="35" y="69">1</text><text class="lb mid" x="75" y="69">2</text><text class="lb mid" x="261" y="69">3</text><text class="lb mid" x="295" y="69">4</text><text class="lb mid" x="329" y="69">5</text><text class="lb mid" x="363" y="69">6</text>
+            <path class="tw-up acc" d="M100 61H236"/>
+            <text class="lb mid acc-text" x="168" y="104">Everything waits</text>
+            <text class="lb lb-head" x="16" y="150">SRT, resent in time</text>
+            <g class="pc-piece"><rect x="20" y="166" width="30" height="30" rx="4"/><rect x="60" y="166" width="30" height="30" rx="4"/><rect x="140" y="166" width="30" height="30" rx="4"/><rect x="180" y="166" width="30" height="30" rx="4"/><rect x="220" y="166" width="30" height="30" rx="4"/></g>
+            <rect class="tw-line acc" x="100" y="166" width="30" height="30" rx="4"/>
+            <text class="lb mid" x="35" y="189">1</text><text class="lb mid" x="75" y="189">2</text><text class="lb mid acc-text" x="115" y="189">3</text><text class="lb mid" x="155" y="189">4</text><text class="lb mid" x="195" y="189">5</text><text class="lb mid" x="235" y="189">6</text>
+            <text class="lb lb-head" x="16" y="244">SRT, too late</text>
+            <g class="pc-piece"><rect x="20" y="260" width="30" height="30" rx="4"/><rect x="60" y="260" width="30" height="30" rx="4"/><rect x="140" y="260" width="30" height="30" rx="4"/><rect x="180" y="260" width="30" height="30" rx="4"/><rect x="220" y="260" width="30" height="30" rx="4"/></g>
+            <rect class="bar-extra acc" x="100" y="260" width="30" height="30" rx="4"/>
+            <text class="lb mid" x="35" y="283">1</text><text class="lb mid" x="75" y="283">2</text><text class="lb mid" x="155" y="283">4</text><text class="lb mid" x="195" y="283">5</text><text class="lb mid" x="235" y="283">6</text>
+            <text class="lb mid acc-text" x="115" y="320">Dropped</text>
+          </svg>
+        </figure>
         <h3 id="srtla">SRTLA: SRT over several connections at once</h3>
         <p><a href="glossary.html#srtla">SRTLA</a> spreads one SRT stream over two or more connections, for example two SIMs, or a SIM and a hotspot. A receiver on the internet joins the pieces back together and passes one SRT stream on to OBS or a cloud hub. OBS and the platforms don't take SRTLA directly. <a href="why-bonding.html#pieces">How SRTLA splits a stream.</a></p>
 
@@ -58,6 +78,34 @@
           <li class="w"><span class="vh">Watch out: </span>The listener has to be reachable from where the caller is. A PC at home is hidden behind your router, so a phone on mobile data can't reach it until you forward the port on the router (SRT uses UDP).</li>
           <li class="w"><span class="vh">Watch out: </span>Some internet connections share one public address among many customers (carrier-grade NAT). Then a forwarded port on your own router isn't enough: the port would also have to be opened on your provider's side, and that's up to your provider. A server or a hosted receiver avoids the problem.</li>
         </ul>
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 356" role="img" aria-labelledby="reach-t reach-d">
+            <title id="reach-t">Can the phone reach OBS at home?</title>
+            <desc id="reach-d">A phone on mobile data calls OBS on a PC at home, three times. Without a forwarded port, the call stops at your router. With the port forwarded on the router, it gets through to the PC. With a shared public address, the call already stops on your provider's side, so the forwarded port on your router doesn't help.</desc>
+            <text class="lb" x="12" y="26">Phone</text>
+            <text class="lb mid" x="262" y="26">Router</text>
+            <text class="lb mid" x="360" y="26">PC</text>
+            <g class="tw-line">
+              <rect x="16" y="80" width="24" height="46" rx="4"/><rect x="16" y="180" width="24" height="46" rx="4"/><rect x="16" y="280" width="24" height="46" rx="4"/>
+              <rect x="238" y="92" width="48" height="26" rx="4"/><rect x="238" y="192" width="48" height="26" rx="4"/><rect x="238" y="292" width="48" height="26" rx="4"/>
+              <path d="M248 92l-4-12M276 92l4-12M248 192l-4-12M276 192l4-12M248 292l-4-12M276 292l4-12"/>
+              <rect x="336" y="86" width="48" height="32" rx="3"/><rect x="336" y="186" width="48" height="32" rx="3"/><rect x="336" y="286" width="48" height="32" rx="3"/>
+            </g>
+            <path class="tw-line" d="M23 88h10M23 188h10M23 288h10"/>
+            <circle class="tw-dot" cx="28" cy="118" r="2"/><circle class="tw-dot" cx="28" cy="218" r="2"/><circle class="tw-dot" cx="28" cy="318" r="2"/>
+            <path class="tw-thin" d="M360 118v8M350 126h20M360 218v8M350 226h20M360 318v8M350 326h20"/>
+            <text class="lb lb-head" x="16" y="66">No forwarded port</text>
+            <path class="tw-down" d="M48 105H212"/>
+            <path class="tw-line acc" d="M218 96l16 18M234 96l-16 18"/>
+            <text class="lb lb-head" x="16" y="166">Port forwarded</text>
+            <path class="tw-down acc" d="M48 205H232M290 205H328M318 195l10 10-10 10"/>
+            <text class="lb lb-head" x="16" y="266">Shared address</text>
+            <path class="tw-down" d="M48 305H96"/>
+            <path class="tw-line acc" d="M102 296l16 18M118 296l-16 18"/>
+            <rect class="tw-line" x="128" y="290" width="76" height="30" rx="4"/>
+            <text class="lb mid" x="166" y="350">Provider</text>
+          </svg>
+        </figure>
         <h3 id="obs-listens">Let OBS listen</h3>
         <p>OBS can take SRT in a Media Source. Untick "Local File" and enter an address with <code>mode=listener</code> at the end, like <code>srt://0.0.0.0:9000?mode=listener</code>. Here <code>0.0.0.0</code> means "on every network this PC is on", and 9000 is the port your app sends to. In your app, enter the PC's address and the same port.</p>
         <p>OBS can also call: to take a stream from a receiver, enter the receiver's address without <code>mode=listener</code>.</p>
