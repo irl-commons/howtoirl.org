@@ -8,6 +8,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'shared'))
 import render as r
 from addresses import address
+sys.path.insert(0, str(ROOT / 'scripts'))
+import category  # noqa: E402
+
+# Each page's category (scripts/category.py), by file name. Filled by scripts/prepare.py before rendering.
+CATEGORY: dict[str, str] = {}
 
 KEYS = ('id', 'class', 'kind', 'role', 'hosting', 'part', 'platforms', 'tags')
 LIST_FIELDS = {'part', 'platforms', 'tags'}
@@ -202,17 +207,25 @@ def page(aid: str) -> str:
     return f'{DIRS[aid]}/{aid}.html' if aid in DIRS else f'{aid}.html'
 
 
+def card_category(cards: list[dict]) -> str | None:
+    """The category all of a group's cards share: shown once, as a badge in the group's heading, and as a coloured edge
+    on each card. A group whose cards mix categories shows none."""
+    return category.common([c.get('href') or page(c['to']) for c in cards], CATEGORY)
+
+
 def home_html(setup: dict) -> str:
     parts = []
     for i, g in enumerate(setup['groups']):
         gid = g.get('id') or 'grp-' + re.sub('[^a-z0-9]+', '-', g['title'].lower()).strip('-')
-        cls = 'choices' + {'learn': ' learn', 'symptoms': ' symptoms'}.get(g.get('style'), '')
-        hcls = 'grp live' if g.get('style') == 'symptoms' else 'grp'
+        cat = card_category(g['cards'])
+        cls = 'choices' + {'learn': ' learn', 'symptoms': ' symptoms'}.get(g.get('style'), '') + (f' cat-{cat}' if cat else '')
+        hcls = 'grp' + (' has-cat' if cat else ' live' if g.get('style') == 'symptoms' else '')
+        badge = category.badge(cat) if cat else ''
         cards = '\n          '.join(card(c) for c in g['cards'])
         anchor = f' id="{g["anchor"]}"' if g.get('anchor') else ''
         more = (f'\n        <p class="grp-more"><a href="{g["more"]["href"]}">{esc(g["more"]["label"])}</a></p>'
                 if g.get('more') else '')
-        parts.append(f'<h2 class="{hcls}" id="{gid}" data-permalink="no">{esc(g["title"])}</h2>\n'
+        parts.append(f'<h2 class="{hcls}" id="{gid}" data-permalink="no">{badge}{esc(g["title"])}</h2>\n'
                      f'        <ul class="{cls}"{anchor} aria-labelledby="{gid}">\n          {cards}\n        </ul>{more}')
     return ('<section class="step start" id="start" tabindex="-1" aria-label="Choose your starting point">\n        '
             + '\n        '.join(parts) + '\n      </section>')
@@ -539,11 +552,12 @@ def fix_html(setup: dict) -> str:
                     f'Copy link for chat</button></li>')
     improve = next(g for g in setup['groups'] if g.get('id') == 'improve')
     cards = '\n          '.join(card(c) for c in improve['cards'])
+    cat = card_category(improve['cards'])
     return (f'<ul class="fix-list" aria-label="Problems">\n        ' + '\n        '.join(rows) + '\n      </ul>\n'
             f'      <section class="fix-band" aria-labelledby="every-time-h">\n'
-            f'        <h2 id="every-time-h">Happens every time?</h2>\n'
+            f'        <h2 id="every-time-h"{" class=\"has-cat\"" if cat else ""}>{category.badge(cat) if cat else ""}Happens every time?</h2>\n'
             f'        <p>Then it\'s the setup, not this stream.</p>\n'
-            f'        <ul class="choices" aria-labelledby="every-time-h">\n          {cards}\n        </ul>\n'
+            f'        <ul class="choices{f" cat-{cat}" if cat else ""}" aria-labelledby="every-time-h">\n          {cards}\n        </ul>\n'
             f'      </section>')
 
 # The site's own pages in Help's Guides tab, in this order, each with the part colour of its topic.
@@ -600,5 +614,6 @@ def answer_meta(setup: dict) -> list[dict]:
     adds its share image. The rest of the page around it is Home's."""
     return [{'name': page(a['id']), 'title': f'{a["title"]} · How to IRL',
              'description': plain_text(a['summary']).strip(), 'illustrations': 'home',
+             'category': 'fix' if a.get('dir') == 'fix' else 'guide',
              **({'section': f'{a["dir"]}.html'} if a.get('dir') else {})}
             for a in setup['answers']]

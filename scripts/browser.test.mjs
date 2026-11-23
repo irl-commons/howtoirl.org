@@ -238,3 +238,56 @@ test('Every baseline entry in browser-checks.json still matches a finding',()=>{
  const {stale}=applyBaseline(all,settings.baseline||[]);
  assert.equal(stale.length,0,`These look fixed; remove them from browser-checks.json "baseline":\n${JSON.stringify(stale,null,1)}`);
 });
+
+test('A saved theme applies before first paint even when the script is slow',async()=>{
+ const server=await serve('dist'), browser=await chromium.launch();
+ try{
+  const page=await browser.newPage({colorScheme:'light'});
+  page.setDefaultTimeout(5000);
+  await page.addInitScript(key=>{
+   localStorage.setItem(key,'dark');
+   const observer=new MutationObserver(()=>{
+    if(document.documentElement?.dataset.theme==='dark'){
+     performance.mark('saved-theme-applied');
+     observer.disconnect();
+    }
+   });
+   observer.observe(document,{subtree:true,attributes:true,attributeFilter:['data-theme']});
+  },settings.themeStorageKey);
+  await page.route('**/assets/*.js',async route=>{
+   await new Promise(resolve=>setTimeout(resolve,350));
+   await route.continue();
+  });
+  await page.goto(server.origin);
+  await page.waitForFunction(()=>performance.getEntriesByName('first-contentful-paint').length>0);
+  const {applied,paint}=await page.evaluate(()=>({
+   applied:performance.getEntriesByName('saved-theme-applied')[0]?.startTime,
+   paint:performance.getEntriesByName('first-contentful-paint')[0].startTime,
+  }));
+  assert.ok(applied>0&&applied<=paint,`Theme applied at ${applied} ms, first contentful paint at ${paint} ms`);
+ }finally{await browser.close();await server.close();}
+});
+
+test('Go-live ticks persist per answer, then clear from the existing storage key',async()=>{
+ const server=await serve('dist'), browser=await chromium.launch();
+ try{
+  const page=await browser.newPage();
+  page.setDefaultTimeout(5000);
+  await page.goto(server.origin+'/one-phone');
+  const list=page.locator('.golive[data-checklist]');
+  const id=await list.getAttribute('data-checklist');
+  const first=list.getByRole('checkbox').first();
+  await first.check();
+  const value=await first.inputValue();
+  const stored=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('howtoirl.golive.v1')||'{}'));
+  assert.deepEqual(await stored(),{[id]:[value]});
+  await page.goto(server.origin+'/second-network');
+  assert.equal(await page.locator('.golive').getByRole('checkbox').first().isChecked(),false);
+  await page.goto(server.origin+'/one-phone');
+  assert.equal(await first.isChecked(),true);
+  assert.match(await list.locator('.golive-count').innerText(),/^1 of \d+ ready$/);
+  await list.locator('.golive-clear').click();
+  assert.equal(await first.isChecked(),false);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('howtoirl.golive.v1')),null);
+ }finally{await browser.close();await server.close();}
+});

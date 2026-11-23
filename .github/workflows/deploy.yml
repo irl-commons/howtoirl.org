@@ -38,6 +38,8 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Verify npm package signatures and provenance
         run: npm audit signatures
+      - name: Install the Chromium build that playwright-core is pinned to (the build draws the share cards)
+        run: npx --no-install playwright-core install --with-deps chromium-headless-shell
       - run: npm run check
       - name: Pack the build
         id: site

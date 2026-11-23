@@ -1,10 +1,9 @@
-// What a share image was made from, kept in the PNG itself (a tEXt chunk), so the tests can tell a card that no
-// longer matches its page from a current one. Used by scripts/share-images.mjs and scripts/check.test.mjs.
-import {createHash} from 'node:crypto';
+// What a share image was made from, kept in the PNG itself (a tEXt chunk): the card's hash from .generated/share.json
+// (scripts/share.py), so the tests can tell an image that no longer matches its page from a current one. Used by
+// scripts/share-images.mjs and scripts/check.test.mjs.
 import {crc32} from 'node:zlib';
 
 const KEY='howtoirl-card';
-export const cardHash=card=>createHash('sha256').update(JSON.stringify([card.kind,card.title,card.line,card.icon,card.url])).digest('hex').slice(0,16);
 
 function* chunks(png){
  for(let at=8;at<png.length;){const size=png.readUInt32BE(at);yield {at,type:png.toString('latin1',at+4,at+8),data:png.subarray(at+8,at+8+size),end:at+12+size};at+=12+size;}
