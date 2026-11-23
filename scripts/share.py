@@ -4,17 +4,28 @@ Every page in site.json gets a card of its own (its h1, the first sentence of it
 unless src/pages.yaml says `share: site` for it; those pages share the site card. `share_icon` and `share_line` choose
 the drawing and line where a page has none of its own or its own is too long. The manifest goes to
 .generated/share.json: src/components/Head.astro writes the Open Graph and X card tags from it, and
-scripts/share-images.mjs renders its cards into public/assets/share/. The image address carries a hash of the PNG, so a
-changed card gets a new address and chat apps fetch it again instead of showing their cached copy."""
-import hashlib, html, pathlib, re, sys
+scripts/share-images.mjs renders its cards into dist/assets/share/ at the end of every build; the images are not in Git.
+The image address carries a hash of what the card is made from (its text, drawing, category, the card template and the
+site's stylesheet and drawings), so a changed card gets a new address and chat apps fetch it again instead of showing
+their cached copy."""
+import hashlib, html, json, pathlib, re, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'shared'))
 from addresses import address  # noqa: E402
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import category  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SIZE = (1200, 630)
 SITE_CARD = 'assets/share/site.png'
 LONG = 120
+# What every card's look depends on besides its own text: a change to any of these gives every card a new address.
+# The stylesheet counts under this one name wherever it lives (STYLESHEET), so moving it alone keeps every address.
+TEMPLATE = ['scripts/share-images.mjs', 'scripts/category.py', 'public/assets/style.css', 'src/components/Illustrations.astro',
+            'src/components/Marks.astro']
+# Where the stylesheet may be: copied as is from public/, or bundled from src/styles/ with font addresses from the
+# site root. Font addresses are hashed in the public/ form.
+STYLESHEET = ['src/styles/site.css', 'public/assets/style.css']
 
 
 def plain(t: str) -> str:
@@ -47,13 +58,15 @@ def card(name: str, meta: dict, body: str, cards: dict, domain: str) -> dict:
     drawn = re.search(r'^<div class="result-head">\s*<svg class="ill[^"]*"[^>]*><use href="#([a-z0-9-]+)"', head)
     icon = meta.get('share_icon') or (drawn[1] if drawn else home.get('icon', ''))
     url = f'{domain}/' + address(name)
-    return {'kind': 'page', 'page': name, 'title': plain(h1[1]), 'line': line, 'icon': icon, 'url': url}
+    return {'kind': 'page', 'page': name, 'title': plain(h1[1]), 'line': line, 'icon': icon, 'url': url,
+            'category': category.of(name, meta)}
 
 
 def site_card(home: dict, domain: str, name: str) -> dict:
     """The card the contact and legal pages share: the site's name and Home's description."""
     return {'kind': 'site', 'page': 'index.html', 'title': name,
-            'line': home.get('share_line') or first_sentence(home['description']), 'icon': 'mark', 'url': domain}
+            'line': home.get('share_line') or first_sentence(home['description']), 'icon': 'mark', 'url': domain,
+            'category': None}
 
 
 def image_of(name: str, meta: dict) -> str:
@@ -61,13 +74,26 @@ def image_of(name: str, meta: dict) -> str:
     return SITE_CARD if meta.get('share') == 'site' else f'assets/share/{name.removesuffix(".html").replace("/", "-")}.png'
 
 
-def version(image: str) -> str:
-    """A short hash of the committed PNG; 'missing' until `npm run share-images` has made it (the tests then fail)."""
-    path = ROOT / 'public' / image
-    if not path.exists():
-        print(f'share image {image} is missing: run `npm run build && npm run share-images`', file=sys.stderr)
-        return 'missing'
-    return hashlib.sha256(path.read_bytes()).hexdigest()[:10]
+def stylesheet() -> bytes:
+    for path in STYLESHEET:
+        if (ROOT / path).is_file():
+            return (ROOT / path).read_bytes().replace(b'url("/assets/fonts/', b'url("fonts/')
+    sys.exit('scripts/share.py: no stylesheet at ' + ' or '.join(STYLESHEET))
+
+
+def template_hash() -> str:
+    h = hashlib.sha256()
+    for path in TEMPLATE:
+        source = stylesheet() if path == 'public/assets/style.css' else (ROOT / path).read_bytes()
+        h.update(path.encode() + b'\0' + source)
+    return h.hexdigest()
+
+
+def card_hash(card: dict, template: str) -> str:
+    """The card's version: its address carries the first 10 characters, the PNG keeps all 16 (scripts/share-card.mjs),
+    so the tests can tell a stale image from a current one."""
+    fields = [card[k] for k in ('kind', 'title', 'line', 'icon', 'url', 'category')]
+    return hashlib.sha256(json.dumps([fields, template], ensure_ascii=False).encode()).hexdigest()[:16]
 
 
 def manifest(pages: list[dict], rendered: dict, setup: dict, cfg: dict) -> dict:
@@ -83,5 +109,9 @@ def manifest(pages: list[dict], rendered: dict, setup: dict, cfg: dict) -> dict:
         if image not in cards:
             cards[image] = (site_card(by_name['index.html'], cfg['domain'], cfg['name']) if image == SITE_CARD
                             else card(name, meta, rendered[name], homes, cfg['domain']))
+    template = template_hash()
+    for c in cards.values():
+        c['hash'] = card_hash(c, template)
+        c['badge'] = category.badge(c['category']) if c['category'] else ''
     return {'size': list(SIZE), 'cards': cards, 'pages': images,
-            'images': {image: {'v': version(image), 'alt': f'{c["title"]}: {c["line"]}'} for image, c in cards.items()}}
+            'images': {image: {'v': c['hash'][:10], 'alt': f'{c["title"]}: {c["line"]}'} for image, c in cards.items()}}

@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "python3 scripts/prepare.py && astro build && python3 scripts/finish.py",
+    "build": "python3 scripts/prepare.py && astro build && python3 scripts/finish.py && node scripts/share-images.mjs",
     "test": "node --test scripts/check.test.mjs scripts/banned-phrases.test.mjs scripts/budget.test.mjs",
-    "check": "npm run build && npm test",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build && npm test",
     "check:browser": "node --test scripts/browser.test.mjs",
     "budget": "node scripts/budget.mjs",
     "snapshots": "node scripts/snapshots.mjs",
-    "serve": "node scripts/serve.mjs",
-    "share-images": "node scripts/share-images.mjs"
+    "serve": "node scripts/serve.mjs"
   },
   "dependencies": {
     "@irl-commons/data": "0.3.0",
@@ -21,7 +21,8 @@
   "devDependencies": {
     "axe-core": "4.14.0",
     "html-validate": "11.21.1",
-    "playwright-core": "1.65.0"
+    "playwright-core": "1.65.0",
+    "typescript": "6.0.3"
   },
   "engines": {
     "node": ">=26"

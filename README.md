@@ -67,15 +67,23 @@ the host, and the deploy check fetches each page at its clean address and its re
 
 `src/components/Head.astro` writes the Open Graph and X card tags of every page from its metadata
 and `.generated/share.json`, which `scripts/share.py` builds. Each page gets a share image of its
-own: its h1, the first sentence of its lede or summary, and its drawing from the home page cards.
+own: its category badge, h1, the first sentence of its lede or summary, and its drawing from the home page cards.
 Pages with `share: site` in `src/pages.yaml` (contact and legal pages) share one site card;
 `share_icon` and `share_line` choose the drawing and line where a page has none or its own is
-too long. After adding a page or changing a title or lede, run `npm run build`,
-`npm run share-images` and `npm run check`, then commit `public/assets/share/`. The image
-address carries a hash of the PNG, so chat apps fetch a changed card again. `npm test` fails when
+too long. The images are build output, not files in Git: the last step of `npm run build`
+(`scripts/share-images.mjs`) draws them into `dist/assets/share/` with the site's own stylesheet and fonts in the
+Chromium build `playwright-core` is pinned to (`npx playwright-core install chromium-headless-shell` once). The image
+address carries a hash of what the card is made from, so chat apps fetch a changed card again. `npm test` fails when
 a page lacks a tag or its image, when an image is not 1200 by 630 pixels or no longer matches
-its page, or when an image is used by no page, and `npm run share-images` stops when text would
-be cut off.
+its page, or when an image is used by no page, and the build stops when text would be cut off.
+
+## Fix, guide and tip
+
+Each page is a fix (`fix/`), a tip (`tips/`) or a guide (an answer page, or a page under Help), or none of them
+(`scripts/category.py`; `category:` in `src/pages.yaml` overrides). Its badge shows above the h1 and on its share
+card. A Home group whose cards share a category shows the badge once in its heading and the colour as an edge on its
+cards; Help's Guides tab shows it on each of the site's own rows. The colours are the `--cat-*` custom properties in
+`public/assets/style.css`, in light and dark, and always come with the label and glyph.
 
 Edit prose in `content/` and each page's title, description, language and pager
 link in `src/pages.yaml`. The head, header with the site navigation, drawings,
