@@ -7,6 +7,7 @@ from addresses import address
 sys.path.insert(0,str(ROOT/'scripts'))
 import setup as setup_answers
 import share
+import category
 pkg=ROOT/'node_modules/@irl-commons/data'
 data={k:json.loads((pkg/'data'/f'{k}.json').read_text())[k] for k in ['words','services','guides','standards']}
 cfg=json.loads((ROOT/'site.json').read_text())
@@ -21,6 +22,14 @@ setup,found=setup_answers.check(pkg)
 r.HELP_OWN[:]=setup_answers.help_pages(setup)
 if found:
  sys.exit('content/setup.yaml does not match IRL Commons:\n  '+'\n  '.join(found))
+# Each page's category (fix, guide or tip; scripts/category.py), for its badge, Home's groups and Help's Guides tab.
+authored_meta=setup_answers.load_yaml(ROOT/'src/pages.yaml')
+answer_meta=setup_answers.answer_meta(setup)
+cats=category.table([{'name':n,**m} for n,m in authored_meta.items()]+answer_meta)
+setup_answers.CATEGORY.update(cats)
+def help_badges(body):
+ # Help's Guides tab mixes guides and fixes, so each of the site's own rows shows its badge.
+ return re.sub(r'<span class="tx"><a class="tt" href="([^"]+)">',lambda m: m[0].replace('<span class="tx">','<span class="tx">'+category.badge(cats[m[1]])) if m[1] in cats else m[0],body)
 cfg=json.loads((ROOT/'site.json').read_text())
 other='irlcommons.org' if cfg['domain']=='howtoirl.org' else 'howtoirl.org'
 def finish(body):
@@ -42,7 +51,6 @@ def finish(body):
  return r.add_permalinks(body)
 # Pages in folders (content/tips/x.html) keep the folder: tips/x.html, served at /tips/x. Links in them are written
 # from the site root, like everywhere else (shared/addresses.py).
-authored_meta=setup_answers.load_yaml(ROOT/'src/pages.yaml')
 def tips_html():
  tips=[(n,m) for n,m in authored_meta.items() if n.startswith('tips/')]
  return '<ul class="tip-list">\n      '+'\n      '.join(
@@ -59,16 +67,18 @@ for src in sorted((ROOT/'content').rglob('*.html')):
  body=r.fill_services(body,data['services'])
  body=r.fill_calc(body,r.datause.load_model())
  body=setup_answers.stamp_sections(body)
- rendered[src.relative_to(ROOT/'content').as_posix()]=finish(body)
+ name=src.relative_to(ROOT/'content').as_posix()
+ if name=='help.html':
+  body=help_badges(body)
+ rendered[name]=category.head(finish(body),cats.get(name))
 # Each answer is a page of its own, with its own title, description and share image.
 answer_pages=setup_answers.answer_pages(setup,data['services'])
 missing=[n for n in answer_pages if n not in cfg['pages']]
 if missing:
  sys.exit('site.json pages must list every answer page: '+', '.join(missing))
 for name,body in answer_pages.items():
- rendered[name]=finish(body)
+ rendered[name]=category.head(finish(body),cats.get(name))
 (ROOT/'.generated').mkdir(exist_ok=True)
-answer_meta=setup_answers.answer_meta(setup)
 (ROOT/'.generated/answer-pages.json').write_text(json.dumps(answer_meta,ensure_ascii=False))
 # Every page gets its link preview tags and share image (scripts/share.py, src/components/Head.astro,
 # scripts/share-images.mjs).
@@ -80,4 +90,4 @@ authored=[{'name':n,**m} for n,m in authored_meta.items()]
 (ROOT/'.generated').mkdir(exist_ok=True)
 (ROOT/'.generated/content.json').write_text(json.dumps(rendered,ensure_ascii=False))
 if 'links.html' in json.loads((ROOT/'site.json').read_text())['pages']:
- (ROOT/'public/assets/links-filters.css').write_text(r.links_filters_css(data['services']))
+ (ROOT/'.generated/links-filters.css').write_text(r.links_filters_css(data['services']))
