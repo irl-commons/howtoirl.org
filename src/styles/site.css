@@ -6,7 +6,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 200 800;
-  src: url("fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2") format("woff2");
+  src: url("/assets/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
@@ -14,12 +14,12 @@
   font-style: normal;
   font-display: swap;
   font-weight: 200 800;
-  src: url("fonts/atkinson-hyperlegible-next-latin-ext-wght-normal.woff2") format("woff2");
+  src: url("/assets/fonts/atkinson-hyperlegible-next-latin-ext-wght-normal.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 400; src: url("fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 500; src: url("fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 600; src: url("fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 400; src: url("/assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 500; src: url("/assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-display: swap; font-weight: 600; src: url("/assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); }
 
 
 :root {
@@ -77,6 +77,37 @@
 }
 @media (max-width: 759px) { :root { --t-body: 17px; --t-lede: 19px; --s6: 64px; --s5: 48px; } }
 @media (min-width: 760px) { :root { --head-top: 40px; --head-gap: 16px; --head-bottom: 24px; } }
+
+/* Category badges: Guide, Fix and Tip (scripts/category.py). One accent per category, never colour alone: every badge
+   has its label and glyph. Accent: edges and figure fills. Ink: badge text and glyph on the tint (WCAG AA or better). */
+:root {
+  --cat-guide: #6a52b0; --cat-guide-ink: #4a3690; --cat-guide-tint: #e5def5;
+  --cat-fix: #c98a12; --cat-fix-ink: #6e4300; --cat-fix-tint: #f7e2b2;
+  --cat-tip: #1a8580; --cat-tip-ink: #105c58; --cat-tip-tint: #d3ebe8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cat-guide: #a593e6; --cat-guide-ink: #d4cbf5; --cat-guide-tint: #221c3a;
+    --cat-fix: #e3a83a; --cat-fix-ink: #f5d58f; --cat-fix-tint: #33270d;
+    --cat-tip: #4fbfb5; --cat-tip-ink: #a6e3dc; --cat-tip-tint: #0f2a28;
+  }
+}
+:root[data-theme="dark"] {
+  --cat-guide: #a593e6; --cat-guide-ink: #d4cbf5; --cat-guide-tint: #221c3a;
+  --cat-fix: #e3a83a; --cat-fix-ink: #f5d58f; --cat-fix-tint: #33270d;
+  --cat-tip: #4fbfb5; --cat-tip-ink: #a6e3dc; --cat-tip-tint: #0f2a28;
+}
+.cat-guide { --c: var(--cat-guide); --c-ink: var(--cat-guide-ink); --c-tint: var(--cat-guide-tint); }
+.cat-fix { --c: var(--cat-fix); --c-ink: var(--cat-fix-ink); --c-tint: var(--cat-fix-tint); }
+.cat-tip { --c: var(--cat-tip); --c-ink: var(--cat-tip-ink); --c-tint: var(--cat-tip-tint); }
+.cat { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.28em 0.62em 0.28em 0.5em; border-radius: var(--radius); background: var(--c-tint); color: var(--c-ink); font: 700 13px/1.15 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; }
+.cat svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.page-head > .cat, .result-head .cat { margin: 0 0 12px; }
+.page-head > .cat + h1, .result-head .cat + h1 { margin-top: 0; }
+.has-cat { display: flex; align-items: center; gap: 10px; }
+.has-cat > .cat { font-size: 11px; }
+.choices[class*="cat-"] a { border-top: 3px solid var(--c); }
+.glist .tx > .cat { display: flex; width: max-content; margin: 0 0 4px; font-size: 11px; }
 
 
 *, *::before, *::after { box-sizing: border-box; }

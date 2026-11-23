@@ -1,2 +1,10 @@
 import {defineConfig} from 'astro/config';
-export default defineConfig({site:'https://howtoirl.org',output:'static',build:{format:'file'},compressHTML:false});
+import renderBlockingScript from './scripts/render-blocking-script.mjs';
+export default defineConfig({
+  site: 'https://howtoirl.org',
+  output: 'static',
+  build: { format: 'file', assets: 'assets', inlineStylesheets: 'never' },
+  vite: { build: { assetsInlineLimit: 0 } },
+  integrations: [renderBlockingScript()],
+  compressHTML: false,
+});
