@@ -78,6 +78,37 @@
 @media (max-width: 759px) { :root { --t-body: 17px; --t-lede: 19px; --s6: 64px; --s5: 48px; } }
 @media (min-width: 760px) { :root { --head-top: 40px; --head-gap: 16px; --head-bottom: 24px; } }
 
+/* Category badges: Guide, Fix and Tip (scripts/category.py). One accent per category, never colour alone: every badge
+   has its label and glyph. Accent: edges and figure fills. Ink: badge text and glyph on the tint (WCAG AA or better). */
+:root {
+  --cat-guide: #6a52b0; --cat-guide-ink: #4a3690; --cat-guide-tint: #e5def5;
+  --cat-fix: #c98a12; --cat-fix-ink: #6e4300; --cat-fix-tint: #f7e2b2;
+  --cat-tip: #1a8580; --cat-tip-ink: #105c58; --cat-tip-tint: #d3ebe8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cat-guide: #a593e6; --cat-guide-ink: #d4cbf5; --cat-guide-tint: #221c3a;
+    --cat-fix: #e3a83a; --cat-fix-ink: #f5d58f; --cat-fix-tint: #33270d;
+    --cat-tip: #4fbfb5; --cat-tip-ink: #a6e3dc; --cat-tip-tint: #0f2a28;
+  }
+}
+:root[data-theme="dark"] {
+  --cat-guide: #a593e6; --cat-guide-ink: #d4cbf5; --cat-guide-tint: #221c3a;
+  --cat-fix: #e3a83a; --cat-fix-ink: #f5d58f; --cat-fix-tint: #33270d;
+  --cat-tip: #4fbfb5; --cat-tip-ink: #a6e3dc; --cat-tip-tint: #0f2a28;
+}
+.cat-guide { --c: var(--cat-guide); --c-ink: var(--cat-guide-ink); --c-tint: var(--cat-guide-tint); }
+.cat-fix { --c: var(--cat-fix); --c-ink: var(--cat-fix-ink); --c-tint: var(--cat-fix-tint); }
+.cat-tip { --c: var(--cat-tip); --c-ink: var(--cat-tip-ink); --c-tint: var(--cat-tip-tint); }
+.cat { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.28em 0.62em 0.28em 0.5em; border-radius: var(--radius); background: var(--c-tint); color: var(--c-ink); font: 700 13px/1.15 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; }
+.cat svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.page-head > .cat, .result-head .cat { margin: 0 0 12px; }
+.page-head > .cat + h1, .result-head .cat + h1 { margin-top: 0; }
+.has-cat { display: flex; align-items: center; gap: 10px; }
+.has-cat > .cat { font-size: 11px; }
+.choices[class*="cat-"] a { border-top: 3px solid var(--c); }
+.glist .tx > .cat { display: flex; width: max-content; margin: 0 0 4px; font-size: 11px; }
+
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }

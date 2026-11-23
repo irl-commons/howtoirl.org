@@ -11,6 +11,7 @@
 #   share               site: use the site's share card instead of one of its own (scripts/share.py)
 #   share_icon          the drawing on the page's share card, where the page has none of its own
 #   share_line          the line on the share card, where the page's own first sentence is too long
+#   category            fix, guide or tip for the badge (scripts/category.py), where the folder or section doesn't say
 
 index.html:
   title: How to IRL · Help for IRL streaming

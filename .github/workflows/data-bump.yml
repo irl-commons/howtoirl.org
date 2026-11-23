@@ -57,6 +57,8 @@ jobs:
         if: steps.release.outputs.version != ''
         run: |
           npm ci --ignore-scripts
+          # The build draws the share cards in the Chromium build playwright-core is pinned to.
+          npx --no-install playwright-core install --with-deps chromium-headless-shell
           npm audit signatures
           npm run build
           # Data pages may grow with a release; raise their page weight limits in this
@@ -78,6 +80,8 @@ jobs:
           git merge origin/main --no-edit
           # Recheck if main changed while the release was being tested.
           npm ci --ignore-scripts
+          # The build draws the share cards in the Chromium build playwright-core is pinned to.
+          npx --no-install playwright-core install --with-deps chromium-headless-shell
           npm audit signatures
           npm run build
           npm run budget -- --raise
