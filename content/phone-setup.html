@@ -89,6 +89,29 @@
           <li class="w"><span class="vh">Watch out: </span>Two SIMs on the same network help less: <a href="why-bonding.html#same-network">why</a>.</li>
         </ul>
 
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 290" role="img" aria-labelledby="two-t two-d">
+            <title id="two-t">Two connections, one stream</title>
+            <desc id="two-d">Your phone sends over two connections at once. One is its own mobile data, straight to the receiver. The other is Wi-Fi to a hotspot, which sends on over its own mobile data. The receiver on the internet joins both into one stream.</desc>
+            <rect class="tw-line" x="20" y="118" width="38" height="68" rx="6"/>
+            <path class="tw-line" d="M32 127h14"/>
+            <circle class="tw-dot" cx="39" cy="176" r="2.5"/>
+            <text class="lb" x="16" y="222">Your phone</text>
+            <rect class="tw-line" x="146" y="44" width="52" height="30" rx="9"/>
+            <circle class="tw-dot" cx="160" cy="59" r="2.5"/>
+            <text class="lb mid" x="172" y="106">Hotspot</text>
+            <path class="tw-down acc" d="M66 120L138 70"/>
+            <text class="lb" x="30" y="84">Wi-Fi</text>
+            <path class="tw-down acc" d="M206 59C264 59 302 76 314 114"/>
+            <text class="lb" x="236" y="38">Mobile data</text>
+            <path class="tw-down acc" d="M66 158H262"/>
+            <text class="lb mid" x="164" y="146">Mobile data</text>
+            <rect class="tw-line" x="270" y="120" width="112" height="70" rx="4"/>
+            <text class="lb mid" x="326" y="162">Receiver</text>
+            <path class="tw-thin" d="M326 196V232M318 224l8 8 8-8"/>
+            <text class="lb mid" x="326" y="266">One stream</text>
+          </svg>
+        </figure>
         <h3 id="moblink-setup">A spare phone with Moblink</h3>
         <p>Set this up before you go live.</p>
         <ol class="checklist">
@@ -102,6 +125,28 @@
           <li class="w"><span class="vh">Watch out: </span>On a spare Android phone, turn off energy saving for Moblink.</li>
         </ul>
 
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 300" role="img" aria-labelledby="spare-t spare-d">
+            <title id="spare-t">A spare phone lends its mobile data</title>
+            <desc id="spare-d">Your phone and a spare phone are on the same Wi-Fi. Your phone sends part of the stream over that Wi-Fi to the spare phone, and the spare phone sends it on over its own mobile data to the receiver. Your phone sends the rest over its own mobile data.</desc>
+            <text class="lb" x="16" y="36">Your phone</text>
+            <rect class="tw-line" x="30" y="58" width="38" height="68" rx="6"/>
+            <path class="tw-line" d="M42 67h14"/>
+            <circle class="tw-dot" cx="49" cy="116" r="2.5"/>
+            <text class="lb" x="384" y="36" text-anchor="end">Spare phone</text>
+            <rect class="tw-line" x="332" y="58" width="38" height="68" rx="6"/>
+            <path class="tw-line" d="M344 67h14"/>
+            <circle class="tw-dot" cx="351" cy="116" r="2.5"/>
+            <path class="tw-thin acc" d="M78 92H322M310 84l12 8-12 8"/>
+            <text class="lb mid" x="200" y="80">Wi-Fi</text>
+            <path class="tw-down" d="M49 136C49 206 88 236 136 236"/>
+            <path class="tw-down acc" d="M351 136C351 206 312 236 264 236"/>
+            <rect class="tw-line" x="144" y="204" width="112" height="64" rx="4"/>
+            <text class="lb mid" x="200" y="243">Receiver</text>
+            <text class="lb" x="16" y="292">Mobile data</text>
+            <text class="lb" x="384" y="292" text-anchor="end">Mobile data</text>
+          </svg>
+        </figure>
         <h3 id="needs-srtla">For bonding: SRTLA and a receiver</h3>
         <ul class="bul">
           <li>Two connections on the phone don't add up by themselves. Your app has to split the stream over both: that's <a href="glossary.html#bonding">bonding</a>. This guide bonds with SRTLA, the protocol Moblin's bonding status and connection settings below belong to.</li>
@@ -121,6 +166,32 @@
         <p class="short-answer"><strong>In short:</strong> during a private test, let each connection carry the stream on its own for a minute, and check that fresh video keeps arriving each time.</p>
         <p>Connected isn't the same as carrying. A phone can show a hotspot as connected while the stream doesn't use it. Switching one connection off only proves that the other one works, so this test does it both ways. The steps are for Moblin with an <code>srtla://</code> address; in another app, look for its statistics per connection.</p>
 
+        <figure class="line-fig why-fig guide-fig">
+          <svg class="line-svg" viewBox="0 0 400 320" role="img" aria-labelledby="test-t test-d">
+            <title id="test-t">Each connection on its own</title>
+            <desc id="test-d">Two tests, one after the other. In step 2, Cellular is switched off, so it carries none of the stream, and the second connection carries all of it to the receiver. In step 3, Wi-Fi is off, so the second connection carries nothing, and Cellular carries the whole stream.</desc>
+            <text class="lb lb-head" x="16" y="30">Step 2: Cellular off</text>
+            <rect class="tw-line" x="20" y="58" width="34" height="68" rx="6"/>
+            <path class="tw-line" d="M31 67h12"/>
+            <circle class="tw-dot" cx="37" cy="116" r="2.5"/>
+            <text class="lb" x="68" y="62">Cellular</text>
+            <path class="tw-up" d="M62 74H276"/>
+            <text class="lb" x="68" y="110">Second connection</text>
+            <path class="tw-down acc" d="M62 122H276"/>
+            <rect class="tw-line" x="282" y="54" width="104" height="80" rx="4"/>
+            <text class="lb mid" x="334" y="101">Receiver</text>
+            <text class="lb lb-head" x="16" y="196">Step 3: Wi-Fi off</text>
+            <rect class="tw-line" x="20" y="224" width="34" height="68" rx="6"/>
+            <path class="tw-line" d="M31 233h12"/>
+            <circle class="tw-dot" cx="37" cy="282" r="2.5"/>
+            <text class="lb" x="68" y="228">Cellular</text>
+            <path class="tw-down acc" d="M62 240H276"/>
+            <text class="lb" x="68" y="276">Second connection</text>
+            <path class="tw-up" d="M62 288H276"/>
+            <rect class="tw-line" x="282" y="220" width="104" height="80" rx="4"/>
+            <text class="lb mid" x="334" y="267">Receiver</text>
+          </svg>
+        </figure>
         <h3 id="test-setup">Before you start</h3>
         <ul class="bul">
           <li>Watch on a device whose connection you won't switch off, for example a computer on your home internet.</li>
