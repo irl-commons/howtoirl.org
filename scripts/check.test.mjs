@@ -6,8 +6,9 @@ import {movedUrl,pickPlatform} from '../src/scripts/addresses.ts';
 import {countText,fuzzy,guidesHash,parseHash} from '../src/scripts/help-query.ts';
 import path from 'node:path';
 import {HtmlValidate} from 'html-validate';
-import {createHash} from 'node:crypto';
-import {cardHash,pngSize,readCard} from './share-card.mjs';
+import {pngSize,readCard} from './share-card.mjs';
+// A page's text without its category badges (scripts/category.py), for tests about what is around them.
+const noBadge=t=>t.replace(/<span class="cat cat-[a-z]+"><svg[\s\S]*?<\/svg>[A-Za-z]+<\/span>\s*/g,'');
 const root=path.resolve('dist');
 const config=JSON.parse(await readFile('site.json','utf8'));
 const docs=new Map(await Promise.all(config.pages.map(async name=>[name,await readFile(path.join(root,name),'utf8')])));
@@ -58,17 +59,17 @@ test('Every page has complete link preview tags and a current 1200x630 share ima
   assert.equal(one('name','twitter:image:alt'),one('property','og:image:alt'),name);
   const image=one('property','og:image');
   assert.equal(one('name','twitter:image'),image,name);
-  const m=new RegExp(`^https://${config.domain.replaceAll('.','\\.')}/(assets/share/[a-z0-9-]+\\.png)\\?v=([0-9a-f]{10}|missing)$`).exec(image);
+  const m=new RegExp(`^https://${config.domain.replaceAll('.','\\.')}/(assets/share/[a-z0-9-]+\\.png)\\?v=([0-9a-f]{10})$`).exec(image);
   assert.ok(m,`${name}: ${image}`);
   const [,file,v]=m;used.add(file);
   assert.equal(share.pages[name],file,name);
-  const png=await readFile(`public/${file}`).catch(()=>assert.fail(`${name}: ${file} is missing; run npm run share-images, then build again`));
+  const png=await readFile(`dist/${file}`).catch(()=>assert.fail(`${name}: ${file} is missing; run npm run build`));
   assert.deepEqual(pngSize(png),[1200,630],file);
-  assert.equal(readCard(png),cardHash(share.cards[file]),`${file} no longer matches its page; run npm run share-images, then build again`);
-  assert.equal(v,createHash('sha256').update(png).digest('hex').slice(0,10),`${name}: the address of ${file} carries an old hash; build again`);
-  assert.ok(png.equals(await readFile(`dist/${file}`)),`dist/${file} is an old copy; build again`);
+  assert.equal(readCard(png),share.cards[file].hash,`${file} no longer matches its page; run npm run build`);
+  assert.equal(v,share.cards[file].hash.slice(0,10),`${name}: the address of ${file} carries an old hash; build again`);
  }
- for(const file of await readdir('public/assets/share'))assert.ok(used.has(`assets/share/${file}`),`public/assets/share/${file} is used by no page`);
+ for(const file of await readdir('dist/assets/share'))assert.ok(used.has(`assets/share/${file}`),`dist/assets/share/${file} is used by no page`);
+ await assert.rejects(stat('public/assets/share'),'share images are build output (dist/assets/share/), not files in public/');
 });
 test('Local links and fragments resolve',async()=>{
  for(const [name,text] of docs)for(const match of text.matchAll(/(?:href|src)="([^\"]+)"/g)){
@@ -175,7 +176,7 @@ test('Home: visible h1, no lede, steps bar, SIMs note or pager, the four groups 
   'Data plans and SIMs — Upload speed and data use','Why more than one network? — A second one covers the gaps',
   "Find what broke while you're live — Trace the stream step by step","RTMP, SRT or SRTLA? — Which one fits your connection","Power, and taking power banks on a flight — Power banks, cables, flights",
   "How to IRL stream with your phone — Set up, then test each connection"]);
- assert.deepEqual([...start.matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
+ assert.deepEqual([...noBadge(start).matchAll(/<h2 class="grp[^"]*"[^>]*>([^<]+)</g)].map(m=>m[1]),['Start or add something','Improve your setup',"Trying to stream, but something's not working?",'Learn more']);
 });
 
 test('Answer blocks are collapsible, with the first one open; step-by-step answers have no folds', ()=>{
@@ -504,7 +505,7 @@ test('Every answer has its own page, title, description and share image; old hom
 
 test("Trying to stream, but something's not working?: four symptom cards, each with checks, sources and a still-stuck line", ()=>{
  const home=docs.get('index.html');
- assert.ok(/<h2 class="grp live" id="fix"[^>]*>Trying to stream, but something's not working\?<\/h2>\s*<ul class="choices symptoms"/.test(home));
+ assert.ok(/<h2 class="grp has-cat" id="fix"[^>]*>Trying to stream, but something's not working\?<\/h2>\s*<ul class="choices symptoms cat-fix"/.test(noBadge(home)));
  for(const id of ['live-not-on-platform','picture-frozen','no-sound-or-alerts','second-link-idle']){
   const h=answerHtml(home,id);
   assert.ok(h.includes('<details class="more fold sources" open><summary>Sources</summary><p class="tip-src"><a href="https://'),id);
@@ -613,7 +614,7 @@ test('Top navigation: Start, Improve, Fix and Help; Improve goes to its group on
  assert.ok(/<a href="\/help" data-label="Help" aria-current="page">/.test(nav('help.html')),'Help is the current item on Help');
  assert.ok(/<a href="\/help" data-label="Help" aria-current="true">/.test(nav('data-plans.html')),'a page under Help marks Help');
  const home=docs.get('index.html');
- assert.ok(/<h2 class="grp" id="improve"[^>]*>Improve your setup<\/h2>/.test(home)&&/<h2 class="grp live" id="fix"/.test(home));
+ assert.ok(/<h2 class="grp has-cat" id="improve"[^>]*>Improve your setup<\/h2>/.test(noBadge(home))&&/<h2 class="grp has-cat" id="fix"/.test(home));
  assert.ok(!home.includes('grp-note')&&!/href="#(?:fix|improve)"/.test(home),'no jump-link lines on Home');
  assert.ok(/<footer[\s\S]*<a href="\/glossary"/.test(home),'Glossary stays in the footer');
 });
@@ -640,7 +641,7 @@ test('/fix: the problems with a link to send each, Improve for what happens ever
  const rows=[...fix.matchAll(/<li><a class="fix-t" href="([^"]+)">[^<]+<\/a><span class="fix-s">[^<]+<\/span><button type="button" class="copy-link" data-copy="([^"]+)" aria-label="Copy link for chat: [^"]+" hidden>Copy link for chat<\/button><\/li>/g)];
  assert.deepEqual(rows.map(m=>[m[1],m[2]]),FIX.map(id=>[`/fix/${id}`,`https://howtoirl.org/fix/${id}`]));
  const band=fix.slice(fix.indexOf('<section class="fix-band"'),fix.indexOf('</section>',fix.indexOf('<section class="fix-band"')));
- assert.ok(/<h2 id="every-time-h">Happens every time\?/.test(band));
+ assert.ok(/<h2 id="every-time-h" class="has-cat">Happens every time\?/.test(noBadge(band)));
  assert.deepEqual([...band.matchAll(/<li><a href="([^"]+)">/g)].map(m=>m[1]),['/second-network','/more','/cloud','/satellite']);
  assert.ok(fix.includes('<a href="/something-wrong">Find what broke while you&#39;re live</a>')||fix.includes('<a href="/something-wrong">Find what broke while you\'re live</a>'));
  const home=docs.get('index.html');
@@ -670,4 +671,51 @@ test('/tips lists every tip; each tip has its answer, three steps, a check, its 
   assert.equal((how.match(/<p class="stamp">Checked <time datetime="2026-11-22">/g)||[]).length,1,`${name}: Checked`);
  }
  assert.ok(/<li>If the picture looks hazy or lights have halos, gently wipe the lens/.test(docs.get('phone-setup.html'))&&docs.get('phone-setup.html').includes('href="https://support.apple.com/en-us/102514"'),'Phone setup: the sourced lens line');
+});
+
+test('Fix, guide and tip badges: above each h1, on Home groups and the /fix band, on Help\'s own guides, and on the share cards', async()=>{
+ const share=JSON.parse(await readFile('.generated/share.json','utf8'));
+ const want=name=>name.startsWith('fix/')?'fix':name.startsWith('tips/')?'tip':
+  ['index.html','help.html','glossary.html','links.html','fix.html','tips.html','contact.html','legal-notice.html','impressum.html','privacy.html','datenschutz.html'].includes(name)?null:'guide';
+ const badge=c=>new RegExp(`<span class="cat cat-${c}"><svg viewBox="0 0 16 16" aria-hidden="true">[\\s\\S]*?</svg>${{guide:'Guide',fix:'Fix',tip:'Tip'}[c]}</span>\\s*<h1`);
+ for(const [name,text] of docs){
+  const main=text.slice(text.indexOf('<main'),text.indexOf('</main>'));
+  const c=want(name);
+  if(c)assert.ok(badge(c).test(main),`${name}: a ${c} badge right above the h1`);
+  else assert.ok(!/<span class="cat cat-[a-z]+">[\s\S]*?<\/span>\s*<h1/.test(main),`${name}: no badge above the h1`);
+  const card=share.cards[share.pages[name]];
+  assert.equal(card.category,c,`${name}: share card category`);
+ }
+ const home=docs.get('index.html');
+ for(const [id,c] of [['improve','guide'],['fix','fix']])assert.ok(new RegExp(`<h2 class="grp has-cat" id="${id}"[^>]*><span class="cat cat-${c}">`).test(home),`Home ${id}: ${c} badge in the heading`);
+ assert.ok(/<ul class="choices learn"/.test(home),'Learn more mixes kinds: no badge, no edge');
+ assert.ok(!home.includes('grp live'),'the red dot gave way to the Fix badge');
+ const help=docs.get('help.html');
+ assert.ok(/<span class="tx"><span class="cat cat-fix">[\s\S]*?<\/span><a class="tt" href="\/fix\/picture-frozen">/.test(help),'Help: fix rows carry the Fix badge');
+ assert.ok(/<span class="tx"><span class="cat cat-guide">[\s\S]*?<\/span><a class="tt" href="\/protocols">/.test(help),'Help: guide rows carry the Guide badge');
+ const css=await readFile('src/styles/site.css','utf8').catch(()=>readFile('public/assets/style.css','utf8'));
+ for(const c of ['guide','fix','tip'])for(const k of ['','-ink','-tint'])assert.equal(css.split(`--cat-${c}${k}:`).length-1,3,`--cat-${c}${k} in light, dark and the dark theme`);
+});
+
+test('Moving the stylesheet to src/styles/ with root font addresses keeps every share card address', async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-c', `
+import pathlib, shutil, sys, tempfile
+sys.path.insert(0, 'scripts')
+import share
+before = share.template_hash()
+with tempfile.TemporaryDirectory() as tmp:
+    root = pathlib.Path(tmp)
+    for path in share.TEMPLATE:
+        if path != 'public/assets/style.css':
+            (root / path).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(path, root / path)
+    css = share.stylesheet().replace(b'url("fonts/', b'url("/assets/fonts/')
+    (root / 'src/styles').mkdir(parents=True)
+    (root / 'src/styles/site.css').write_bytes(css)
+    share.ROOT = root
+    assert share.template_hash() == before, 'moving the stylesheet changed the card hash'
+    (root / 'src/styles/site.css').write_bytes(css + b'.x{}')
+    assert share.template_hash() != before, 'a stylesheet change must change the card hash'
+`],{stdio:'pipe'});
 });
