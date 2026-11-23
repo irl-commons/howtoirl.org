@@ -9,7 +9,7 @@ const {page} = Astro.props;
 <html lang={page.lang}>
 <head>
 <Head page={page} />
-<script is:inline src="/assets/site.js"></script>
+<script>import "../scripts/site.ts";</script>
 </head>
 <body>
 <Header page={page} />
