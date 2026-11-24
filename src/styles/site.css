@@ -1855,3 +1855,10 @@ details.nerd > p { font-size: 16px; }
 .guide-page .guide-fig { max-width: 440px; }
 .guide-fig .lb { font-size: 22px; }
 .guide-fig .lb-head { font-weight: 700; }
+
+/* Section marks: a small drawing at the right of each guide section heading, in the card illustrations' style. */
+.part > h2:has(> .sec-ill) { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s2); }
+.sec-ill { flex: none; order: 2; width: 84px; height: 56px; color: var(--fg); }
+@media (min-width: 760px) { .sec-ill { width: 120px; height: 80px; } }
+@media (forced-colors: active) { .sec-ill { forced-color-adjust: auto; } }
+@media print { .sec-ill { display: none; } }
