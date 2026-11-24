@@ -1291,6 +1291,18 @@ details.sources > .tip-src { display: block; margin-top: 4px; margin-bottom: 8px
   .why-step > .why-text { grid-column: 1; }
   .why-page .why-step > .why-fig { grid-column: 2; margin: 4px 0 0; max-width: none; }
 }
+/* One guide layout: each drawing sits beside the text it belongs to from 900 px, in why-bonding's step markup.
+   Guides keep their plain section flow, so a step gets no rule above it, and text outside a step keeps its width. */
+.plans-page:not(.why-page) .why-step { margin-top: var(--s3); padding-top: 0; border-top: 0; }
+.plans-page:not(.why-page) .why-step:has(> .why-text > h3:first-child) { margin-top: var(--s4); }
+.plans-page:not(.why-page) .read > .why-step:first-child { margin-top: 0; }
+.plans-page:not(.why-page) .why-text > h3 { margin-top: 0; }
+@media (min-width: 900px) {
+  .plans-page:not(.why-page) .read:has(> .why-step) { max-width: none; }
+  .plans-page:not(.why-page) .read:has(> .why-step) > :not(.why-step) { max-width: var(--read); }
+  .plans-page:not(.why-page) .read > .why-step { display: grid; grid-template-columns: minmax(0, 58fr) minmax(0, 42fr); column-gap: var(--s4); align-items: start; }
+  .plans-page:not(.why-page) .why-step > figure { grid-column: 2; margin: 4px 0 0; max-width: none; }
+}
 @media (forced-colors: active) {
   .why-fig .acc, .why-fig .acc-pieces rect, .why-fig .acc-box, .why-fig .acc-extra { stroke: Highlight; }
   .why-fig .acc-text { fill: Highlight; }
